@@ -12,31 +12,42 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // 게임 배경
-        this.add.rectangle(400, 300, 1000, 800, 0x000000);
+        // Set world bounds to be larger than the visible area
+        this.physics.world.setBounds(0, 0, 2000, 2000);
 
-        // 플레이어 생성
+        // Create a larger background
+        this.add.rectangle(1000, 1000, 2000, 2000, 0x000000);
+
+        // Draw world border
+        const borderGraphics = this.add.graphics();
+        borderGraphics.lineStyle(4, 0xffffff, 1); // White border with 4px thickness
+        borderGraphics.strokeRect(0, 0, 2000, 2000);
+
+        // Create player
         this.player = new Player(this);
         this.add.existing(this.player);
         this.physics.add.existing(this.player);
         this.player.setCollideWorldBounds(true);
 
-        // 에너미 그룹
+        // Set camera to follow the player
+        this.cameras.main.startFollow(this.player);
+
+        // Enemy group
         this.enemies = this.physics.add.group();
         this.createEnemies();
 
-        // 충돌 설정
+        // Collision settings
         this.physics.add.collider(this.player, this.enemies, this.hitEnemy, null, this);
 
-        // 입력 설정
+        // Input settings
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        // 스코어 텍스트
-        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
+        // Score text
+        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' }).setScrollFactor(0);
 
-        // 정기적으로 에너미 생성
+        // Regularly create enemies
         this.time.addEvent({
-            delay: 1000, // 1초마다
+            delay: 1000, // Every second
             callback: this.createEnemies,
             callbackScope: this,
             loop: true
