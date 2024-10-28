@@ -36,14 +36,17 @@ export default class GameScene extends Phaser.Scene {
         this.enemies = this.physics.add.group();
         this.createEnemies();
 
-        // Collision settings
-        this.physics.add.collider(this.player, this.enemies, this.hitEnemy, null, this);
+        // Overlap settings instead of collider
+        this.physics.add.overlap(this.player, this.enemies, this.hitEnemy, null, this);
 
         // Input settings
         this.cursors = this.input.keyboard.createCursorKeys();
 
         // Score text
         this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' }).setScrollFactor(0);
+
+        // Health text
+        this.healthText = this.add.text(16, 50, 'Health: 100', { fontSize: '32px', fill: '#f00' }).setScrollFactor(0);
 
         // Regularly create enemies
         this.time.addEvent({
@@ -52,6 +55,10 @@ export default class GameScene extends Phaser.Scene {
             callbackScope: this,
             loop: true
         });
+
+        // Listen to health changes
+        this.events.on('playerHealthChanged', this.updateHealthText, this);
+        this.events.on('playerDead', this.gameOver, this);
     }
 
     createEnemies() {
@@ -63,19 +70,29 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
-    update() {
-        if (this.player) {
-            this.player.update(this.cursors);
-        }
+    hitEnemy(player, enemy) {
+        // Since enemies now handle their own attacks based on range,
+        // you might want to handle collision differently or remove this method.
+        // For now, we'll keep it to disable enemy on collision and increase score.
+        enemy.disableBody(true, true);
+        this.score += 10;
+        this.scoreText.setText('Score: ' + this.score);
+    }
 
+    update(time, delta) {
+        this.player.update(this.cursors);
+
+        // Update each enemy
         this.enemies.getChildren().forEach(enemy => {
             enemy.update(this.player);
         });
     }
 
-    hitEnemy(player, enemy) {
-        enemy.disableBody(true, true);
-        this.score += 10;
-        this.scoreText.setText('Score: ' + this.score);
+    updateHealthText(health) {
+        this.healthText.setText('Health: ' + health);
+    }
+
+    gameOver() {
+        this.scene.start('GameOverScene');
     }
 }

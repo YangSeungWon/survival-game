@@ -17,6 +17,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setBounce(1);
 
         this.speed = 160; // 이동 속도를 변수로 설정
+        this.health = 100; // 초기 체력 설정
     }
 
     update(cursors) {
@@ -48,5 +49,23 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // 정규화된 벡터에 speed를 곱하여 속도 설정
         this.setVelocity(velocityX * this.speed, velocityY * this.speed);
+    }
+
+    takeDamage(amount) {
+        this.health -= amount;
+        this.scene.events.emit('playerHealthChanged', this.health);
+
+        // Flash the player sprite to indicate damage
+        this.scene.tweens.add({
+            targets: this,
+            alpha: 0,
+            duration: 100,
+            yoyo: true,
+            repeat: 5
+        });
+
+        if (this.health <= 0) {
+            this.scene.events.emit('playerDead');
+        }
     }
 }
