@@ -1,5 +1,5 @@
-import FastEnemy from '../sprites/FastEnemy.js';
-import StrongEnemy from '../sprites/StrongEnemy.js';
+import FastEnemy from '../sprites/enemies/FastEnemy.js';
+import StrongEnemy from '../sprites/enemies/StrongEnemy.js';
 import Player from '../sprites/Player.js';
 
 export default class GameScene extends Phaser.Scene {
