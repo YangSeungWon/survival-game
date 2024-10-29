@@ -59,9 +59,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.tweens.add({
             targets: this,
             alpha: 0,
-            duration: 100,
+            duration: 20,
             yoyo: true,
-            repeat: 5
+            repeat: 0,
+            onComplete: () => {
+                this.alpha = 1; // Ensure alpha is reset to 1
+            }
         });
 
         if (this.health <= 0) {
