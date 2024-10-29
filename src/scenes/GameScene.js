@@ -144,6 +144,6 @@ export default class GameScene extends Phaser.Scene {
     }
 
     gameOver() {
-        this.scene.start('GameOverScene');
+        this.scene.start('GameOverScene', { score: this.score, time: this.elapsedTime });
     }
 }
