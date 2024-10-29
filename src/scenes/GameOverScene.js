@@ -4,10 +4,12 @@ export default class GameOverScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(400, 300, 'Game Over', { fontSize: '64px', fill: '#ff0000' }).setOrigin(0.5);
-        this.add.text(400, 400, 'Press Space to Restart', { fontSize: '32px', fill: '#ffffff' }).setOrigin(0.5);
+        const { width, height } = this.scale;
 
-        this.input.keyboard.once('keydown_SPACE', () => {
+        this.add.text(width / 2, height / 2 - 50, 'Game Over', { fontSize: '64px', fill: '#ff0000' }).setOrigin(0.5);
+        this.add.text(width / 2, height / 2 + 50, 'Press Space to Restart', { fontSize: '32px', fill: '#ffffff' }).setOrigin(0.5);
+
+        this.input.keyboard.once('keydown-SPACE', () => {
             this.scene.start('GameScene');
         });
     }
