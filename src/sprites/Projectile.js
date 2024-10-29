@@ -1,5 +1,4 @@
 import Enemy from './enemies/Enemy.js';
-import Player from './player.js';
 
 export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     /**
