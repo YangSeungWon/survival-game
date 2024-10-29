@@ -8,6 +8,7 @@ export default class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
         this.score = 0;
+        this.elapsedTime = 0;
     }
 
     preload() {
@@ -72,6 +73,9 @@ export default class GameScene extends Phaser.Scene {
         this.events.on('playerHealthChanged', this.updateHealthText, this);
         this.events.on('playerDead', this.gameOver, this);
 
+        // Time text
+        this.timeText = this.add.text(16, 84, 'Time: 0:00', { fontSize: '32px', fill: '#fff' }).setScrollFactor(0);
+
         // Check if the device is a mobile device
         const isMobile = /Mobi|Android/i.test(navigator.userAgent);
         if (isMobile) {
@@ -110,6 +114,16 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+        // Update elapsed time
+        this.elapsedTime += delta / 1000; // Convert delta to seconds
+
+        // Calculate minutes and seconds
+        const minutes = Math.floor(this.elapsedTime / 60);
+        const seconds = Math.floor(this.elapsedTime % 60);
+
+        // Update time text
+        this.timeText.setText(`Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
+
         // Update player movement based on joystick if smartphone, else use keyboard
         if (this.joystick) {
             // Use joystick input
