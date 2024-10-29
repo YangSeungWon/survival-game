@@ -1,12 +1,12 @@
 import Enemy from './Enemy.js';
 
 export default class RangedEnemy extends Enemy {
-    constructor(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, projectileSpeed, projectileColor, projectileSize, projectilePool) {
+    constructor(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, projectileSpeed, projectileColor, projectileSize) {
         super(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange);
         this.projectileSpeed = projectileSpeed;
         this.projectileColor = projectileColor;
         this.projectileSize = projectileSize;
-        this.projectilePool = projectilePool;
+        this.projectilePool = scene.projectilePool;
     }
 
     attack(player) {
@@ -16,12 +16,24 @@ export default class RangedEnemy extends Enemy {
         this.setVelocity(0, 0);
 
         this.scene.time.delayedCall(this.attackSpeed, () => {
-            this.projectilePool.fireProjectile(this.x, this.y, player.x, player.y, this.projectileSpeed, this.attackPower, this.projectileColor, this.projectileSize);
+            this.projectilePool.fireProjectile(
+                this.x, 
+                this.y, 
+                player.x, 
+                player.y, 
+                this.projectileSpeed, 
+                this.attackPower, 
+                this.projectileColor, 
+                this.projectileSize,
+                'enemy'
+            );
             this.canMove = true;
 
-            this.scene.time.delayedCall(this.attackSpeed, () => {
-                this.canAttack = true;
-            }, [], this);
+            if (this.active && this.visible) {
+                this.scene.time.delayedCall(this.attackSpeed, () => {
+                    this.canAttack = true;
+                }, [], this);
+            }
         }, [], this);
     }
 }

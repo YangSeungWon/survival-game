@@ -19,15 +19,14 @@ export default class ProjectilePool {
         }
     }
 
-    fireProjectile(x, y, targetX, targetY, speed, attackPower, color, projectileSize) {
+    fireProjectile(x, y, targetX, targetY, speed, attackPower, color, projectileSize, faction) {
         var projectile = this.pool.getFirstDead();
         // if failed to get projectile, create new one
         if (!projectile) {
             projectile = new Projectile(this.scene, x, y);
             this.pool.add(projectile);
         }
-
-        projectile.fire(x, y, targetX, targetY, speed, attackPower, color, projectileSize);
+        projectile.fire(x, y, targetX, targetY, speed, attackPower, color, projectileSize, faction);
         projectile.setActive(true);
         projectile.setVisible(true);
     }

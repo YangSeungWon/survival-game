@@ -48,6 +48,18 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     takeDamage(amount) {
         this.health -= amount;
+
+        this.scene.tweens.add({
+            targets: this,
+            alpha: 0,
+            duration: 20,
+            yoyo: true,
+            repeat: 0,
+            onComplete: () => {
+                this.alpha = 1; // Ensure alpha is reset to 1
+            }
+        });
+
         if (this.health <= 0) {
             this.destroy();
         }

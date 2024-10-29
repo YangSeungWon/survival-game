@@ -1,3 +1,6 @@
+import Enemy from './enemies/Enemy.js';
+import Player from './player.js';
+
 export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     /**
      * 프로젝트를 생성합니다.
@@ -13,9 +16,6 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         // 초기 상태 설정
         this.setActive(false);
         this.setVisible(false);
-
-        // 충돌 설정 (예: 플레이어와 충돌 시 피해 주기)
-        this.scene.physics.add.overlap(this, this.scene.player, this.handleCollision, null, this);
     }
 
     /**
@@ -28,8 +28,9 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
      * @param {number} attackPower - 프로젝트가 주는 피해량.
      * @param {number} color - 발사체의 색상.
      * @param {number} projectileSize - 발사체의 크기.
+     * @param {string} faction - 프로젝트의 팩션.
      */
-    fire(x, y, targetX, targetY, speed, attackPower, color, projectileSize) {
+    fire(x, y, targetX, targetY, speed, attackPower, color, projectileSize, faction) {
         // change texture, if not exist with 
         const textureKey = this.getTextureKey(projectileSize, color);
         if (!this.scene.textures.exists(textureKey)) {
@@ -44,9 +45,17 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         const angle = Phaser.Math.Angle.Between(x, y, targetX, targetY);
         this.body.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
         this.attackPower = attackPower;
+        this.faction = faction; // Set the faction of the projectile
 
         // 발사체의 색상 설정
         this.setTint(color);
+
+        // Adjust collision based on faction
+        if (this.faction === 'player') {
+            this.scene.physics.add.overlap(this, this.scene.enemies, this.handleCollision, null, this);
+        } else if (this.faction === 'enemy') {
+            this.scene.physics.add.overlap(this, this.scene.player, this.handleCollision, null, this);
+        }
     }
 
     getTextureKey(projectileSize, color) {
@@ -64,15 +73,17 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     /**
      * 충돌 처리 메서드.
      * @param {Phaser.GameObjects.GameObject} projectile - 충돌한 프로젝트.
-     * @param {Phaser.GameObjects.GameObject} player - 충돌한 플레이어.
+     * @param {Phaser.GameObjects.GameObject} target - 충돌한 타겟.
      */
-    handleCollision(projectile, player) {
-        if (!projectile.active) return; // 이미 비활성화된 발사체는 무시
-
-        player.takeDamage(this.attackPower);
-        console.log(`플레이어가 ${this.attackPower}의 피해를 입었습니다.`);
-        projectile.setActive(false);
-        projectile.setVisible(false);
-        projectile.body.setVelocity(0, 0);
+    handleCollision(projectile, target) {
+        if (projectile.active && projectile.visible) {
+            if ((projectile.faction === 'player' && target instanceof Enemy)
+                || (projectile.faction === 'enemy')
+            ) {
+                target.takeDamage(projectile.attackPower);
+                projectile.setActive(false);
+                projectile.setVisible(false);
+            }   
+        }
     }
 }

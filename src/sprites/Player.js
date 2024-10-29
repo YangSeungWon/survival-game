@@ -18,6 +18,23 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.speed = 160; // 이동 속도를 변수로 설정
         this.health = 100; // 초기 체력 설정
+
+        // 공격 관련 변수 설정
+        this.attackSpeed = 300; // 공격 속도 (밀리초)
+        this.projectileSpeed = 300; // 발사체 속도
+        this.attackPower = 1; // 공격력
+        this.projectileColor = 0xffffff; // 발사체 색상
+        this.projectileSize = 3; // 발사체 크기
+
+        this.facingDirection = { x: 0, y: 0 }; // Add a property to store facing direction
+
+        // 자동 공격 타이머 설정
+        this.scene.time.addEvent({
+            delay: this.attackSpeed,
+            callback: this.shoot,
+            callbackScope: this,
+            loop: true
+        });
     }
 
     update(cursors, joystick) {
@@ -30,6 +47,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             if (length !== 0) {
                 forceX /= length;
                 forceY /= length;
+                this.facingDirection = { x: forceX, y: forceY }; // Update facing direction
             }
 
             this.setVelocity(forceX * this.speed, forceY * this.speed);
@@ -57,10 +75,27 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             if (length !== 0) {
                 velocityX /= length;
                 velocityY /= length;
+                this.facingDirection = { x: velocityX, y: velocityY }; // Update facing direction
             }
 
             this.setVelocity(velocityX * this.speed, velocityY * this.speed);
         }
+    }
+
+    shoot() {
+        const { x: directionX, y: directionY } = this.facingDirection;
+
+        this.scene.projectilePool.fireProjectile(
+            this.x, 
+            this.y, 
+            this.x + directionX * 100, // Target X coordinate
+            this.y + directionY * 100, // Target Y coordinate
+            this.projectileSpeed, // Speed of the projectile
+            this.attackPower,  // Attack power of the projectile
+            this.projectileColor, // Color of the projectile
+            this.projectileSize, // Size of the projectile
+            'player'
+        );
     }
 
     takeDamage(amount) {
@@ -82,10 +117,5 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.health <= 0) {
             this.scene.events.emit('playerDead');
         }
-    }
-
-    shoot(scene) {
-        // Implement shooting logic, e.g., firing a projectile
-        // scene.projectilePool.fireProjectile(this.x, this.y, /* target coordinates */, /* other parameters */);
     }
 }

@@ -93,13 +93,17 @@ export default class GameScene extends Phaser.Scene {
 
     createEnemies() {
         const enemyType = Phaser.Math.RND.pick(['FastEnemy', 'StrongEnemy', 'GunEnemy']);
+        var enemy;
         if (enemyType === 'FastEnemy') {
-            this.enemies.add(new FastEnemy(this));
+            enemy = new FastEnemy(this);
         } else if (enemyType === 'StrongEnemy') {
-            this.enemies.add(new StrongEnemy(this));
+            enemy = new StrongEnemy(this);
         } else if (enemyType === 'GunEnemy') {
-            this.enemies.add(new GunEnemy(this, this.projectilePool));
+            enemy = new GunEnemy(this);
+        } else {
+            console.error("Unknown enemy type: " + enemyType);
         }
+        this.enemies.add(enemy);
     }
 
     hitEnemy(player, enemy) {

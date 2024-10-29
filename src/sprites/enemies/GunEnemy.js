@@ -1,7 +1,7 @@
 import RangedEnemy from './RangedEnemy.js';
 
 export default class GunEnemy extends RangedEnemy {
-    constructor(scene, projectilePool) {
+    constructor(scene) {
         const color = 0x5555ff;   
         const size = 15;
         const speed = 100;
@@ -15,6 +15,6 @@ export default class GunEnemy extends RangedEnemy {
         const projectileColor = 0xababff;
         const projectileSize = 5;       
 
-        super(scene, color, size, speed, health, attackSpeed, attackPower, attackRange, projectileSpeed, projectileColor, projectileSize, projectilePool);
+        super(scene, color, size, speed, health, attackSpeed, attackPower, attackRange, projectileSpeed, projectileColor, projectileSize);
     }
 }
