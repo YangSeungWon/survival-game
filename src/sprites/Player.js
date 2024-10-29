@@ -20,35 +20,47 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.health = 100; // 초기 체력 설정
     }
 
-    update(cursors) {
-        this.setVelocity(0);
+    update(cursors, joystick) {
+        if (joystick) {
+            // Normalize joystick input
+            let forceX = joystick.forceX;
+            let forceY = joystick.forceY;
+            const length = Math.sqrt(forceX * forceX + forceY * forceY);
 
-        let velocityX = 0;
-        let velocityY = 0;
+            if (length !== 0) {
+                forceX /= length;
+                forceY /= length;
+            }
 
-        if (cursors.left.isDown) {
-            velocityX = -1;
-        } else if (cursors.right.isDown) {
-            velocityX = 1;
+            this.setVelocity(forceX * this.speed, forceY * this.speed);
+        } else {
+            // 키보드 입력 사용
+            this.setVelocity(0);
+
+            let velocityX = 0;
+            let velocityY = 0;
+
+            if (cursors.left.isDown) {
+                velocityX = -1;
+            } else if (cursors.right.isDown) {
+                velocityX = 1;
+            }
+
+            if (cursors.up.isDown) {
+                velocityY = -1;
+            } else if (cursors.down.isDown) {
+                velocityY = 1;
+            }
+
+            const length = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+
+            if (length !== 0) {
+                velocityX /= length;
+                velocityY /= length;
+            }
+
+            this.setVelocity(velocityX * this.speed, velocityY * this.speed);
         }
-
-        if (cursors.up.isDown) {
-            velocityY = -1;
-        } else if (cursors.down.isDown) {
-            velocityY = 1;
-        }
-
-        // 벡터의 길이를 계산
-        const length = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
-
-        // 벡터의 길이가 0이 아닐 때만 정규화
-        if (length !== 0) {
-            velocityX /= length;
-            velocityY /= length;
-        }
-
-        // 정규화된 벡터에 speed를 곱하여 속도 설정
-        this.setVelocity(velocityX * this.speed, velocityY * this.speed);
     }
 
     takeDamage(amount) {
@@ -70,5 +82,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.health <= 0) {
             this.scene.events.emit('playerDead');
         }
+    }
+
+    shoot(scene) {
+        // Implement shooting logic, e.g., firing a projectile
+        // scene.projectilePool.fireProjectile(this.x, this.y, /* target coordinates */, /* other parameters */);
     }
 }

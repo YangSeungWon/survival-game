@@ -11,6 +11,14 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.script('rexvirtualjoystick', 'https://cdn.jsdelivr.net/npm/phaser3-rex-plugins/dist/rexvirtualjoystickplugin.min.js', true);
+        // The plugin is null because it hasn't been installed yet - we've only loaded the script
+        // We need to install the plugin before we can use it
+        // We need to wait for the script to load before installing
+        this.load.once('complete', () => {
+            this.plugins.install('rexvirtualjoystick', window.rexvirtualjoystickplugin, true);
+            console.log('Plugin after install:', this.plugins.get('rexvirtualjoystick'));
+        });
     }
 
     create() {
@@ -63,6 +71,24 @@ export default class GameScene extends Phaser.Scene {
         // Listen to health changes
         this.events.on('playerHealthChanged', this.updateHealthText, this);
         this.events.on('playerDead', this.gameOver, this);
+
+        // Check if the device is a mobile device
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+        if (isMobile) {
+            // Add Virtual Joystick for mobile devices
+            this.joystick = this.plugins.get('rexvirtualjoystick').add(this, {
+                x: this.cameras.main.width - 100,
+                y: this.cameras.main.height - 100,
+                radius: 50,
+                base: this.add.circle(0, 0, 50, 0x888888).setAlpha(0.5),
+                thumb: this.add.circle(0, 0, 25, 0xcccccc).setAlpha(0.8),
+                dir: '8dir', // Allow 8-directional movement
+                fixed: true // Fix joystick to camera
+            });
+
+            // Create cursor keys from joystick
+            this.joystickCursors = this.joystick.createCursorKeys();
+        }
     }
 
     createEnemies() {
@@ -80,7 +106,14 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
-        this.player.update(this.cursors);
+        // Update player movement based on joystick if smartphone, else use keyboard
+        if (this.joystick) {
+            // Use joystick input
+            this.player.update(this.joystickCursors, this.joystick);
+        } else {
+            // Use keyboard input
+            this.player.update(this.cursors);
+        }
 
         // Update each enemy
         this.enemies.getChildren().forEach(enemy => {

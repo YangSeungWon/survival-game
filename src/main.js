@@ -4,8 +4,12 @@ import GameOverScene from './scenes/GameOverScene.js';
 
 const config = {
     type: Phaser.AUTO,
-    width: 1000,
-    height: 800,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    scale: {
+        mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
     physics: {
         default: 'arcade',
         arcade: {
@@ -13,7 +17,7 @@ const config = {
             debug: false
         }
     },
-    scene: [PreloadScene, GameScene, GameOverScene] // Added GameOverScene
+    scene: [PreloadScene, GameScene, GameOverScene]
 };
 
 const game = new Phaser.Game(config);
