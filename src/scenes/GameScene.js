@@ -127,12 +127,6 @@ export default class GameScene extends Phaser.Scene {
         this.enemies.add(enemy);
     }
 
-    hitEnemy(player, enemy) {
-        // Implement collision between player and enemy
-        // For example, damage the player
-        player.takeDamage(10); // Example damage value
-    }
-
     /**
      * Handles the collection of experience points by the player.
      * @param {Player} player - The player object.
