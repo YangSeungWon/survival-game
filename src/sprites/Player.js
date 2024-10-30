@@ -1,10 +1,10 @@
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene) {
         const graphics = scene.add.graphics();
-        const COLOR = 0x00ff00;
+        const COLOR = 0xffffff;
         graphics.fillStyle(COLOR, 1);
-        graphics.fillRect(0, 0, 50, 50);
-        graphics.generateTexture('playerTexture', 50, 50);
+        graphics.fillRect(0, 0, 40, 40);
+        graphics.generateTexture('playerTexture', 40, 40);
         graphics.destroy();
 
         const x = scene.game.config.width / 2;
@@ -17,7 +17,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setBounce(1);
 
         this.speed = 160; // 이동 속도를 변수로 설정
-        this.health = 100; // 초기 체력 설정
+        this.maxHealth = 100; // 최대 체력을 변수로 설정
+        this.health = this.maxHealth; // 초기 체력 설정
 
         // 공격 관련 변수 설정
         this.attackSpeed = 300; // 공격 속도 (밀리초)
@@ -25,6 +26,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.attackPower = 1; // 공격력
         this.projectileColor = 0xffffff; // 발사체 색상
         this.projectileSize = 3; // 발사체 크기
+
+        
+        this.lifeSteal = 0; // 흡혈 속성 추가, 기본값은 0
 
         this.facingDirection = { x: 0, y: 0 }; // Add a property to store facing direction
 
@@ -38,6 +42,46 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.experience = 0; // Initialize experience
         this.level = 1; // Initialize level (optional)
+
+        // Listen for enemy health change events
+        this.scene.events.on('enemyHealthChanged', this.onEnemyHealthChanged, this);
+
+        // Listen for player health change events
+        this.scene.events.on('playerHealthChanged', this.onPlayerHealthChanged, this);
+    }
+
+    onEnemyHealthChanged(data) {
+        // Calculate life steal based on actual damage dealt
+        const lifeStealAvailable = data.damageDealt * this.lifeSteal;
+        const maxLifeStealAmount = this.maxHealth - this.health;
+        const lifeStealAmount = Math.min(lifeStealAvailable, maxLifeStealAmount);
+
+        if (lifeStealAmount > 0) {
+            this.health = Math.min(this.health + lifeStealAmount, this.maxHealth);
+            this.scene.events.emit('playerHealthChanged', lifeStealAmount);
+        }
+    }
+
+    onPlayerHealthChanged(healthChange) {
+        // Determine the text to display based on health change
+        const text = healthChange > 0 ? `+${healthChange}` : `${healthChange}`;
+
+        // Create a text object to show the health change
+        const healthChangeText = this.scene.add.text(this.x, this.y - 20, text, {
+            fontSize: '16px',
+            fill: healthChange > 0 ? '#99ff99' : '#ff9999' // Green for healing, red for damage
+        });
+
+        // Animate the text to move up and fade out
+        this.scene.tweens.add({
+            targets: healthChangeText,
+            y: this.y - 40,
+            alpha: 0,
+            duration: 1000,
+            onComplete: () => {
+                healthChangeText.destroy(); // Remove the text object after animation
+            }
+        });
     }
 
     update(cursors, joystick) {
@@ -103,7 +147,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     takeDamage(amount) {
         this.health -= amount;
-        this.scene.events.emit('playerHealthChanged', this.health);
+        this.scene.events.emit('playerHealthChanged', -amount);
 
         // Flash the player sprite to indicate damage
         this.scene.tweens.add({
@@ -139,10 +183,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
      * Optional: Handles leveling up.
      */
     levelUp() {
-        this.level += 1;
-        this.experience = 0;
-        this.health += 20; // Example: Increase health on level up
-        this.scene.healthText.setText('Health: ' + this.health);
-        // Optionally increase other stats
+        // TODO: Implement leveling up logic
     }
 }

@@ -49,7 +49,19 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     takeDamage(amount) {
-        this.health -= amount;
+        const initialHealth = this.health;
+        this.health = Math.max(this.health - amount, 0); // Ensure health doesn't go below zero
+
+        const damageDealt = initialHealth - this.health; // Calculate the actual damage dealt
+
+        if (damageDealt > 0) {
+            // Emit an event with the actual damage dealt
+            this.scene.events.emit('enemyHealthChanged', {
+                enemy: this,
+                newHealth: this.health,
+                damageDealt: damageDealt
+            });
+        }
 
         this.scene.tweens.add({
             targets: this,

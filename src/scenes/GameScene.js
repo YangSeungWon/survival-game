@@ -166,7 +166,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     updateHealthText(health) {
-        this.healthText.setText('Health: ' + health);
+        this.healthText.setText('Health: ' + this.player.health);
     }
 
     /**
