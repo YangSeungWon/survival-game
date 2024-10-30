@@ -35,6 +35,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             callbackScope: this,
             loop: true
         });
+
+        this.experience = 0; // Initialize experience
+        this.level = 1; // Initialize level (optional)
     }
 
     update(cursors, joystick) {
@@ -105,7 +108,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Flash the player sprite to indicate damage
         this.scene.tweens.add({
             targets: this,
-            alpha: 0,
+            alpha: 0.5,
             duration: 20,
             yoyo: true,
             repeat: 0,
@@ -117,5 +120,29 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.health <= 0) {
             this.scene.events.emit('playerDead');
         }
+    }
+
+    /**
+     * Adds experience points to the player.
+     * @param {number} amount - Amount of experience to add.
+     */
+    addExperience(amount) {
+        this.experience += amount;
+        // Check for level up if implementing levels
+        // Example:
+        // if (this.experience >= this.level * 100) {
+        //     this.levelUp();
+        // }
+    }
+
+    /**
+     * Optional: Handles leveling up.
+     */
+    levelUp() {
+        this.level += 1;
+        this.experience = 0;
+        this.health += 20; // Example: Increase health on level up
+        this.scene.healthText.setText('Health: ' + this.health);
+        // Optionally increase other stats
     }
 }

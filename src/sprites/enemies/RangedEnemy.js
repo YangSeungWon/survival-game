@@ -1,8 +1,8 @@
 import Enemy from './Enemy.js';
 
 export default class RangedEnemy extends Enemy {
-    constructor(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, projectileSpeed, projectileColor, projectileSize) {
-        super(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange);
+    constructor(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, experiencePoint, projectileSpeed, projectileColor, projectileSize) {
+        super(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, experiencePoint);
         this.projectileSpeed = projectileSpeed;
         this.projectileColor = projectileColor;
         this.projectileSize = projectileSize;

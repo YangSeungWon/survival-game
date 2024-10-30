@@ -1,8 +1,8 @@
 import Enemy from './Enemy.js';
 
 export default class MeleeEnemy extends Enemy {
-    constructor(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange) {
-        super(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange);
+    constructor(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, experiencePoint) {
+        super(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, experiencePoint);
     }
 
     attack(player) {

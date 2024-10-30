@@ -1,5 +1,5 @@
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange) {
+    constructor(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, experiencePoint) {
         // 적을 그래픽으로 생성
         const textureKey = `enemyTexture_${color}_${size}`;
         if (!scene.textures.exists(textureKey)) {
@@ -24,6 +24,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.attackSpeed = attackSpeed;
         this.attackPower = attackPower;
         this.attackRange = attackRange;
+
+        this.experiencePoint = experiencePoint;
 
         this.canAttack = true;
         this.canMove = true;
@@ -51,7 +53,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.scene.tweens.add({
             targets: this,
-            alpha: 0,
+            alpha: 0.5,
             duration: 20,
             yoyo: true,
             repeat: 0,
@@ -61,7 +63,17 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         });
 
         if (this.health <= 0) {
+            this.dropExperience();
             this.destroy();
+        }
+    }
+
+    /**
+     * Drops experience points upon enemy death.
+     */
+    dropExperience() {
+        if (this.scene.experiencePointPool) {
+            this.scene.experiencePointPool.spawnExperience(this.x, this.y, this.experiencePoint);
         }
     }
 }

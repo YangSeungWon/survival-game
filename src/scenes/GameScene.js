@@ -2,6 +2,7 @@ import FastEnemy from '../sprites/enemies/FastEnemy.js';
 import StrongEnemy from '../sprites/enemies/StrongEnemy.js';
 import GunEnemy from '../sprites/enemies/GunEnemy.js';
 import ProjectilePool from '../utils/ProjectilePool.js';
+import ExperiencePointPool from '../utils/ExperiencePointPool.js'; // Import the pool
 import Player from '../sprites/Player.js';
 
 export default class GameScene extends Phaser.Scene {
@@ -9,6 +10,7 @@ export default class GameScene extends Phaser.Scene {
         super({ key: 'GameScene' });
         this.score = 0;
         this.elapsedTime = 0;
+        this.playerExperience = 0; // Initialize player experience
     }
 
     preload() {
@@ -46,8 +48,14 @@ export default class GameScene extends Phaser.Scene {
         // Projectile Pool 생성
         this.projectilePool = new ProjectilePool(this);
 
+        // Experience Point Pool 생성
+        this.experiencePointPool = new ExperiencePointPool(this);
+
         // Enemy 그룹
         this.enemies = this.physics.add.group();
+
+        // Experience Points 그룹
+        this.experiencePoints = this.physics.add.group();
 
         // 적 생성 함수 설정
         this.time.addEvent({
@@ -59,6 +67,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Overlap settings instead of collider
         this.physics.add.overlap(this.player, this.enemies, this.hitEnemy, null, this);
+        this.physics.add.overlap(this.player, this.experiencePointPool.pool, this.collectExperience, null, this);
 
         // Input settings
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -69,12 +78,20 @@ export default class GameScene extends Phaser.Scene {
         // Health text
         this.healthText = this.add.text(16, 50, 'Health: 100', { fontSize: '32px', fill: '#f00' }).setScrollFactor(0);
 
-        // Listen to health changes
-        this.events.on('playerHealthChanged', this.updateHealthText, this);
-        this.events.on('playerDead', this.gameOver, this);
-
         // Time text
         this.timeText = this.add.text(16, 84, 'Time: 0:00', { fontSize: '32px', fill: '#fff' }).setScrollFactor(0);
+
+        // Experience text
+        this.experienceText = this.add.text(16, 118, 'XP: 0', { fontSize: '32px', fill: '#00ff00' }).setScrollFactor(0);
+
+        // Listen to health changes
+        this.events.on('playerHealthChanged', this.updateHealthText, this);
+
+        // Listen to experience collection
+        this.events.on('experienceCollected', this.addPlayerExperience, this);
+
+        // Listen to game over
+        this.events.on('playerDead', this.gameOver, this);
 
         // Check if the device is a mobile device
         const isMobile = /Mobi|Android/i.test(navigator.userAgent);
@@ -111,6 +128,18 @@ export default class GameScene extends Phaser.Scene {
     }
 
     hitEnemy(player, enemy) {
+        // Implement collision between player and enemy
+        // For example, damage the player
+        player.takeDamage(10); // Example damage value
+    }
+
+    /**
+     * Handles the collection of experience points by the player.
+     * @param {Player} player - The player object.
+     * @param {ExperiencePoint} experience - The experience point object.
+     */
+    collectExperience(player, experience) {
+        experience.collect();
     }
 
     update(time, delta) {
@@ -137,13 +166,30 @@ export default class GameScene extends Phaser.Scene {
         this.enemies.getChildren().forEach(enemy => {
             enemy.update(this.player);
         });
+
+        // Update experience points if needed
+        // (Handled by the pool)
     }
 
     updateHealthText(health) {
         this.healthText.setText('Health: ' + health);
     }
 
+    /**
+     * Adds experience to the player.
+     * @param {number} amount - Amount of experience to add.
+     */
+    addPlayerExperience(amount) {
+        this.playerExperience += amount;
+        this.score += amount; // Optionally add to score
+        this.scoreText.setText('Score: ' + this.score);
+        this.experienceText.setText('XP: ' + this.playerExperience);
+
+        // Optionally handle leveling up
+        this.player.addExperience(amount);
+    }
+
     gameOver() {
-        this.scene.start('GameOverScene', { score: this.score, time: this.elapsedTime });
+        this.scene.start('GameOverScene', { score: this.score, time: this.elapsedTime, experience: this.playerExperience });
     }
 }
