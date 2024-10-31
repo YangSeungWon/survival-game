@@ -81,7 +81,10 @@ export default class GameScene extends Phaser.Scene {
         this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' }).setScrollFactor(0);
 
         // Health text
-        this.healthText = this.add.text(16, 50, 'Health: 100', { fontSize: '32px', fill: '#f00' }).setScrollFactor(0);
+        this.healthText = this.add.text(16, 50, `Health: ${this.player.health}/${this.player.maxHealth}`, { fontSize: '32px', fill: '#f00' }).setScrollFactor(0);
+
+        // Player stats text in the bottom-left corner
+        this.playerStatsText = this.add.text(16, this.cameras.main.height - 50, '', { fontSize: '16px', fill: '#fff' }).setScrollFactor(0);
 
         // Time text
         this.timeText = this.add.text(16, 84, 'Time: 0:00', { fontSize: '32px', fill: '#fff' }).setScrollFactor(0);
@@ -171,6 +174,18 @@ export default class GameScene extends Phaser.Scene {
 
         // Update experience points if needed
         // (Handled by the pool)
+
+        // Update health text
+        this.healthText.setText(`Health: ${this.player.health}/${this.player.maxHealth}`);
+
+        // Update player stats text
+        var statsText = '';
+        statsText += `Speed: ${this.player.speed}\n`;
+        statsText += `Attack Power: ${this.player.attackPower}\n`;
+        statsText += `Attack Speed: ${this.player.attackSpeed}\n`;
+        statsText += `Projectile Speed: ${this.player.projectileSpeed}\n`;
+        statsText += `Life Steal: ${this.player.lifeSteal}`;
+        this.playerStatsText.setText(statsText);
     }
 
     updateHealthText(health) {
@@ -213,39 +228,78 @@ export default class GameScene extends Phaser.Scene {
      * @param {number} level - The new level of the player.
      */
     showPowerUpSelection(level) {
-        // 반투명 배경 추가
-        this.powerUpBackground = this.add.rectangle(this.cameras.main.centerX, this.cameras.main.centerY, 400, 300, 0x000000, 0.7).setDepth(10);
+        // Add a semi-transparent background
+        this.powerUpBackground = this.add.rectangle(
+            this.cameras.main.centerX, 
+            this.cameras.main.centerY, 
+            400, 
+            350, // Adjusted height to accommodate the options
+            0x000000, 
+            0.7
+        ).setDepth(10);
 
-        // 텍스트 추가
-        this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 130, `Level ${level}! Choose a Power-Up:`, { fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5).setDepth(11);
+        // Add text
+        this.add.text(
+            this.cameras.main.centerX, 
+            this.cameras.main.centerY - 160, // Adjusted position for the options
+            `Level ${level}! Choose a Power-Up:`, 
+            { fontSize: '24px', fill: '#ffffff' }
+        ).setOrigin(0.5).setDepth(11);
 
-        // 파워업 옵션 정의
-        const powerUps = [
+        // Define all power-up options
+        const allPowerUps = [
             { name: 'Health Boost', description: 'Increase maximum health by 200.', apply: () => this.player.maxHealth += 200 },
             { name: 'Speed Boost', description: 'Increase movement speed by 40.', apply: () => this.player.speed += 40 },
-            { name: 'Attack Power Boost', description: 'Increase attack power by 5.', apply: () => this.player.attackPower += 5 }
+            { name: 'Attack Power Boost', description: 'Increase attack power by 5.', apply: () => this.player.attackPower += 5 },
+            { name: 'Life Steal', description: 'Gain health equal to 10% of damage dealt.', apply: () => this.player.lifeSteal = 0.1 }
         ];
 
-        powerUps.forEach((powerUp, index) => {
-            const buttonY = this.cameras.main.centerY - 50 + index * 80;
+        // Shuffle the array and select the first 3 power-ups
+        Phaser.Utils.Array.Shuffle(allPowerUps);
+        const selectedPowerUps = allPowerUps.slice(0, 3);
 
-            // 버튼 배경
-            const button = this.add.rectangle(this.cameras.main.centerX, buttonY, 200, 50, 0x555555).setInteractive().setDepth(11);
+        selectedPowerUps.forEach((powerUp, index) => {
+            const buttonY = this.cameras.main.centerY - 80 + index * 80; // Adjusted starting position
 
-            // 버튼 텍스트
-            this.add.text(this.cameras.main.centerX, buttonY, powerUp.name, { fontSize: '20px', fill: '#ffffff' }).setOrigin(0.5).setDepth(11);
+            // Button background
+            const button = this.add.rectangle(
+                this.cameras.main.centerX, 
+                buttonY, 
+                200, 
+                50, 
+                0x555555
+            ).setInteractive().setDepth(11);
 
-            // 버튼 클릭 시 파워업 적용
+            // Button text
+            this.add.text(
+                this.cameras.main.centerX, 
+                buttonY, 
+                powerUp.name, 
+                { fontSize: '20px', fill: '#ffffff' }
+            ).setOrigin(0.5).setDepth(11);
+
+            // Apply power-up on button click
             button.on('pointerdown', () => {
                 powerUp.apply();
                 this.closePowerUpSelection();
             });
         });
 
-        // 취소 버튼 (옵션)
-        const cancelY = this.cameras.main.centerY + 100;
-        const cancelButton = this.add.rectangle(this.cameras.main.centerX, cancelY, 100, 40, 0xff4444).setInteractive().setDepth(11);
-        this.add.text(this.cameras.main.centerX, cancelY, 'Cancel', { fontSize: '18px', fill: '#ffffff' }).setOrigin(0.5).setDepth(11);
+        // Cancel button (optional)
+        const cancelY = this.cameras.main.centerY + 140; // Adjusted position for the options
+        const cancelButton = this.add.rectangle(
+            this.cameras.main.centerX, 
+            cancelY, 
+            100, 
+            40, 
+            0xff4444
+        ).setInteractive().setDepth(11);
+        this.add.text(
+            this.cameras.main.centerX, 
+            cancelY, 
+            'Cancel', 
+            { fontSize: '18px', fill: '#ffffff' }
+        ).setOrigin(0.5).setDepth(11);
 
         cancelButton.on('pointerdown', () => {
             this.closePowerUpSelection();
