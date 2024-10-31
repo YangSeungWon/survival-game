@@ -343,6 +343,7 @@ export default class GameScene extends Phaser.Scene {
 
         // 게임 재개
         this.physics.resume();
+        this.isPaused = false;
     }
 
     spawnHeart() {
