@@ -5,11 +5,11 @@ export default class StrongEnemy extends MeleeEnemy {
         const color = 0x0000ff;
         const size = 30;
         const speed = 30;
-        const health = 10;
+        const health = 100;
         
         // 공격 속성 정의
         const attackSpeed = 2000; 
-        const attackPower = 30;  
+        const attackPower = 300;  
         const attackRange = 50;
 
         const experiencePoint = 10;

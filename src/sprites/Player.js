@@ -3,8 +3,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const graphics = scene.add.graphics();
         const COLOR = 0xffffff;
         graphics.fillStyle(COLOR, 1);
-        graphics.fillRect(0, 0, 40, 40);
-        graphics.generateTexture('playerTexture', 40, 40);
+        graphics.fillRect(0, 0, 20, 20);
+        graphics.generateTexture('playerTexture', 20, 20);
         graphics.destroy();
 
         const x = scene.game.config.width / 2;
@@ -17,15 +17,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setBounce(1);
 
         this.speed = 160; // 이동 속도를 변수로 설정
-        this.maxHealth = 100; // 최대 체력을 변수로 설정
+        this.maxHealth = 1000; // 최대 체력을 변수로 설정
         this.health = this.maxHealth; // 초기 체력 설정
 
         // 공격 관련 변수 설정
         this.attackSpeed = 300; // 공격 속도 (밀리초)
-        this.projectileSpeed = 300; // 발사체 속도
-        this.attackPower = 1; // 공격력
+        this.projectileSpeed = 200; // 발사체 속도
+        this.attackPower = 10; // 공격력
         this.projectileColor = 0xffffff; // 발사체 색상
-        this.projectileSize = 3; // 발사체 크기
+        this.projectileSize = 4; // 발사체 크기
 
         
         this.lifeSteal = 0; // 흡혈 속성 추가, 기본값은 0
@@ -40,8 +40,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             loop: true
         });
 
-        this.experience = 0; // Initialize experience
-        this.level = 1; // Initialize level (optional)
+        this.experience = 0; // 경험치 초기화
+        this.level = 1; // 초기 레벨 설정
+        this.experienceThreshold = 100; // 레벨업을 위한 경험치 임계값
 
         // Listen for enemy health change events
         this.scene.events.on('enemyHealthChanged', this.onEnemyHealthChanged, this);
@@ -52,7 +53,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     onEnemyHealthChanged(data) {
         // Calculate life steal based on actual damage dealt
-        const lifeStealAvailable = data.damageDealt * this.lifeSteal;
+        const lifeStealAvailable = Math.floor(data.damageDealt * this.lifeSteal);
         const maxLifeStealAmount = this.maxHealth - this.health;
         const lifeStealAmount = Math.min(lifeStealAvailable, maxLifeStealAmount);
 
@@ -167,22 +168,31 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     /**
-     * Adds experience points to the player.
+     * Adds experience points to the player and handles leveling up.
      * @param {number} amount - Amount of experience to add.
      */
     addExperience(amount) {
         this.experience += amount;
-        // Check for level up if implementing levels
-        // Example:
-        // if (this.experience >= this.level * 100) {
-        //     this.levelUp();
-        // }
+        this.scene.events.emit('experienceUpdated', this.experience);
+        this.checkLevelUp();
+    }
+
+    /**
+     * Checks if the player has enough experience to level up.
+     */
+    checkLevelUp() {
+        while (this.experience >= this.experienceThreshold) {
+            this.experience -= this.experienceThreshold;
+            this.level += 1;
+            this.experienceThreshold = Math.floor(this.experienceThreshold * 1.5); // 다음 레벨업 임계값 증가
+            this.scene.events.emit('playerLevelUp', this.level);
+        }
     }
 
     /**
      * Optional: Handles leveling up.
      */
     levelUp() {
-        // TODO: Implement leveling up logic
+        // TODO: Implement leveling up logic if needed
     }
 }

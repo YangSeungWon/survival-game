@@ -2,7 +2,7 @@ import FastEnemy from '../sprites/enemies/FastEnemy.js';
 import StrongEnemy from '../sprites/enemies/StrongEnemy.js';
 import GunEnemy from '../sprites/enemies/GunEnemy.js';
 import ProjectilePool from '../utils/ProjectilePool.js';
-import ExperiencePointPool from '../utils/ExperiencePointPool.js'; // Import the pool
+import ExperiencePointPool from '../utils/ExperiencePointPool.js';
 import Player from '../sprites/Player.js';
 
 export default class GameScene extends Phaser.Scene {
@@ -10,7 +10,7 @@ export default class GameScene extends Phaser.Scene {
         super({ key: 'GameScene' });
         this.score = 0;
         this.elapsedTime = 0;
-        this.playerExperience = 0; // Initialize player experience
+        this.playerExperience = 0;
     }
 
     preload() {
@@ -93,6 +93,9 @@ export default class GameScene extends Phaser.Scene {
         // Listen to game over
         this.events.on('playerDead', this.gameOver, this);
 
+        // Listen to level up event
+        this.events.on('playerLevelUp', this.onPlayerLevelUp, this);
+
         // Check if the device is a mobile device
         const isMobile = /Mobi|Android/i.test(navigator.userAgent);
         if (isMobile) {
@@ -170,7 +173,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     /**
-     * Adds experience to the player.
+     * Adds experience to the player and checks for level up.
      * @param {number} amount - Amount of experience to add.
      */
     addPlayerExperience(amount) {
@@ -179,11 +182,87 @@ export default class GameScene extends Phaser.Scene {
         this.scoreText.setText('Score: ' + this.score);
         this.experienceText.setText('XP: ' + this.playerExperience);
 
-        // Optionally handle leveling up
+        // 경험치 추가 및 레벨업 체크
         this.player.addExperience(amount);
     }
 
     gameOver() {
         this.scene.start('GameOverScene', { score: this.score, time: this.elapsedTime, experience: this.playerExperience });
+    }
+
+    /**
+     * Handles the player level up event.
+     * @param {number} newLevel - The new level of the player.
+     */
+    onPlayerLevelUp(newLevel) {
+        // 일시정지
+        this.physics.pause();
+        this.player.setTint(0xfff000); // 레벨업 시 플레이어 색상 변경 (옵션)
+
+        // 파워업 선택 UI 표시
+        this.showPowerUpSelection(newLevel);
+    }
+
+    /**
+     * Displays the power-up selection UI with 3 options.
+     * @param {number} level - The new level of the player.
+     */
+    showPowerUpSelection(level) {
+        // 반투명 배경 추가
+        this.powerUpBackground = this.add.rectangle(this.cameras.main.centerX, this.cameras.main.centerY, 400, 300, 0x000000, 0.7).setDepth(10);
+
+        // 텍스트 추가
+        this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 130, `Level ${level}! Choose a Power-Up:`, { fontSize: '24px', fill: '#ffffff' }).setOrigin(0.5).setDepth(11);
+
+        // 파워업 옵션 정의
+        const powerUps = [
+            { name: 'Health Boost', description: 'Increase maximum health by 200.', apply: () => this.player.maxHealth += 200 },
+            { name: 'Speed Boost', description: 'Increase movement speed by 40.', apply: () => this.player.speed += 40 },
+            { name: 'Attack Power Boost', description: 'Increase attack power by 5.', apply: () => this.player.attackPower += 5 }
+        ];
+
+        powerUps.forEach((powerUp, index) => {
+            const buttonY = this.cameras.main.centerY - 50 + index * 80;
+
+            // 버튼 배경
+            const button = this.add.rectangle(this.cameras.main.centerX, buttonY, 200, 50, 0x555555).setInteractive().setDepth(11);
+
+            // 버튼 텍스트
+            this.add.text(this.cameras.main.centerX, buttonY, powerUp.name, { fontSize: '20px', fill: '#ffffff' }).setOrigin(0.5).setDepth(11);
+
+            // 버튼 클릭 시 파워업 적용
+            button.on('pointerdown', () => {
+                powerUp.apply();
+                this.closePowerUpSelection();
+            });
+        });
+
+        // 취소 버튼 (옵션)
+        const cancelY = this.cameras.main.centerY + 100;
+        const cancelButton = this.add.rectangle(this.cameras.main.centerX, cancelY, 100, 40, 0xff4444).setInteractive().setDepth(11);
+        this.add.text(this.cameras.main.centerX, cancelY, 'Cancel', { fontSize: '18px', fill: '#ffffff' }).setOrigin(0.5).setDepth(11);
+
+        cancelButton.on('pointerdown', () => {
+            this.closePowerUpSelection();
+        });
+    }
+
+    /**
+     * Closes the power-up selection UI and resumes the game.
+     */
+    closePowerUpSelection() {
+        // UI 요소 제거
+        this.powerUpBackground.destroy();
+        this.children.getAll().forEach(child => {
+            if (child.depth === 10 || child.depth === 11) {
+                child.destroy();
+            }
+        });
+
+        // 색상 초기화
+        this.player.clearTint();
+
+        // 게임 재개
+        this.physics.resume();
     }
 }
