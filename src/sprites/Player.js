@@ -21,8 +21,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.health = this.maxHealth; // 초기 체력 설정
 
         // 공격 관련 변수 설정
-        this.attackSpeed = 300; // 공격 속도 (밀리초)
-        this.projectileSpeed = 200; // 발사체 속도
+        this.attackSpeed = 200; // 공격 속도 (밀리초)
+        this.projectileSpeed = 300; // 발사체 속도
         this.attackPower = 10; // 공격력
         this.projectileColor = 0xffffff; // 발사체 색상
         this.projectileSize = 4; // 발사체 크기

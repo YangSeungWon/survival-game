@@ -12,6 +12,9 @@ export default class GameScene extends Phaser.Scene {
         this.score = 0;
         this.elapsedTime = 0;
         this.playerExperience = 0;
+        this.mapSize = 2000;
+        this.enemySpawnInterval = 1000; // 1 second interval
+        this.heartSpawnInterval = 10000; // 10 seconds interval
     }
 
     preload() {
@@ -27,15 +30,15 @@ export default class GameScene extends Phaser.Scene {
 
     create() {
         // Set world bounds to be larger than the visible area
-        this.physics.world.setBounds(0, 0, 2000, 2000);
+        this.physics.world.setBounds(0, 0, this.mapSize, this.mapSize);
 
         // Create a larger background
-        this.add.rectangle(1000, 1000, 2000, 2000, 0x000000);
+        this.add.rectangle(this.mapSize / 2, this.mapSize / 2, this.mapSize, this.mapSize, 0x000000);
 
         // Draw world border
         const borderGraphics = this.add.graphics();
         borderGraphics.lineStyle(4, 0xffffff, 1); // White border with 4px thickness
-        borderGraphics.strokeRect(0, 0, 2000, 2000);
+        borderGraphics.strokeRect(0, 0, this.mapSize, this.mapSize);
 
         // Create player
         this.player = new Player(this);
@@ -61,9 +64,20 @@ export default class GameScene extends Phaser.Scene {
         // Heart group
         this.hearts = this.physics.add.group();
 
+        // Call createEnemies to spawn enemies initially
+        this.createEnemies();
+
+        // Optionally, set up a timed event to spawn enemies periodically
+        this.time.addEvent({
+            delay: this.enemySpawnInterval, // 1 seconds
+            callback: this.createEnemies,
+            callbackScope: this,
+            loop: true
+        });
+
         // Example: Add a heart every 10 seconds
         this.time.addEvent({
-            delay: 10000, // 10 seconds
+            delay: this.heartSpawnInterval, // 10 seconds
             callback: this.spawnHeart,
             callbackScope: this,
             loop: true
@@ -84,7 +98,7 @@ export default class GameScene extends Phaser.Scene {
         this.healthText = this.add.text(16, 50, `Health: ${this.player.health}/${this.player.maxHealth}`, { fontSize: '32px', fill: '#f00' }).setScrollFactor(0);
 
         // Player stats text in the bottom-left corner
-        this.playerStatsText = this.add.text(16, this.cameras.main.height - 50, '', { fontSize: '16px', fill: '#fff' }).setScrollFactor(0);
+        this.playerStatsText = this.add.text(16, this.cameras.main.height - 150, '', { fontSize: '16px', fill: '#fff' }).setScrollFactor(0);
 
         // Time text
         this.timeText = this.add.text(16, 84, 'Time: 0:00', { fontSize: '32px', fill: '#fff' }).setScrollFactor(0);
@@ -124,6 +138,8 @@ export default class GameScene extends Phaser.Scene {
     }
 
     createEnemies() {
+        if (this.isPaused) return; // Check if the game is paused
+
         const enemyType = Phaser.Math.RND.pick(['FastEnemy', 'StrongEnemy', 'GunEnemy']);
         var enemy;
         if (enemyType === 'FastEnemy') {
@@ -148,6 +164,8 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+        if (this.isPaused) return; // Check if the game is paused
+
         // Update elapsed time
         this.elapsedTime += delta / 1000; // Convert delta to seconds
 
@@ -171,9 +189,6 @@ export default class GameScene extends Phaser.Scene {
         this.enemies.getChildren().forEach(enemy => {
             enemy.update(this.player);
         });
-
-        // Update experience points if needed
-        // (Handled by the pool)
 
         // Update health text
         this.healthText.setText(`Health: ${this.player.health}/${this.player.maxHealth}`);
@@ -217,6 +232,7 @@ export default class GameScene extends Phaser.Scene {
     onPlayerLevelUp(newLevel) {
         // 일시정지
         this.physics.pause();
+        this.isPaused = true;
         this.player.setTint(0xfff000); // 레벨업 시 플레이어 색상 변경 (옵션)
 
         // 파워업 선택 UI 표시
@@ -228,10 +244,14 @@ export default class GameScene extends Phaser.Scene {
      * @param {number} level - The new level of the player.
      */
     showPowerUpSelection(level) {
+        // Calculate center positions
+        const centerX = this.cameras.main.width / 2;
+        const centerY = this.cameras.main.height / 2;
+
         // Add a semi-transparent background
         this.powerUpBackground = this.add.rectangle(
-            this.cameras.main.centerX, 
-            this.cameras.main.centerY, 
+            centerX, 
+            centerY, 
             400, 
             350, // Adjusted height to accommodate the options
             0x000000, 
@@ -240,8 +260,8 @@ export default class GameScene extends Phaser.Scene {
 
         // Add text
         this.add.text(
-            this.cameras.main.centerX, 
-            this.cameras.main.centerY - 160, // Adjusted position for the options
+            centerX, 
+            centerY - 160, // Adjusted position for the options
             `Level ${level}! Choose a Power-Up:`, 
             { fontSize: '24px', fill: '#ffffff' }
         ).setOrigin(0.5).setDepth(11);
@@ -259,11 +279,11 @@ export default class GameScene extends Phaser.Scene {
         const selectedPowerUps = allPowerUps.slice(0, 3);
 
         selectedPowerUps.forEach((powerUp, index) => {
-            const buttonY = this.cameras.main.centerY - 80 + index * 80; // Adjusted starting position
+            const buttonY = centerY - 80 + index * 80; // Adjusted starting position
 
             // Button background
             const button = this.add.rectangle(
-                this.cameras.main.centerX, 
+                centerX, 
                 buttonY, 
                 200, 
                 50, 
@@ -272,7 +292,7 @@ export default class GameScene extends Phaser.Scene {
 
             // Button text
             this.add.text(
-                this.cameras.main.centerX, 
+                centerX, 
                 buttonY, 
                 powerUp.name, 
                 { fontSize: '20px', fill: '#ffffff' }
@@ -286,16 +306,16 @@ export default class GameScene extends Phaser.Scene {
         });
 
         // Cancel button (optional)
-        const cancelY = this.cameras.main.centerY + 140; // Adjusted position for the options
+        const cancelY = centerY + 140; // Adjusted position for the options
         const cancelButton = this.add.rectangle(
-            this.cameras.main.centerX, 
+            centerX, 
             cancelY, 
             100, 
             40, 
             0xff4444
         ).setInteractive().setDepth(11);
         this.add.text(
-            this.cameras.main.centerX, 
+            centerX, 
             cancelY, 
             'Cancel', 
             { fontSize: '18px', fill: '#ffffff' }
@@ -326,15 +346,15 @@ export default class GameScene extends Phaser.Scene {
     }
 
     spawnHeart() {
-        const x = Phaser.Math.Between(0, 2000);
-        const y = Phaser.Math.Between(0, 2000);
+        const x = Phaser.Math.Between(0, this.mapSize);
+        const y = Phaser.Math.Between(0, this.mapSize);
         const heart = new Heart(this, x, y);
         this.hearts.add(heart);
     }
 
     collectHeart(player, heart) {
         heart.collect();
-        player.health = Math.min(player.maxHealth, player.health + 20); // Restore 20 health
-        this.events.emit('playerHealthChanged', 20);
+        player.health = Math.min(player.maxHealth, player.health + 200); // Restore 200 health
+        this.events.emit('playerHealthChanged', 200);
     }
 }
