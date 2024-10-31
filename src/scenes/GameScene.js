@@ -4,6 +4,7 @@ import GunEnemy from '../sprites/enemies/GunEnemy.js';
 import ProjectilePool from '../utils/ProjectilePool.js';
 import ExperiencePointPool from '../utils/ExperiencePointPool.js';
 import Player from '../sprites/Player.js';
+import Heart from '../sprites/Heart.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -57,10 +58,13 @@ export default class GameScene extends Phaser.Scene {
         // Experience Points 그룹
         this.experiencePoints = this.physics.add.group();
 
-        // 적 생성 함수 설정
+        // Heart group
+        this.hearts = this.physics.add.group();
+
+        // Example: Add a heart every 10 seconds
         this.time.addEvent({
-            delay: 1000, // 매초
-            callback: this.createEnemies,
+            delay: 10000, // 10 seconds
+            callback: this.spawnHeart,
             callbackScope: this,
             loop: true
         });
@@ -68,6 +72,7 @@ export default class GameScene extends Phaser.Scene {
         // Overlap settings instead of collider
         this.physics.add.overlap(this.player, this.enemies, this.hitEnemy, null, this);
         this.physics.add.overlap(this.player, this.experiencePointPool.pool, this.collectExperience, null, this);
+        this.physics.add.overlap(this.player, this.hearts, this.collectHeart, null, this);
 
         // Input settings
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -264,5 +269,18 @@ export default class GameScene extends Phaser.Scene {
 
         // 게임 재개
         this.physics.resume();
+    }
+
+    spawnHeart() {
+        const x = Phaser.Math.Between(0, 2000);
+        const y = Phaser.Math.Between(0, 2000);
+        const heart = new Heart(this, x, y);
+        this.hearts.add(heart);
+    }
+
+    collectHeart(player, heart) {
+        heart.collect();
+        player.health = Math.min(player.maxHealth, player.health + 20); // Restore 20 health
+        this.events.emit('playerHealthChanged', 20);
     }
 }
