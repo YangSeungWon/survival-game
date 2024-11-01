@@ -61,7 +61,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     getTextureKey(projectileSize, color) {
         return `projectileTexture_${projectileSize}_${color}`;
     }
-    
+
     /**
      * 충돌 처리 메서드.
      * @param {Phaser.GameObjects.GameObject} projectile - 충돌한 프로젝트.

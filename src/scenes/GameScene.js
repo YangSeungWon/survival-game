@@ -84,7 +84,6 @@ export default class GameScene extends Phaser.Scene {
         });
 
         // Overlap settings instead of collider
-        this.physics.add.overlap(this.player, this.enemies, this.hitEnemy, null, this);
         this.physics.add.overlap(this.player, this.experiencePointPool.pool, this.collectExperience, null, this);
         this.physics.add.overlap(this.player, this.hearts, this.collectHeart, null, this);
 
