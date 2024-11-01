@@ -1,4 +1,5 @@
 import Enemy from './enemies/Enemy.js';
+import { createProjectileTexture } from '../utils/TextureGenerator.js';
 
 export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     /**
@@ -33,7 +34,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         // change texture, if not exist with 
         const textureKey = this.getTextureKey(projectileSize, color);
         if (!this.scene.textures.exists(textureKey)) {
-            this.createTexture(this.scene, textureKey, color, projectileSize);
+            createProjectileTexture(this.scene, textureKey, color, projectileSize);
         }
         this.setTexture(textureKey);
 
@@ -60,15 +61,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     getTextureKey(projectileSize, color) {
         return `projectileTexture_${projectileSize}_${color}`;
     }
-
-    createTexture(scene, textureKey, color, projectileSize) {
-        const graphics = scene.add.graphics();
-        graphics.fillStyle(color, 1);
-        graphics.fillCircle(projectileSize, projectileSize, projectileSize);
-        graphics.generateTexture(textureKey, projectileSize * 2, projectileSize * 2);
-        graphics.destroy();
-    }
-
+    
     /**
      * 충돌 처리 메서드.
      * @param {Phaser.GameObjects.GameObject} projectile - 충돌한 프로젝트.

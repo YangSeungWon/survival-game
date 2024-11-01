@@ -271,7 +271,7 @@ export default class GameScene extends Phaser.Scene {
             { name: 'Health Boost', description: 'Increase maximum health by 200.', apply: () => this.player.maxHealth += 200 },
             { name: 'Speed Boost', description: 'Increase movement speed by 40.', apply: () => this.player.speed += 40 },
             { name: 'Attack Power Boost', description: 'Increase attack power by 5.', apply: () => this.player.attackPower += 5 },
-            { name: 'Life Steal', description: 'Gain health equal to 10% of damage dealt.', apply: () => this.player.lifeSteal = 0.1 }
+            { name: 'Life Steal', description: 'Gain health equal to 10% of damage dealt.', apply: () => this.player.lifeSteal += 0.1 }
         ];
 
         // Shuffle the array and select the first 3 power-ups

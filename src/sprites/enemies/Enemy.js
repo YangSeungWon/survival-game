@@ -1,14 +1,10 @@
+import { createEnemyTexture } from '../../utils/TextureGenerator.js';
+
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, experiencePoint) {
         // 적을 그래픽으로 생성
         const textureKey = `enemyTexture_${color}_${size}`;
-        if (!scene.textures.exists(textureKey)) {
-            const graphics = scene.add.graphics();
-            graphics.fillStyle(color, 1);
-            graphics.fillCircle(size, size, size);
-            graphics.generateTexture(textureKey, size * 2, size * 2);
-            graphics.destroy();
-        }
+        createEnemyTexture(scene, textureKey, color, size);
 
         const x = Phaser.Math.Between(0, scene.game.config.width);
         const y = Phaser.Math.Between(0, scene.game.config.height);
@@ -29,9 +25,25 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.canAttack = true;
         this.canMove = true;
+
+        this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, scene.player.x, scene.player.y);
+
+        // Initialize attack bar
+        this.initAttackBar(scene, Phaser.Display.Color.ValueToColor(color).lighten(20).color, attackRange, attackPower);
+    }
+
+    // Update the attack bar position
+    updateAttackBar(player) {
+        if (this.attackBar) {
+            this.attackBar.setPosition(this.x, this.y);
+        }
     }
 
     update(player) {
+        // Update attack bar position
+        this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
+        this.updateAttackBar(player);
+        
         const distance = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
         if (distance <= this.attackRange) {
             if (this.canAttack) {
@@ -87,5 +99,12 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         if (this.scene.experiencePointPool) {
             this.scene.experiencePointPool.spawnExperience(this.x, this.y, this.experiencePoint);
         }
+    }
+
+    destroy(fromScene) {
+        if (this.attackBar) {
+            this.attackBar.destroy();
+        }
+        super.destroy(fromScene);
     }
 }
