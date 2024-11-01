@@ -27,9 +27,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.projectileColor = 0xffffff; // 발사체 색상
         this.projectileSize = 4; // 발사체 크기
 
-        
         this.lifeSteal = 0; // 흡혈 속성 추가, 기본값은 0
-
+        this.defense = 0; // 방어력 속성 추가, 기본값은 0
+        this.critChance = 0; // 크리티컬 확률 속성 추가, 기본값은 0
+        console.log(this.critChance)
         this.facingDirection = { x: 0, y: 0 }; // Add a property to store facing direction
 
         // 자동 공격 타이머 설정
@@ -147,8 +148,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     takeDamage(amount) {
-        this.health -= amount;
-        this.scene.events.emit('playerHealthChanged', -amount);
+        // Calculate actual damage after applying defense
+        const actualDamage = Math.max(amount - this.defense, 0); // Ensure damage doesn't go below zero
+
+        this.health -= actualDamage;
+        this.scene.events.emit('playerHealthChanged', -actualDamage);
 
         // Flash the player sprite to indicate damage
         this.scene.tweens.add({

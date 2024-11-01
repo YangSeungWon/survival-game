@@ -202,7 +202,9 @@ export default class GameScene extends Phaser.Scene {
         statsText += `Attack Power: ${this.player.attackPower}\n`;
         statsText += `Attack Speed: ${this.player.attackSpeed}\n`;
         statsText += `Projectile Speed: ${this.player.projectileSpeed}\n`;
-        statsText += `Life Steal: ${this.player.lifeSteal}`;
+        statsText += `Life Steal: ${this.player.lifeSteal}\n`;
+        statsText += `Defense: ${this.player.defense}\n`;
+        statsText += `Critical Hit Chance: ${this.player.critChance}`;
         this.playerStatsText.setText(statsText);
     }
 

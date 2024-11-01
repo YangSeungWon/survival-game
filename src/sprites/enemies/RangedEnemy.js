@@ -65,7 +65,6 @@ export default class RangedEnemy extends Enemy {
 
     update(player, delta) {
         // Update attack bar position and rotation based on facing angle
-        console.log(this.facingAngle);
         if (this.attackBar) {
             this.attackBar.setRotation(this.facingAngle);
         }

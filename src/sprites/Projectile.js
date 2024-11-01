@@ -72,7 +72,33 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
             if ((projectile.faction === 'player' && target instanceof Enemy)
                 || (projectile.faction === 'enemy')
             ) {
-                target.takeDamage(projectile.attackPower);
+                // Determine if a critical hit occurs
+                const isCriticalHit = Math.random() < this.scene.player.critChance;
+                const damage = isCriticalHit ? projectile.attackPower * 2 : projectile.attackPower;
+
+                // Apply damage to the target
+                target.takeDamage(damage);
+
+                // Optionally, emit an event or show a visual effect for critical hits
+                if (isCriticalHit) {
+                    this.scene.events.emit('criticalHit', target.x, target.y);
+                    const critText = this.scene.add.text(target.x, target.y - 30, 'Critical!', {
+                        fontSize: '16px',
+                        fill: '#ffcc00' // Yellow color for critical hit text
+                    }).setOrigin(0.5).setDepth(11);
+
+                    // Add fade out and rise animation
+                    this.scene.tweens.add({
+                        targets: critText,
+                        alpha: 0,
+                        y: critText.y - 20,
+                        duration: 200,
+                        onComplete: () => {
+                            critText.destroy();
+                        }
+                    });
+                }
+
                 projectile.setActive(false);
                 projectile.setVisible(false);
             }   
