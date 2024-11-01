@@ -168,7 +168,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Update elapsed time
         this.elapsedTime += delta / 1000; // Convert delta to seconds
-        const deltaNormalized = delta / 10;
+        const deltaNormalized = delta / 20;
 
         // Calculate minutes and seconds
         const minutes = Math.floor(this.elapsedTime / 60);
