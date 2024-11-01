@@ -5,6 +5,7 @@ import ProjectilePool from '../utils/ProjectilePool.js';
 import ExperiencePointPool from '../utils/ExperiencePointPool.js';
 import Player from '../sprites/Player.js';
 import Heart from '../sprites/Heart.js';
+import PowerUpManager from '../utils/PowerUpManager.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -133,6 +134,9 @@ export default class GameScene extends Phaser.Scene {
             // Create cursor keys from joystick
             this.joystickCursors = this.joystick.createCursorKeys();
         }
+
+        // Initialize PowerUpManager
+        this.powerUpManager = new PowerUpManager(this, this.player);
     }
 
     createEnemies() {
@@ -229,138 +233,8 @@ export default class GameScene extends Phaser.Scene {
      * @param {number} newLevel - The new level of the player.
      */
     onPlayerLevelUp(newLevel) {
-        // Pause the game
         this.pauseGame();
-
-        // Show power-up selection UI
-        this.showPowerUpSelection(newLevel);
-    }
-
-    /**
-     * Displays the power-up selection UI with 3 options.
-     * @param {number} level - The new level of the player.
-     */
-    showPowerUpSelection(level) {
-        // Calculate center positions based on the camera's center
-        const centerX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-        const centerY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
-
-        // Add a semi-transparent background
-        this.powerUpBackground = this.add.rectangle(
-            centerX, 
-            centerY, 
-            400, 
-            350, // Adjusted height to accommodate the options
-            0x000000, 
-            0.7
-        ).setDepth(10);
-
-        // Add text
-        this.add.text(
-            centerX, 
-            centerY - 160, // Adjusted position for the options
-            `Level ${level}! Choose a Power-Up:`, 
-            { fontSize: '24px', fill: '#ffffff' }
-        ).setOrigin(0.5).setDepth(11);
-
-        // Define all power-up options
-        const allPowerUps = [
-            { name: 'Health Boost', description: 'Increase maximum health by 200.', apply: () => this.player.maxHealth += 200 },
-            { name: 'Speed Boost', description: 'Increase movement speed by 40.', apply: () => this.player.speed += 40 },
-            { name: 'Attack Power Boost', description: 'Increase attack power by 5.', apply: () => this.player.attackPower += 5 },
-            { name: 'Life Steal', description: 'Gain health equal to 10% of damage dealt.', apply: () => this.player.lifeSteal += 0.1 }
-        ];
-
-        // Shuffle the array and select the first 3 power-ups
-        Phaser.Utils.Array.Shuffle(allPowerUps);
-        const selectedPowerUps = allPowerUps.slice(0, 3);
-
-        // Store the keyboard event listener references
-        const keyboardListeners = [];
-
-        selectedPowerUps.forEach((powerUp, index) => {
-            const buttonY = centerY - 80 + index * 80; // Adjusted starting position
-
-            // Button background
-            const button = this.add.rectangle(
-                centerX, 
-                buttonY, 
-                200, 
-                50, 
-                0x555555
-            ).setInteractive().setDepth(11);
-
-            // Button text
-            this.add.text(
-                centerX, 
-                buttonY, 
-                `${index + 1}: ${powerUp.name}`, // Add shortcut number
-                { fontSize: '20px', fill: '#ffffff' }
-            ).setOrigin(0.5).setDepth(11);
-
-            // Apply power-up on button click
-            button.on('pointerdown', () => {
-                powerUp.apply();
-                this.closePowerUpSelection();
-            });
-
-            // Add keyboard shortcut
-            const listener = (event) => {
-                if (event.key === `${index + 1}`) {
-                    powerUp.apply();
-                    this.closePowerUpSelection();
-                }
-            };
-            this.input.keyboard.on('keydown', listener);
-            keyboardListeners.push(listener);
-        });
-
-        // Cancel button (optional)
-        const cancelY = centerY + 140; // Adjusted position for the options
-        const cancelButton = this.add.rectangle(
-            centerX, 
-            cancelY, 
-            100, 
-            40, 
-            0xff4444
-        ).setInteractive().setDepth(11);
-        this.add.text(
-            centerX, 
-            cancelY, 
-            'Cancel', 
-            { fontSize: '18px', fill: '#ffffff' }
-        ).setOrigin(0.5).setDepth(11);
-
-        cancelButton.on('pointerdown', () => {
-            this.closePowerUpSelection();
-        });
-
-        // Store the listeners to remove them later
-        this.keyboardListeners = keyboardListeners;
-    }
-
-    /**
-     * Closes the power-up selection UI and resumes the game.
-     */
-    closePowerUpSelection() {
-        // Destroy UI elements
-        this.powerUpBackground.destroy();
-        this.children.getAll().forEach(child => {
-            if (child.depth === 10 || child.depth === 11) {
-                child.destroy();
-            }
-        });
-
-        // Remove keyboard listeners
-        this.keyboardListeners.forEach(listener => {
-            this.input.keyboard.off('keydown', listener);
-        });
-
-        // Clear tint
-        this.player.clearTint();
-
-        // Resume the game
-        this.resumeGame();
+        this.powerUpManager.showPowerUpSelection(newLevel);
     }
 
     spawnHeart() {
