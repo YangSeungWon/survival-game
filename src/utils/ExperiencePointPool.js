@@ -19,7 +19,7 @@ export default class ExperiencePointPool {
         }
 
         // Listen to collection events
-        scene.events.on('experienceCollected', this.addExperience, this);
+        scene.events.on('experienceCollected', this.addPlayerExperience, this);
     }
 
     /**
@@ -43,7 +43,7 @@ export default class ExperiencePointPool {
      * Optional: Handle adding experience to the player.
      * @param {number} amount - Amount of experience to add.
      */
-    addExperience(amount) {
+    addPlayerExperience(amount) {
         // Implement how the player's experience is handled
         if (this.scene.player) {
             this.scene.player.addExperience(amount);

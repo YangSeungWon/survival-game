@@ -30,7 +30,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.lifeSteal = 0; // 흡혈 속성 추가, 기본값은 0
         this.defense = 0; // 방어력 속성 추가, 기본값은 0
         this.critChance = 0; // 크리티컬 확률 속성 추가, 기본값은 0
-        console.log(this.critChance)
         this.facingDirection = { x: 0, y: 0 }; // Add a property to store facing direction
 
         // 자동 공격 타이머 설정
@@ -68,6 +67,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Determine the text to display based on health change
         const text = healthChange > 0 ? `+${healthChange}` : `${healthChange}`;
 
+        if (this.scene == undefined) return;
         // Create a text object to show the health change
         const healthChangeText = this.scene.add.text(this.x, this.y - 20, text, {
             fontSize: '16px',
@@ -177,8 +177,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
      */
     addExperience(amount) {
         this.experience += amount;
-        this.scene.events.emit('experienceUpdated', this.experience);
         this.checkLevelUp();
+        this.scene.events.emit('experienceUpdated', this.experience);
     }
 
     /**

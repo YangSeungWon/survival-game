@@ -12,7 +12,6 @@ export default class GameScene extends Phaser.Scene {
         super({ key: 'GameScene' });
         this.score = 0;
         this.elapsedTime = 0;
-        this.playerExperience = 0;
         this.mapSize = 2000;
         this.enemySpawnInterval = 1000; // 1 second interval
         this.heartSpawnInterval = 10000; // 10 seconds interval
@@ -106,10 +105,10 @@ export default class GameScene extends Phaser.Scene {
         this.experienceText = this.add.text(16, 118, 'XP: 0', { fontSize: '32px', fill: '#00ff00' }).setScrollFactor(0);
 
         // Listen to health changes
-        this.events.on('playerHealthChanged', this.updateHealthText, this);
+        this.events.on('playerHealthChanged', this.updateHealthRelatedUI, this);
 
-        // Listen to experience collection
-        this.events.on('experienceCollected', this.addPlayerExperience, this);
+        // Listen to experience changes
+        this.events.on('experienceUpdated', this.updateExperienceRelatedUI, this);
 
         // Listen to game over
         this.events.on('playerDead', this.gameOver, this);
@@ -137,6 +136,24 @@ export default class GameScene extends Phaser.Scene {
 
         // Initialize PowerUpManager
         this.powerUpManager = new PowerUpManager(this, this.player);
+
+        // Create health bar background
+        this.healthBarBackground = this.add.graphics();
+        this.healthBarBackground.fillStyle(0x555555, 1); // Grey color for background
+        this.healthBarBackground.fillRect(this.cameras.main.width - 216, 16, 200, 20).setScrollFactor(0); // Full size of the health bar
+
+        // Create health bar
+        this.healthBar = this.add.graphics();
+        this.updateHealthRelatedUI();
+
+        // Create experience bar background
+        this.experienceBarBackground = this.add.graphics();
+        this.experienceBarBackground.fillStyle(0x555555, 1); // Grey color for background
+        this.experienceBarBackground.fillRect(this.cameras.main.width - 216, 40, 200, 20).setScrollFactor(0); // Full size of the experience bar
+
+        // Create experience bar
+        this.experienceBar = this.add.graphics();
+        this.updateExperienceRelatedUI();
     }
 
     createEnemies() {
@@ -193,9 +210,6 @@ export default class GameScene extends Phaser.Scene {
             enemy.update(this.player, deltaNormalized);
         });
 
-        // Update health text
-        this.healthText.setText(`Health: ${this.player.health}/${this.player.maxHealth}`);
-
         // Update player stats text
         var statsText = '';
         statsText += `Speed: ${this.player.speed}\n`;
@@ -208,26 +222,40 @@ export default class GameScene extends Phaser.Scene {
         this.playerStatsText.setText(statsText);
     }
 
-    updateHealthText(health) {
-        this.healthText.setText('Health: ' + this.player.health);
+    updateHealthRelatedUI() {
+        this.updateHealthText();
+        this.updateHealthBar();
     }
 
-    /**
-     * Adds experience to the player and checks for level up.
-     * @param {number} amount - Amount of experience to add.
-     */
-    addPlayerExperience(amount) {
-        this.playerExperience += amount;
-        this.score += amount; // Optionally add to score
-        this.scoreText.setText('Score: ' + this.score);
-        this.experienceText.setText('XP: ' + this.playerExperience);
+    updateExperienceRelatedUI() {
+        this.updateExperienceText();
+        this.updateExperienceBar();
+    }
 
-        // 경험치 추가 및 레벨업 체크
-        this.player.addExperience(amount);
+    updateHealthText() {
+        this.healthText.setText(`Health: ${this.player.health}/${this.player.maxHealth}`);
+    }
+
+    updateExperienceText() {
+        this.experienceText.setText(`XP: ${this.player.experience}`);
+    }
+
+    updateHealthBar() {
+        this.healthBar.clear();
+        this.healthBar.fillStyle(0xff0000, 1); // Red color for current health
+        const healthPercentage = this.player.health / this.player.maxHealth;
+        this.healthBar.fillRect(this.cameras.main.width - 216, 16, 200 * healthPercentage, 20).setScrollFactor(0); // Adjust size and position as needed
+    }
+
+    updateExperienceBar() {
+        this.experienceBar.clear();
+        this.experienceBar.fillStyle(0xffff00, 1); // Yellow color for current experience
+        const experiencePercentage = this.player.experience / this.player.experienceThreshold; // Assuming you have a way to calculate this
+        this.experienceBar.fillRect(this.cameras.main.width - 216, 40, 200 * experiencePercentage, 20).setScrollFactor(0); // Adjust size and position as needed
     }
 
     gameOver() {
-        this.scene.start('GameOverScene', { score: this.score, time: this.elapsedTime, experience: this.playerExperience });
+        this.scene.start('GameOverScene', { score: this.score, time: this.elapsedTime, experience: this.player.experience });
     }
 
     /**
