@@ -67,16 +67,15 @@ export default class GameScene extends Phaser.Scene {
         // Call createEnemies to spawn enemies initially
         this.createEnemies();
 
-        // Optionally, set up a timed event to spawn enemies periodically
-        this.time.addEvent({
-            delay: this.enemySpawnInterval, // 1 seconds
+        // Store references to the timed events
+        this.enemySpawnEvent = this.time.addEvent({
+            delay: this.enemySpawnInterval, // 1 second
             callback: this.createEnemies,
             callbackScope: this,
             loop: true
         });
 
-        // Example: Add a heart every 10 seconds
-        this.time.addEvent({
+        this.heartSpawnEvent = this.time.addEvent({
             delay: this.heartSpawnInterval, // 10 seconds
             callback: this.spawnHeart,
             callbackScope: this,
@@ -230,12 +229,10 @@ export default class GameScene extends Phaser.Scene {
      * @param {number} newLevel - The new level of the player.
      */
     onPlayerLevelUp(newLevel) {
-        // 일시정지
-        this.physics.pause();
-        this.isPaused = true;
-        this.player.setTint(0xfff000); // 레벨업 시 플레이어 색상 변경 (옵션)
+        // Pause the game
+        this.pauseGame();
 
-        // 파워업 선택 UI 표시
+        // Show power-up selection UI
         this.showPowerUpSelection(newLevel);
     }
 
@@ -244,9 +241,9 @@ export default class GameScene extends Phaser.Scene {
      * @param {number} level - The new level of the player.
      */
     showPowerUpSelection(level) {
-        // Calculate center positions
-        const centerX = this.cameras.main.width / 2;
-        const centerY = this.cameras.main.height / 2;
+        // Calculate center positions based on the camera's center
+        const centerX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+        const centerY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
         // Add a semi-transparent background
         this.powerUpBackground = this.add.rectangle(
@@ -278,6 +275,9 @@ export default class GameScene extends Phaser.Scene {
         Phaser.Utils.Array.Shuffle(allPowerUps);
         const selectedPowerUps = allPowerUps.slice(0, 3);
 
+        // Store the keyboard event listener references
+        const keyboardListeners = [];
+
         selectedPowerUps.forEach((powerUp, index) => {
             const buttonY = centerY - 80 + index * 80; // Adjusted starting position
 
@@ -294,7 +294,7 @@ export default class GameScene extends Phaser.Scene {
             this.add.text(
                 centerX, 
                 buttonY, 
-                powerUp.name, 
+                `${index + 1}: ${powerUp.name}`, // Add shortcut number
                 { fontSize: '20px', fill: '#ffffff' }
             ).setOrigin(0.5).setDepth(11);
 
@@ -303,6 +303,16 @@ export default class GameScene extends Phaser.Scene {
                 powerUp.apply();
                 this.closePowerUpSelection();
             });
+
+            // Add keyboard shortcut
+            const listener = (event) => {
+                if (event.key === `${index + 1}`) {
+                    powerUp.apply();
+                    this.closePowerUpSelection();
+                }
+            };
+            this.input.keyboard.on('keydown', listener);
+            keyboardListeners.push(listener);
         });
 
         // Cancel button (optional)
@@ -324,13 +334,16 @@ export default class GameScene extends Phaser.Scene {
         cancelButton.on('pointerdown', () => {
             this.closePowerUpSelection();
         });
+
+        // Store the listeners to remove them later
+        this.keyboardListeners = keyboardListeners;
     }
 
     /**
      * Closes the power-up selection UI and resumes the game.
      */
     closePowerUpSelection() {
-        // UI 요소 제거
+        // Destroy UI elements
         this.powerUpBackground.destroy();
         this.children.getAll().forEach(child => {
             if (child.depth === 10 || child.depth === 11) {
@@ -338,12 +351,16 @@ export default class GameScene extends Phaser.Scene {
             }
         });
 
-        // 색상 초기화
+        // Remove keyboard listeners
+        this.keyboardListeners.forEach(listener => {
+            this.input.keyboard.off('keydown', listener);
+        });
+
+        // Clear tint
         this.player.clearTint();
 
-        // 게임 재개
-        this.physics.resume();
-        this.isPaused = false;
+        // Resume the game
+        this.resumeGame();
     }
 
     spawnHeart() {
@@ -357,5 +374,25 @@ export default class GameScene extends Phaser.Scene {
         heart.collect();
         player.health = Math.min(player.maxHealth, player.health + 200); // Restore 200 health
         this.events.emit('playerHealthChanged', 200);
+    }
+
+    pauseGame() {
+        // Pause the game physics
+        this.physics.pause();
+        this.isPaused = true;
+
+        // Pause the timed events
+        this.enemySpawnEvent.paused = true;
+        this.heartSpawnEvent.paused = true;
+    }
+
+    resumeGame() {
+        // Resume the game physics
+        this.physics.resume();
+        this.isPaused = false;
+
+        // Resume the timed events
+        this.enemySpawnEvent.paused = false;
+        this.heartSpawnEvent.paused = false;
     }
 }
