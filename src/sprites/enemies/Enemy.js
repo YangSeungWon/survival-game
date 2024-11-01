@@ -39,7 +39,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    update(player) {
+    update(player, delta) {
         // Update attack bar position
         this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
         this.updateAttackBar(player);
@@ -50,7 +50,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
                 this.attack(player);
             }
         } else if (this.canMove) {
-            this.scene.physics.moveToObject(this, player, this.moveSpeed);
+            this.scene.physics.moveToObject(this, player, this.moveSpeed * delta);
         } else {
             this.setVelocity(0, 0);
         }

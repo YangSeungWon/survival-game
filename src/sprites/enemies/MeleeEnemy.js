@@ -15,7 +15,6 @@ export default class MeleeEnemy extends Enemy {
         // Show and animate the attack bar
         this.attackBar.setVisible(true);
         this.attackBar.setPosition(this.x, this.y);
-        this.attackBar.setRotation(Phaser.Math.DegToRad(-15));
 
         // Calculate angle towards the player
         const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
@@ -24,7 +23,7 @@ export default class MeleeEnemy extends Enemy {
         // Animate the swing (e.g., a quick rotation)
         this.scene.tweens.add({
             targets: this.attackBar,
-            rotation: angle + Phaser.Math.DegToRad(45),
+            rotation: angle + Phaser.Math.DegToRad(30),
             duration: 100,
             yoyo: true,
             onComplete: () => {

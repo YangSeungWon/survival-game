@@ -168,6 +168,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Update elapsed time
         this.elapsedTime += delta / 1000; // Convert delta to seconds
+        const deltaNormalized = delta / 10;
 
         // Calculate minutes and seconds
         const minutes = Math.floor(this.elapsedTime / 60);
@@ -179,15 +180,15 @@ export default class GameScene extends Phaser.Scene {
         // Update player movement based on joystick if smartphone, else use keyboard
         if (this.joystick) {
             // Use joystick input
-            this.player.update(this.joystickCursors, this.joystick);
+            this.player.update(this.joystickCursors, deltaNormalized, this.joystick);
         } else {
             // Use keyboard input
-            this.player.update(this.cursors);
+            this.player.update(this.cursors, deltaNormalized);
         }
 
         // Update each enemy
         this.enemies.getChildren().forEach(enemy => {
-            enemy.update(this.player);
+            enemy.update(this.player, deltaNormalized);
         });
 
         // Update health text

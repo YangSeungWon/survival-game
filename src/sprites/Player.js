@@ -85,7 +85,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         });
     }
 
-    update(cursors, joystick) {
+    update(cursors, delta, joystick) {
         if (joystick) {
             // Normalize joystick input
             let forceX = joystick.forceX;
@@ -98,7 +98,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.facingDirection = { x: forceX, y: forceY }; // Update facing direction
             }
 
-            this.setVelocity(forceX * this.speed, forceY * this.speed);
+            this.setVelocity(forceX * this.speed * delta, forceY * this.speed * delta);
         } else {
             // 키보드 입력 사용
             this.setVelocity(0);
@@ -126,7 +126,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 this.facingDirection = { x: velocityX, y: velocityY }; // Update facing direction
             }
 
-            this.setVelocity(velocityX * this.speed, velocityY * this.speed);
+            this.setVelocity(velocityX * this.speed * delta, velocityY * this.speed * delta);
         }
     }
 
