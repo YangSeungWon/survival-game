@@ -1,7 +1,7 @@
 import ExperiencePoint from '../sprites/ExperiencePoint.js';
 
 export default class ExperiencePointPool {
-    constructor(scene, poolSize = 50) {
+    constructor(scene, poolSize = -1) {
         this.scene = scene;
         this.pool = scene.physics.add.group({
             classType: ExperiencePoint,

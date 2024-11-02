@@ -7,8 +7,14 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         const textureKey = `enemyTexture_${color}_${size}`;
         createEnemyTexture(scene, textureKey, color, size);
 
-        const x = Phaser.Math.Between(0, scene.game.config.width);
-        const y = Phaser.Math.Between(0, scene.game.config.height);
+        const margin = 200; // Adjust this value as needed
+        const minDistanceFromPlayer = 500; // Minimum distance from the player
+
+        let x, y;
+        do {
+            x = Phaser.Math.Between(-margin, scene.game.config.width + margin);
+            y = Phaser.Math.Between(-margin, scene.game.config.height + margin);
+        } while (Phaser.Math.Distance.Between(x, y, scene.player.x, scene.player.y) < minDistanceFromPlayer);
 
         super(scene, x, y, textureKey);
         scene.add.existing(this);
