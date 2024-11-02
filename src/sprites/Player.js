@@ -1,8 +1,10 @@
+import ProjectileAttack from '../attacks/ProjectileAttack.js';
+
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene) {
         const graphics = scene.add.graphics();
-        const COLOR = 0xffffff;
-        graphics.fillStyle(COLOR, 1);
+        const color = 0xffffff;
+        graphics.fillStyle(color, 1);
         graphics.fillRect(0, 0, 20, 20);
         graphics.generateTexture('playerTexture', 20, 20);
         graphics.destroy();
@@ -16,29 +18,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setCollideWorldBounds(true);
         this.setBounce(1);
 
+        this.color = color;
+
         this.speed = 200; // 이동 속도를 변수로 설정
         this.maxHealth = 1000; // 최대 체력을 변수로 설정
         this.health = this.maxHealth; // 초기 체력 설정
 
-        // 공격 관련 변수 설정
-        this.attackSpeed = 200; // 공격 속도 (밀리초)
-        this.projectileSpeed = 300; // 발사체 속도
-        this.attackPower = 10; // 공격력
-        this.projectileColor = 0xffffff; // 발사체 색상
-        this.projectileSize = 4; // 발사체 크기
+        // Attack-related properties
+        this.attacks = []; // Array to hold attack instances
 
         this.lifeSteal = 0; // 흡혈 속성 추가, 기본값은 0
         this.defense = 0; // 방어력 속성 추가, 기본값은 0
         this.critChance = 0; // 크리티컬 확률 속성 추가, 기본값은 0
-        this.facingDirection = { x: 0, y: 0 }; // Add a property to store facing direction
+        this.facingAngle = 0
 
-        // 자동 공격 타이머 설정
-        this.scene.time.addEvent({
-            delay: this.attackSpeed,
-            callback: this.shoot,
-            callbackScope: this,
-            loop: true
-        });
+        // Initialize default attacks
+        this.initDefaultAttacks();
 
         this.experience = 0; // 경험치 초기화
         this.level = 1; // 초기 레벨 설정
@@ -49,6 +44,40 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Listen for player health change events
         this.scene.events.on('playerHealthChanged', this.onPlayerHealthChanged, this);
+
+        this.canAttack = true;
+        this.canMove = true;
+    }
+
+    initDefaultAttacks() {
+        // Example: Initialize a default projectile attack
+        const projectileAttackConfig = {
+            attackSpeed: 300,
+            projectileSpeed: 400,
+            attackPower: 10,
+            projectileColor: 0xffffff,
+            projectileSize: 4,
+            attackRange: 500
+        };
+        const projectileAttack = new ProjectileAttack(this.scene, this, projectileAttackConfig);
+        this.addAttack(projectileAttack);
+    }
+
+    /**
+     * Adds a new attack to the player.
+     * @param {Attack} attack - An instance of an Attack subclass.
+     */
+    addAttack(attack) {
+        this.attacks.push(attack);
+    }
+
+    /**
+     * Removes an attack from the player.
+     * @param {Attack} attack - The attack instance to remove.
+     */
+    removeAttack(attack) {
+        attack.destroy();
+        this.attacks = this.attacks.filter(a => a !== attack);
     }
 
     onEnemyHealthChanged(data) {
@@ -96,7 +125,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             if (length !== 0) {
                 forceX /= length;
                 forceY /= length;
-                this.facingDirection = { x: forceX, y: forceY }; // Update facing direction
+                this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, this.x + forceX, this.y + forceY); // Update facing angle
             }
 
             this.setVelocity(forceX * this.speed * delta, forceY * this.speed * delta);
@@ -124,27 +153,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             if (length !== 0) {
                 velocityX /= length;
                 velocityY /= length;
-                this.facingDirection = { x: velocityX, y: velocityY }; // Update facing direction
+                this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, this.x + velocityX, this.y + velocityY); // Update facing angle
             }
 
             this.setVelocity(velocityX * this.speed * delta, velocityY * this.speed * delta);
         }
-    }
 
-    shoot() {
-        const { x: directionX, y: directionY } = this.facingDirection;
-
-        this.scene.projectilePool.fireProjectile(
-            this.x, 
-            this.y, 
-            this.x + directionX * 100, // Target X coordinate
-            this.y + directionY * 100, // Target Y coordinate
-            this.projectileSpeed, // Speed of the projectile
-            this.attackPower,  // Attack power of the projectile
-            this.projectileColor, // Color of the projectile
-            this.projectileSize, // Size of the projectile
-            'player'
-        );
+        // Update all attacks
+        this.attacks.forEach(attack => {
+            attack.updateAttackBar();
+            attack.performAttack();
+        });
     }
 
     takeDamage(amount) {
@@ -193,10 +212,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    /**
-     * Optional: Handles leveling up.
-     */
-    levelUp() {
-        // TODO: Implement leveling up logic if needed
+    destroy() {
+        // Clean up all attacks
+        this.attacks.forEach(attack => attack.destroy());
+        super.destroy();
     }
 }

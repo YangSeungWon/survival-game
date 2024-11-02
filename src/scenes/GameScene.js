@@ -213,12 +213,10 @@ export default class GameScene extends Phaser.Scene {
         // Update player stats text
         var statsText = '';
         statsText += `Speed: ${this.player.speed}\n`;
-        statsText += `Attack Power: ${this.player.attackPower}\n`;
-        statsText += `Attack Speed: ${this.player.attackSpeed}\n`;
-        statsText += `Projectile Speed: ${this.player.projectileSpeed}\n`;
         statsText += `Life Steal: ${this.player.lifeSteal}\n`;
         statsText += `Defense: ${this.player.defense}\n`;
-        statsText += `Critical Hit Chance: ${this.player.critChance}`;
+        statsText += `Critical Hit Chance: ${this.player.critChance}\n`;
+        statsText += `Attacks: ${this.player.attacks.length}`;
         this.playerStatsText.setText(statsText);
     }
 
@@ -244,14 +242,22 @@ export default class GameScene extends Phaser.Scene {
         this.healthBar.clear();
         this.healthBar.fillStyle(0xff0000, 1); // Red color for current health
         const healthPercentage = this.player.health / this.player.maxHealth;
-        this.healthBar.fillRect(this.cameras.main.width - 216, 16, 200 * healthPercentage, 20).setScrollFactor(0); // Adjust size and position as needed
+        const healthBarWidth = 200 * healthPercentage; // Calculate width
+        if (healthBarWidth < 0 || healthBarWidth > 200) {
+            console.error("Invalid health bar width:", healthBarWidth);
+        }
+        this.healthBar.fillRect(this.cameras.main.width - 216, 16, healthBarWidth, 20).setScrollFactor(0);
     }
 
     updateExperienceBar() {
         this.experienceBar.clear();
         this.experienceBar.fillStyle(0xffff00, 1); // Yellow color for current experience
-        const experiencePercentage = this.player.experience / this.player.experienceThreshold; // Assuming you have a way to calculate this
-        this.experienceBar.fillRect(this.cameras.main.width - 216, 40, 200 * experiencePercentage, 20).setScrollFactor(0); // Adjust size and position as needed
+        const experiencePercentage = this.player.experience / this.player.experienceThreshold;
+        const experienceBarWidth = 200 * experiencePercentage; // Calculate width
+        if (experienceBarWidth < 0 || experienceBarWidth > 200) {
+            console.error("Invalid experience bar width:", experienceBarWidth);
+        }
+        this.experienceBar.fillRect(this.cameras.main.width - 216, 40, experienceBarWidth, 20).setScrollFactor(0);
     }
 
     gameOver() {
@@ -298,5 +304,22 @@ export default class GameScene extends Phaser.Scene {
         // Resume the timed events
         this.enemySpawnEvent.paused = false;
         this.heartSpawnEvent.paused = false;
+    }
+
+    showCriticalHit(x, y) {
+        const critText = this.add.text(x, y - 30, 'Critical!', {
+            fontSize: '16px',
+            fill: '#ffcc00' // Yellow color for critical hit text
+        }).setOrigin(0.5).setDepth(11);
+
+        this.tweens.add({
+            targets: critText,
+            y: y - 50,
+            alpha: 0,
+            duration: 200,
+            onComplete: () => {
+                critText.destroy();
+            }
+        });
     }
 }

@@ -13,6 +13,10 @@ export default class GameOverScene extends Phaser.Scene {
         this.add.text(width / 2, height / 2 + 150, 'Press Space to Restart', { fontSize: '32px', fill: '#ffffff' }).setOrigin(0.5);
 
         this.input.keyboard.once('keydown-SPACE', () => {
+            if (this.scene.get('GameScene')) {
+                const gameScene = this.scene.get('GameScene');
+                gameScene.player.attacks.forEach(attack => attack.destroy());
+            }
             this.scene.start('GameScene');
         });
     }

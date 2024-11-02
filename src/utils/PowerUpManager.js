@@ -1,3 +1,6 @@
+import ProjectileAttack from '../attacks/ProjectileAttack.js';
+import MeleeAttack from '../attacks/MeleeAttack.js';
+
 export default class PowerUpManager {
     constructor(scene, player) {
         this.scene = scene;
@@ -31,7 +34,9 @@ export default class PowerUpManager {
             { name: 'Attack Power Boost', description: 'Increase attack power by 5.', apply: () => { this.player.attackPower += 5 } },
             { name: 'Life Steal', description: 'Gain health equal to 10% of damage dealt.', apply: () => { this.player.lifeSteal += 0.1 } },
             { name: 'Defense Boost', description: 'Increase defense by 10.', apply: () => { this.player.defense += 1 } },
-            { name: 'Critical Hit Chance', description: 'Increase critical hit chance by 5%.', apply: () => { this.player.critChance += 0.05 } }
+            { name: 'Critical Hit Chance', description: 'Increase critical hit chance by 5%.', apply: () => { this.player.critChance += 0.05 } },
+            { name: 'Projectile Attack', description: 'Add a projectile attack.', apply: () => { this.applyProjectilePowerUp() } },
+            { name: 'Melee Attack', description: 'Add a melee attack.', apply: () => { this.applyMeleePowerUp() } }
         ];
 
         Phaser.Utils.Array.Shuffle(allPowerUps);
@@ -104,5 +109,28 @@ export default class PowerUpManager {
 
         this.player.clearTint();
         this.scene.resumeGame();
+    }
+
+    applyProjectilePowerUp() {
+        const projectileAttackConfig = {
+            attackSpeed: 1000,
+            projectileSpeed: 300,
+            attackPower: 30,
+            attackRange: 1000,
+            projectileColor: 0x00ff00,
+            projectileSize: 8
+        };
+        const newProjectileAttack = new ProjectileAttack(this.scene, this.player, projectileAttackConfig);
+        this.player.addAttack(newProjectileAttack);
+    }
+
+    applyMeleePowerUp() {
+        const meleeAttackConfig = {
+            attackSpeed: 1000,
+            attackPower: 50,
+            attackRange: 100
+        };
+        const newMeleeAttack = new MeleeAttack(this.scene, this.player, meleeAttackConfig);
+        this.player.addAttack(newMeleeAttack);
     }
 }

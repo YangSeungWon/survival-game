@@ -3,14 +3,14 @@ import MeleeEnemy from './MeleeEnemy.js';
 export default class StrongEnemy extends MeleeEnemy {
     constructor(scene) {
         const color = 0x0000ff;
-        const size = 30;
-        const speed = 30;
+        const size = 20;
+        const speed = 50;
         const health = 100;
         
         // 공격 속성 정의
-        const attackSpeed = 2000; 
-        const attackPower = 300;  
-        const attackRange = 60;
+        const attackSpeed = 1000; 
+        const attackPower = 100;  
+        const attackRange = 40;
 
         const experiencePoint = 10;
 

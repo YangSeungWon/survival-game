@@ -4,13 +4,13 @@ export default class GunEnemy extends RangedEnemy {
     constructor(scene) {
         const color = 0x5555ff;   
         const size = 10;
-        const speed = 100;
+        const speed = 50;
         const health = 20;
         
         // 공격 속성 정의
         const attackSpeed = 500; 
         const attackPower = 10;
-        const attackRange = 500;
+        const attackRange = 300;
 
         const experiencePoint = 10;
 

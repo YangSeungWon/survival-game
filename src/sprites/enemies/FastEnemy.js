@@ -10,7 +10,7 @@ export default class FastEnemy extends MeleeEnemy {
         // 공격 속성 정의
         const attackSpeed = 600;
         const attackPower = 50;
-        const attackRange = 30;
+        const attackRange = 25;
         const experiencePoint = 10;
 
         super(scene, color, size, speed, health, attackSpeed, attackPower, attackRange, experiencePoint); // 빨간색 빠른 적

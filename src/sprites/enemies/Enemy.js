@@ -15,6 +15,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.setCollideWorldBounds(true);
         this.setBounce(1);
 
+        this.color = color;
+
         this.moveSpeed = moveSpeed;
         this.health = health;
         this.attackSpeed = attackSpeed;
@@ -23,46 +25,40 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.experiencePoint = experiencePoint;
 
-        this.canAttack = true;
         this.canMove = true;
 
         this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, scene.player.x, scene.player.y);
-
-        // Initialize attack bar
-        this.initAttackBar(scene, Phaser.Display.Color.ValueToColor(color).lighten(20).color, attackRange, attackPower);
-    }
-
-    // Update the attack bar position
-    updateAttackBar(player) {
-        if (this.attackBar) {
-            this.attackBar.setPosition(this.x, this.y);
-        }
     }
 
     update(player, delta) {
         // Update attack bar position
         this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
-        this.updateAttackBar(player);
+        this.attackTool.updateAttackBar();
         
         const distance = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
         if (distance <= this.attackRange) {
-            if (this.canAttack) {
-                this.attack(player);
-            }
-        } else if (this.canMove) {
+            this.setVelocity(0, 0);
+            this.attackTool.performAttack(player);
+        } else if (this.canMove && !this.attackTool.isAttacking) {
             this.scene.physics.moveToObject(this, player, this.moveSpeed * delta);
         } else {
             this.setVelocity(0, 0);
         }
     }
 
-    attack(player) {
-        throw new Error('attack() method must be implemented by subclass');
+    calculateCriticalHit(critChance) {
+        return Phaser.Math.FloatBetween(0, 1) < critChance;
     }
 
     takeDamage(amount) {
+        const isCriticalHit = this.calculateCriticalHit(this.scene.player.critChance);
+        const damage = isCriticalHit ? amount * 2 : amount;
+        if (isCriticalHit) {
+            this.scene.showCriticalHit(this.x, this.y);
+        }
+
         const initialHealth = this.health;
-        this.health = Math.max(this.health - amount, 0); // Ensure health doesn't go below zero
+        this.health = Math.max(this.health - damage, 0); // Ensure health doesn't go below zero
 
         const damageDealt = initialHealth - this.health; // Calculate the actual damage dealt
 
