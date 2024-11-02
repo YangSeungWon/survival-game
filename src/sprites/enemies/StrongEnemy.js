@@ -15,6 +15,6 @@ export default class StrongEnemy extends MeleeEnemy {
 
         const experiencePoint = 10;
 
-        super(scene, color, size, speed, health, attackSpeed, attackPower, attackRange, attackAngle, experiencePoint); // 파란색 강한 적
+        super(scene, color, size, speed, health, attackSpeed, attackPower, attackRange, experiencePoint, attackAngle); // 파란색 강한 적
     }
 }
