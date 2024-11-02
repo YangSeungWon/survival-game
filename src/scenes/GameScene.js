@@ -11,10 +11,11 @@ export default class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
         this.score = 0;
-        this.elapsedTime = 0;
+        this.elapsedTimeMillis = 0;
         this.mapSize = 2000;
         this.enemySpawnInterval = 1000; // 1 second interval
         this.heartSpawnInterval = 10000; // 10 seconds interval
+        this.lastUpdateTime = 0; // Store the last update time
     }
 
     preload() {
@@ -49,6 +50,8 @@ export default class GameScene extends Phaser.Scene {
         // Set camera to follow the player
         this.cameras.main.startFollow(this.player);
 
+        this.fpsText = this.add.text(this.cameras.main.width / 2, 8, 'FPS: 0', { fontSize: '16px', fill: '#ffffff' }).setScrollFactor(0);
+
         // Projectile Pool 생성
         this.projectilePool = new ProjectilePool(this);
 
@@ -81,6 +84,8 @@ export default class GameScene extends Phaser.Scene {
             callbackScope: this,
             loop: true
         });
+
+        this.attackEvents = [];
 
         // Overlap settings instead of collider
         this.physics.add.overlap(this.player, this.experiencePointPool.pool, this.collectExperience, null, this);
@@ -182,32 +187,51 @@ export default class GameScene extends Phaser.Scene {
         experience.collect();
     }
 
-    update(time, delta) {
+    update(time, deltaGame) {
         if (this.isPaused) return; // Check if the game is paused
 
+        // Calculate the time difference since the last update
+        const deltaTime = this.lastUpdateTime ? time - this.lastUpdateTime : 0;
+        this.lastUpdateTime = time; // Update the last update time
+
         // Update elapsed time
-        this.elapsedTime += delta / 1000; // Convert delta to seconds
-        const deltaNormalized = delta / 20;
+        this.elapsedTimeMillis += deltaTime;
+
+        const normalizedDeltaTime = deltaTime / deltaGame;
+
+        const fps = Math.floor(this.game.loop.actualFps);
+        this.fpsText.setText(`FPS: ${fps}\nDelta: ${normalizedDeltaTime}`);
 
         // Calculate minutes and seconds
-        const minutes = Math.floor(this.elapsedTime / 60);
-        const seconds = Math.floor(this.elapsedTime % 60);
+        const minutes = Math.floor(this.elapsedTimeMillis / 60000);
+        const seconds = Math.floor((this.elapsedTimeMillis % 60000) / 1000);
 
         // Update time text
         this.timeText.setText(`Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
 
+
+        this.physics.timeScale = normalizedDeltaTime;
+        this.tweens.timeScale = normalizedDeltaTime;
+        this.time.timeScale = normalizedDeltaTime;
+        this.anims.timeScale = normalizedDeltaTime;
+        this.input.timeScale = normalizedDeltaTime;
+        this.sound.timeScale = normalizedDeltaTime;
+        this.events.timeScale = normalizedDeltaTime;
+        this.projectilePool.timeScale = normalizedDeltaTime;
+
+
         // Update player movement based on joystick if smartphone, else use keyboard
         if (this.joystick) {
             // Use joystick input
-            this.player.update(this.joystickCursors, deltaNormalized, this.joystick);
+            this.player.update(this.joystickCursors, normalizedDeltaTime, this.joystick);
         } else {
             // Use keyboard input
-            this.player.update(this.cursors, deltaNormalized);
+            this.player.update(this.cursors, normalizedDeltaTime);
         }
 
         // Update each enemy
         this.enemies.getChildren().forEach(enemy => {
-            enemy.update(this.player, deltaNormalized);
+            enemy.update(this.player, normalizedDeltaTime);
         });
 
         // Update player stats text
@@ -217,6 +241,9 @@ export default class GameScene extends Phaser.Scene {
         statsText += `Defense: ${this.player.defense}\n`;
         statsText += `Critical Hit Chance: ${this.player.critChance}\n`;
         statsText += `Attacks: ${this.player.attacks.length}`;
+        for (const attack of this.player.attacks) {
+            statsText += `\n\t- P${attack.attackPower} S${attack.attackSpeed} R${attack.attackRange}`;
+        }
         this.playerStatsText.setText(statsText);
     }
 
@@ -261,7 +288,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     gameOver() {
-        this.scene.start('GameOverScene', { score: this.score, time: this.elapsedTime, experience: this.player.experience });
+        this.scene.start('GameOverScene', { score: this.score, time: this.elapsedTimeMillis, experience: this.player.experience });
     }
 
     /**
@@ -294,6 +321,7 @@ export default class GameScene extends Phaser.Scene {
         // Pause the timed events
         this.enemySpawnEvent.paused = true;
         this.heartSpawnEvent.paused = true;
+        this.attackEvents.forEach(event => event.paused = true);
     }
 
     resumeGame() {
@@ -304,6 +332,7 @@ export default class GameScene extends Phaser.Scene {
         // Resume the timed events
         this.enemySpawnEvent.paused = false;
         this.heartSpawnEvent.paused = false;
+        this.attackEvents.forEach(event => event.paused = false);
     }
 
     showCriticalHit(x, y) {

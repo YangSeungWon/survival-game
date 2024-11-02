@@ -8,7 +8,7 @@ export default class MeleeAttack extends Attack {
 
     initAttackBar(scene, attackRange, attackPower) {
         const barLength = attackRange;
-        const barHeight = 3 + attackPower * 0.01; // Thickness of the bar
+        const barHeight = 5 + attackPower * 0.01; // Thickness of the bar
         super.initAttackBar(scene, barLength, barHeight);
 
         this.attackBar.setVisible(false);
@@ -21,10 +21,12 @@ export default class MeleeAttack extends Attack {
 
         this.showAttackMotion();
 
+        this.giveDamage();
+
         // Reset attack state after attackSpeed delay
-        this.scene.time.delayedCall(this.attackSpeed, () => {
+        this.scene.attackEvents.push(this.scene.time.delayedCall(this.attackSpeed, () => {
             this.isAttacking = false;
-        }, [], this);
+        }, [], this));
     }
 
     showAttackMotion() {
@@ -35,8 +37,6 @@ export default class MeleeAttack extends Attack {
         // Calculate angle towards the player
         const facingAngle = this.owner.facingAngle;
         this.attackBar.setRotation(facingAngle - Phaser.Math.DegToRad(20));
-
-        this.giveDamage();
 
         // Animate the swing (e.g., a quick rotation)
         this.scene.tweens.add({
