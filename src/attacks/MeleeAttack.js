@@ -54,15 +54,13 @@ export default class MeleeAttack extends Attack {
 
     giveDamage() {
         const target = this.owner instanceof Player ? this.scene.enemies : this.scene.player;
-        // Calculate the attack area based on position and angle with 40 degree arc
-        const attackAngle = this.attackBar.rotation;
+        const attackAngle = this.owner.facingAngle;
         const arcAngle = Phaser.Math.DegToRad(40); // 40 degree arc
         const halfArc = arcAngle / 2;
 
-        if (Array.isArray(target)) {
-            // For enemies array
-            target.forEach(enemy => {
-                // Calculate angle to target
+        if (target instanceof Phaser.Physics.Arcade.Group) {
+            // For enemies group
+            target.getChildren().forEach(enemy => {
                 const angleToTarget = Phaser.Math.Angle.Between(
                     this.owner.x, 
                     this.owner.y,
@@ -70,10 +68,7 @@ export default class MeleeAttack extends Attack {
                     enemy.y
                 );
 
-                // Get angle difference
                 let angleDiff = Math.abs(Phaser.Math.Angle.Wrap(angleToTarget - attackAngle));
-
-                // Check if target is within arc and range
                 const distance = Phaser.Math.Distance.Between(
                     this.owner.x,
                     this.owner.y,

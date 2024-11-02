@@ -126,9 +126,9 @@ export default class PowerUpManager {
 
     applyMeleePowerUp() {
         const meleeAttackConfig = {
-            attackSpeed: 1000,
+            attackSpeed: 2000,
             attackPower: 50,
-            attackRange: 100
+            attackRange: 50
         };
         const newMeleeAttack = new MeleeAttack(this.scene, this.player, meleeAttackConfig);
         this.player.addAttack(newMeleeAttack);
