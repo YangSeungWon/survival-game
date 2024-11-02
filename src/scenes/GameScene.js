@@ -197,41 +197,33 @@ export default class GameScene extends Phaser.Scene {
         // Update elapsed time
         this.elapsedTimeMillis += deltaTime;
 
-        const normalizedDeltaTime = deltaTime / deltaGame;
+        const deltaMultiplier = deltaTime / deltaGame;
 
-        const fps = Math.floor(this.game.loop.actualFps);
-        this.fpsText.setText(`FPS: ${fps}\nDelta: ${normalizedDeltaTime}`);
-
-        // Calculate minutes and seconds
-        const minutes = Math.floor(this.elapsedTimeMillis / 60000);
-        const seconds = Math.floor((this.elapsedTimeMillis % 60000) / 1000);
-
-        // Update time text
-        this.timeText.setText(`Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
-
-
-        this.physics.timeScale = normalizedDeltaTime;
-        this.tweens.timeScale = normalizedDeltaTime;
-        this.time.timeScale = normalizedDeltaTime;
-        this.anims.timeScale = normalizedDeltaTime;
-        this.input.timeScale = normalizedDeltaTime;
-        this.sound.timeScale = normalizedDeltaTime;
-        this.events.timeScale = normalizedDeltaTime;
-        this.projectilePool.timeScale = normalizedDeltaTime;
+        this.physics.timeScale = deltaMultiplier;
+        this.tweens.timeScale = deltaMultiplier;
+        this.time.timeScale = deltaMultiplier;
+        this.anims.timeScale = deltaMultiplier;
+        this.input.timeScale = deltaMultiplier;
+        this.sound.timeScale = deltaMultiplier;
+        this.events.timeScale = deltaMultiplier;
+        this.projectilePool.timeScale = deltaMultiplier;
 
 
         // Update player movement based on joystick if smartphone, else use keyboard
         if (this.joystick) {
             // Use joystick input
-            this.player.update(this.joystickCursors, normalizedDeltaTime, this.joystick);
+            this.player.move(this.joystickCursors, deltaMultiplier, this.joystick);
         } else {
             // Use keyboard input
-            this.player.update(this.cursors, normalizedDeltaTime);
+            this.player.move(this.cursors, deltaMultiplier);
         }
+
+        // Update each projectile
+        this.projectilePool.moveAll(deltaMultiplier);
 
         // Update each enemy
         this.enemies.getChildren().forEach(enemy => {
-            enemy.update(this.player, normalizedDeltaTime);
+            enemy.update(this.player, deltaMultiplier);
         });
 
         // Update player stats text
@@ -245,6 +237,17 @@ export default class GameScene extends Phaser.Scene {
             statsText += `\n\t- P${attack.attackPower} S${attack.attackSpeed} R${attack.attackRange}`;
         }
         this.playerStatsText.setText(statsText);
+
+
+        const fps = Math.floor(this.game.loop.actualFps);
+        this.fpsText.setText(`FPS: ${fps}\nDelta: ${deltaMultiplier}`);
+
+        // Calculate minutes and seconds
+        const minutes = Math.floor(this.elapsedTimeMillis / 60000);
+        const seconds = Math.floor((this.elapsedTimeMillis % 60000) / 1000);
+
+        // Update time text
+        this.timeText.setText(`Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
     }
 
     updateHealthRelatedUI() {

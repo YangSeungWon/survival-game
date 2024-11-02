@@ -1,4 +1,5 @@
 import ProjectileAttack from '../attacks/ProjectileAttack.js';
+import { moveObject } from '../utils/MovementUtils.js';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene) {
@@ -115,24 +116,19 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         });
     }
 
-    update(cursors, delta, joystick) {
+    move(cursors, delta, joystick) {
         if (joystick) {
             // Normalize joystick input
             let forceX = joystick.forceX;
             let forceY = joystick.forceY;
-            const length = Math.sqrt(forceX * forceX + forceY * forceY);
 
-            if (length !== 0) {
-                forceX /= length;
-                forceY /= length;
+            if (forceX !== 0 || forceY !== 0) {
                 this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, this.x + forceX, this.y + forceY); // Update facing angle
-            }
 
-            this.setVelocity(forceX * this.speed * delta, forceY * this.speed * delta);
+                moveObject(this, this.facingAngle, this.speed, delta);
+            }
         } else {
             // 키보드 입력 사용
-            this.setVelocity(0);
-
             let velocityX = 0;
             let velocityY = 0;
 
@@ -148,16 +144,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
                 velocityY = 1;
             }
 
-            const length = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
-
-            if (length !== 0) {
-                velocityX /= length;
-                velocityY /= length;
+            if (velocityX !== 0 || velocityY !== 0) {
                 this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, this.x + velocityX, this.y + velocityY); // Update facing angle
+                moveObject(this, this.facingAngle, this.speed, delta);
             }
-
-            this.setVelocity(velocityX * this.speed * delta, velocityY * this.speed * delta);
         }
+
 
         // Update all attacks
         this.attacks.forEach(attack => {

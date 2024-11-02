@@ -1,4 +1,5 @@
 import { createEnemyTexture } from '../../utils/TextureGenerator.js';
+import { moveObject } from '../../utils/MovementUtils.js';
 
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, experiencePoint) {
@@ -37,12 +38,9 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         
         const distance = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
         if (distance <= this.attackRange) {
-            this.setVelocity(0, 0);
             this.attackTool.performAttack(player);
         } else if (this.canMove && !this.attackTool.isAttacking) {
-            this.scene.physics.moveToObject(this, player, this.moveSpeed * delta);
-        } else {
-            this.setVelocity(0, 0);
+            moveObject(this, this.facingAngle, this.moveSpeed, delta);
         }
     }
 

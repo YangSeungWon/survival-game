@@ -27,8 +27,6 @@ export default class ProjectilePool {
             this.pool.add(projectile);
         }
         projectile.fire(owner, angle, speed, attackPower, color, projectileSize);
-        projectile.setActive(true);
-        projectile.setVisible(true);
     }
 
     preUpdate() {
@@ -40,6 +38,12 @@ export default class ProjectilePool {
                 projectile.setVisible(false);
                 projectile.body.setVelocity(0, 0);
             }
+        });
+    }
+
+    moveAll(deltaMultiplier) {
+        this.pool.getChildren().forEach(projectile => {
+            projectile.move(deltaMultiplier);
         });
     }
 }

@@ -1,6 +1,7 @@
 import Player from './Player.js';
 import Enemy from './enemies/Enemy.js';
 import { createProjectileTexture } from '../utils/TextureGenerator.js';
+import { moveObject } from '../utils/MovementUtils.js';
 
 export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     /**
@@ -39,8 +40,9 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setPosition(owner.x, owner.y);
         this.setActive(true);
         this.setVisible(true);
-        
-        this.body.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
+
+        this.facingAngle = angle;
+        this.speed = speed;
         this.attackPower = attackPower;
 
         this.owner = owner;
@@ -78,5 +80,14 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
                 projectile.setVisible(false);
             }   
         }
+    }
+
+    move(deltaMultiplier) {
+        const threshold = 100; // Define a reasonable threshold for deltaMultiplier
+        if (deltaMultiplier > threshold) {
+            console.error(`Abnormal deltaMultiplier detected: ${deltaMultiplier}`);
+            throw new Error('Abnormal deltaMultiplier detected');
+        }
+        moveObject(this, this.facingAngle, this.speed, deltaMultiplier);
     }
 }
