@@ -36,7 +36,6 @@ export default class ProjectilePool {
                 projectile.y < 0 || projectile.y > this.scene.game.config.height) {
                 projectile.setActive(false);
                 projectile.setVisible(false);
-                projectile.body.setVelocity(0, 0);
             }
         });
     }

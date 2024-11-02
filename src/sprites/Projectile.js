@@ -83,11 +83,6 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     }
 
     move(deltaMultiplier) {
-        const threshold = 100; // Define a reasonable threshold for deltaMultiplier
-        if (deltaMultiplier > threshold) {
-            console.error(`Abnormal deltaMultiplier detected: ${deltaMultiplier}`);
-            throw new Error('Abnormal deltaMultiplier detected');
-        }
         moveObject(this, this.facingAngle, this.speed, deltaMultiplier);
     }
 }

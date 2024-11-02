@@ -21,7 +21,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.color = color;
 
-        this.speed = 200; // 이동 속도를 변수로 설정
+        this.speed = 250; // 이동 속도를 변수로 설정
         this.maxHealth = 1000; // 최대 체력을 변수로 설정
         this.health = this.maxHealth; // 초기 체력 설정
 
