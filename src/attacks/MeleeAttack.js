@@ -4,6 +4,7 @@ import Player from '../sprites/Player.js';
 export default class MeleeAttack extends Attack {
     constructor(scene, owner, config) {
         super(scene, owner, config);
+        this.attackAngle = Phaser.Math.DegToRad(config.attackAngle || 40); // Default to 40 degrees if not provided
     }
 
     initAttackBar(scene, attackRange, attackPower) {
@@ -36,12 +37,13 @@ export default class MeleeAttack extends Attack {
 
         // Calculate angle towards the player
         const facingAngle = this.owner.facingAngle;
-        this.attackBar.setRotation(facingAngle - Phaser.Math.DegToRad(20));
+        const halfArc = this.attackAngle / 2;
+        this.attackBar.setRotation(facingAngle - halfArc);
 
         // Animate the swing (e.g., a quick rotation)
         this.scene.tweens.add({
             targets: this.attackBar,
-            rotation: facingAngle + Phaser.Math.DegToRad(20),
+            rotation: facingAngle + halfArc,
             duration: 100,
             yoyo: true,
             onComplete: () => {
@@ -55,8 +57,7 @@ export default class MeleeAttack extends Attack {
     giveDamage() {
         const target = this.owner instanceof Player ? this.scene.enemies : this.scene.player;
         const attackAngle = this.owner.facingAngle;
-        const arcAngle = Phaser.Math.DegToRad(40); // 40 degree arc
-        const halfArc = arcAngle / 2;
+        const halfArc = this.attackAngle / 2;
 
         if (target instanceof Phaser.Physics.Arcade.Group) {
             // For enemies group
