@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "html-webpack-plugin": "^5.6.3",
+    "phaser": "^3.86.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.6.3",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "webpack serve --open",
+    "watch": "tsc --watch"
+  }
+}
