@@ -212,18 +212,18 @@ export default class GameScene extends Phaser.Scene {
         // Update player movement based on joystick if smartphone, else use keyboard
         if (this.joystick) {
             // Use joystick input
-            this.player.move(this.joystickCursors, deltaMultiplier, this.joystick);
+            this.player.move(this.joystickCursors, deltaTime, this.joystick);
         } else {
             // Use keyboard input
-            this.player.move(this.cursors, deltaMultiplier);
+            this.player.move(this.cursors, deltaTime);
         }
 
         // Update each projectile
-        this.projectilePool.moveAll(deltaMultiplier);
+        this.projectilePool.moveAll(deltaTime);
 
         // Update each enemy
         this.enemies.getChildren().forEach(enemy => {
-            enemy.update(this.player, deltaMultiplier);
+            enemy.update(this.player, deltaTime);
         });
 
         // Update player stats text
