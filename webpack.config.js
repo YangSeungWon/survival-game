@@ -1,6 +1,5 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -29,11 +28,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/index.html', // Ensure this path is correct
       filename: 'index.html', // Output filename in the dist directory
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        { from: 'CNAME', to: './CNAME' }, // Copy CNAME file to the dist directory
-      ],
     }),
   ],
 };

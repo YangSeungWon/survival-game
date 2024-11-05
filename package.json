@@ -10,7 +10,7 @@
     "webpack-dev-server": "^5.1.0"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.js && node createCNAME.js",
     "start": "webpack serve --open",
     "watch": "webpack --watch"
   }
