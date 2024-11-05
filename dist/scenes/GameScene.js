@@ -18,6 +18,35 @@ export default class GameScene extends Phaser.Scene {
         this.lastUpdateTime = 0;
         this.isPaused = false;
         this.attackEvents = [];
+        this.player = null;
+        this.projectilePool = null;
+        this.experiencePointPool = null;
+        this.enemies = null;
+        this.experiencePoints = null;
+        this.hearts = null;
+        this.enemySpawnEvent = null;
+        this.heartSpawnEvent = null;
+        this.cursors = null;
+        this.scoreText = null;
+        this.healthText = null;
+        this.playerStatsText = null;
+        this.timeText = null;
+        this.experienceText = null;
+        this.fpsText = null;
+        this.powerUpManager = null;
+        this.healthBarBackground = null;
+        this.healthBar = null;
+        this.experienceBarBackground = null;
+        this.experienceBar = null;
+    }
+    preload() {
+        this.load.script('rexvirtualjoystick', 'https://cdn.jsdelivr.net/npm/phaser3-rex-plugins/dist/rexvirtualjoystickplugin.min.js');
+        this.load.once('complete', () => {
+            this.plugins.install('rexvirtualjoystick', window.rexvirtualjoystickplugin, true);
+            console.log('Plugin after install:', this.plugins.get('rexvirtualjoystick'));
+        });
+    }
+    create() {
         this.player = new Player(this);
         this.projectilePool = new ProjectilePool(this);
         this.experiencePointPool = new ExperiencePointPool(this);
@@ -37,37 +66,28 @@ export default class GameScene extends Phaser.Scene {
             loop: true
         });
         this.cursors = this.input.keyboard.createCursorKeys() ? this.input.keyboard.createCursorKeys() : null;
-        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', color: '#fff' }).setScrollFactor(0);
-        this.healthText = this.add.text(16, 50, `Health: ${this.player.health}/${this.player.maxHealth}`, { fontSize: '32px', color: '#f00' }).setScrollFactor(0);
-        this.playerStatsText = this.add.text(16, this.cameras.main.height - 150, '', { fontSize: '16px', color: '#fff' }).setScrollFactor(0);
-        this.timeText = this.add.text(16, 84, 'Time: 0:00', { fontSize: '32px', color: '#fff' }).setScrollFactor(0);
-        this.experienceText = this.add.text(16, 118, 'XP: 0', { fontSize: '32px', color: '#00ff00' }).setScrollFactor(0);
-        this.fpsText = this.add.text(this.cameras.main.width / 2, 8, 'FPS: 0', { fontSize: '16px', color: '#ffffff' }).setScrollFactor(0);
+        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', color: '#fff' }).setScrollFactor(0).setDepth(1);
+        this.healthText = this.add.text(16, 50, `Health: ${this.player.health}/${this.player.maxHealth}`, { fontSize: '32px', color: '#f00' }).setScrollFactor(0).setDepth(1);
+        this.playerStatsText = this.add.text(16, this.cameras.main.height - 150, '', { fontSize: '16px', color: '#fff' }).setScrollFactor(0).setDepth(1);
+        this.timeText = this.add.text(16, 84, 'Time: 0:00', { fontSize: '32px', color: '#fff' }).setScrollFactor(0).setDepth(1);
+        this.experienceText = this.add.text(16, 118, 'XP: 0', { fontSize: '32px', color: '#00ff00' }).setScrollFactor(0).setDepth(1);
+        this.fpsText = this.add.text(this.cameras.main.width / 2, 8, 'FPS: 0', { fontSize: '16px', color: '#ffffff' }).setScrollFactor(0).setDepth(1);
         this.powerUpManager = new PowerUpManager(this, this.player);
         this.healthBarBackground = this.add.graphics();
         this.healthBarBackground.fillStyle(0x555555, 1); // Grey color for background
-        this.healthBarBackground.fillRect(this.cameras.main.width - 216, 16, 200, 20).setScrollFactor(0); // Full size of the health bar
+        this.healthBarBackground.fillRect(this.cameras.main.width - 216, 16, 200, 20).setScrollFactor(0).setDepth(1); // Full size of the health bar
         this.healthBar = this.add.graphics();
+        this.healthBar.setDepth(2); // Set depth for health bar
         this.updateHealthRelatedUI();
         this.experienceBarBackground = this.add.graphics();
         this.experienceBarBackground.fillStyle(0x555555, 1); // Grey color for background
-        this.experienceBarBackground.fillRect(this.cameras.main.width - 216, 40, 200, 20).setScrollFactor(0); // Full size of the experience bar
+        this.experienceBarBackground.fillRect(this.cameras.main.width - 216, 40, 200, 20).setScrollFactor(0).setDepth(1); // Full size of the experience bar
         this.experienceBar = this.add.graphics();
+        this.experienceBar.setDepth(2); // Set depth for experience bar
         this.updateExperienceRelatedUI();
-    }
-    preload() {
-        this.load.script('rexvirtualjoystick', 'https://cdn.jsdelivr.net/npm/phaser3-rex-plugins/dist/rexvirtualjoystickplugin.min.js');
-        this.load.once('complete', () => {
-            this.plugins.install('rexvirtualjoystick', window.rexvirtualjoystickplugin, true);
-            console.log('Plugin after install:', this.plugins.get('rexvirtualjoystick'));
-        });
-    }
-    create() {
-        // Set world bounds to be larger than the visible area
         this.physics.world.setBounds(0, 0, this.mapSize, this.mapSize);
-        // Create a larger background
+        this.add.rectangle(this.mapSize / 2, this.mapSize / 2, this.mapSize * 2, this.mapSize * 2, 0x222222);
         this.add.rectangle(this.mapSize / 2, this.mapSize / 2, this.mapSize, this.mapSize, 0x000000);
-        // Draw world border
         const borderGraphics = this.add.graphics();
         borderGraphics.lineStyle(4, 0xffffff, 1); // White border with 4px thickness
         borderGraphics.strokeRect(0, 0, this.mapSize, this.mapSize);

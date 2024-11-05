@@ -16,6 +16,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
         this.setCollideWorldBounds(true);
         this.setBounce(1);
+        this.setDepth(1);
         this.scene = scene;
         this.color = color;
         this.speed = 250; // 이동 속도를 변수로 설정
