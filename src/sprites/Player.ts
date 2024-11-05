@@ -3,6 +3,7 @@ import ProjectileAttack from '../attacks/ProjectileAttack';
 import Attack from '../attacks/Attack';
 import { moveObject } from '../utils/MovementUtils';
 import GameScene from '../scenes/GameScene';
+import Enemy from './enemies/Enemy';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene: GameScene;
@@ -44,7 +45,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.color = color;
 
-        this.speed = 250; // 이동 속도를 변수로 설정
+        this.speed = 200; // 이동 속도를 변수로 설정
         this.maxHealth = 1000; // 최대 체력을 변수로 설정
         this.health = this.maxHealth; // 초기 체력 설정
 
@@ -170,16 +171,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             }
 
             if (velocityX !== 0 || velocityY !== 0) {
-                this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, this.x + velocityX, this.y + velocityY); // Update facing angle
-                moveObject(this, this.facingAngle, this.speed, delta);
+                const moveAngle = Phaser.Math.Angle.Between(this.x, this.y, this.x + velocityX, this.y + velocityY);
+                moveObject(this, moveAngle, this.speed, delta);
             }
         }
 
-        // Update all attacks
-        this.attacks.forEach(attack => {
-            attack.updateAttackBar();
-            attack.performAttack();
-        });
+        const nearestEnemy = this.getNearestEnemy();
+        if (nearestEnemy) {
+            this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, nearestEnemy.x, nearestEnemy.y);
+
+            // Update all attacks
+            this.attacks.forEach(attack => {
+                attack.updateAttackBar();
+                attack.performAttack();
+            });
+        }
     }
 
     takeDamage(amount: number) {
@@ -206,6 +212,25 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    // Method to find the nearest enemy
+    private getNearestEnemy(): Enemy | null {
+        let nearestEnemy: Enemy | null = null;
+        let minDistance = Infinity;
+
+        const enemies = this.scene.enemies;
+        if (enemies == null) return null;
+        enemies.getChildren().forEach(object => {
+            const enemy = object as Enemy;
+            const distance = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearestEnemy = enemy;
+            }
+        });
+
+        return nearestEnemy;
+    }
+
     /**
      * Adds experience points to the player and handles leveling up.
      * @param amount - Amount of experience to add.
@@ -213,7 +238,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     addExperience(amount: number) {
         this.experience += amount;
         this.checkLevelUp();
-        this.scene.events.emit('experienceUpdated', this.experience);
+        if (this.scene != undefined) {
+            this.scene.events.emit('experienceUpdated', this.experience);
+        }
     }
 
     /**

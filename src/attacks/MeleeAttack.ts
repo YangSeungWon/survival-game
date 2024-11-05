@@ -4,6 +4,7 @@ import Player from '../sprites/Player';
 import GameScene from '../scenes/GameScene';
 import Enemy from '../sprites/enemies/Enemy';
 import { AttackConfig } from './Attack';
+import { createAttackBarTexture } from '../utils/TextureGenerator';
 
 interface MeleeConfig {
     attackAngle: number;
@@ -17,12 +18,15 @@ export default class MeleeAttack extends Attack {
         super(scene, owner, config);
         this.scene = scene;
         this.attackAngle = Phaser.Math.DegToRad(config.attackAngle || 40); // Default to 40 degrees if not provided
+        this.initAttackBar(scene);
     }
 
-    initAttackBar(scene: GameScene, attackRange: number, attackPower: number): void {
-        const barLength = attackRange;
-        const barHeight = 5 + attackPower * 0.01; // Thickness of the bar
-        super.initAttackBar(scene, barLength, barHeight);
+    initAttackBar(scene: GameScene): void {
+        const barLength = this.attackRange;
+        const barHeight = 5 + this.attackPower * 0.01; // Thickness of the bar
+        const barKey = `attackBar_${this.constructor.name}_${this.owner.color}_${barLength}_${barHeight}`;
+        createAttackBarTexture(scene, barKey, this.owner.color, barLength, barHeight);
+        super.initAttackBar(scene, barKey);
 
         this.attackBar.setVisible(false);
     }

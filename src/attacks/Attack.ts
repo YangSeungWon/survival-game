@@ -26,13 +26,9 @@ export default abstract class Attack {
         this.attackSpeed = config.attackSpeed;
         this.attackPower = config.attackPower;
         this.isAttacking = false;
-        this.initAttackBar(scene, this.attackRange, this.attackPower);
     }
 
-    initAttackBar(scene: GameScene, barLength: number, barHeight: number): void {
-        const barKey = `attackBar_${this.constructor.name}_${this.owner.color}_${barLength}_${barHeight}`;
-        createAttackBarTexture(scene, barKey, this.owner.color, barLength, barHeight);
-
+    initAttackBar(scene: GameScene, barKey: string): void {
         this.attackBar = scene.physics.add.sprite(this.owner.x, this.owner.y, barKey);
         this.attackBar.setOrigin(0, 1);
         this.attackBar.setDepth(this.owner.depth + 1);

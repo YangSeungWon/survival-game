@@ -11,7 +11,7 @@ export default class StrongEnemy extends MeleeEnemy {
         // 공격 속성 정의
         const attackSpeed: number = 1000; 
         const attackPower: number = 100;  
-        const attackRange: number = 40;
+        const attackRange: number = 100;
         const attackAngle: number = 40;
 
         const experiencePoint: number = 10;

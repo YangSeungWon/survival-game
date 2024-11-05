@@ -3,6 +3,7 @@ import Attack, { AttackConfig } from './Attack';
 import GameScene from '../scenes/GameScene';
 import Player from '../sprites/Player';
 import Enemy from '../sprites/enemies/Enemy';
+import { createAttackBarTexture } from '../utils/TextureGenerator';
 
 interface ProjectileConfig {
     projectileSpeed: number;
@@ -23,13 +24,15 @@ export default class ProjectileAttack extends Attack {
         this.projectileSpeed = config.projectileSpeed;
         this.projectileColor = config.projectileColor;
         this.projectileSize = config.projectileSize;
+        this.initAttackBar(scene);
     }
 
-    initAttackBar(scene: GameScene, attackRange: number, attackPower: number): void {
-        const barLength = 20 + attackRange * 0.01;
-        const barHeight = 5 + attackPower * 0.01; // Thickness of the bar
-
-        super.initAttackBar(scene, barLength, barHeight);
+    initAttackBar(scene: GameScene): void {
+        const barLength = 20 + this.attackRange * 0.01;
+        const barHeight = 5 + this.attackPower * 0.01; // Thickness of the bar
+        const barKey = `attackBar_${this.constructor.name}_${this.projectileColor}_${barLength}_${barHeight}`;
+        createAttackBarTexture(scene, barKey, this.projectileColor, barLength, barHeight);
+        super.initAttackBar(scene, barKey);
     }
     
     performAttack(): void {
