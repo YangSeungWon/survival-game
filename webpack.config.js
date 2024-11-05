@@ -26,7 +26,8 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html', // 템플릿 파일 경로
+      template: './src/index.html', // Ensure this path is correct
+      filename: 'index.html', // Output filename in the dist directory
     }),
   ],
 };
