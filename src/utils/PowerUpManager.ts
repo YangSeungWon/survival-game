@@ -50,12 +50,13 @@ export default class PowerUpManager {
         const centerX = this.scene.cameras.main.worldView.x + this.scene.cameras.main.width / 2;
         const centerY = this.scene.cameras.main.worldView.y + this.scene.cameras.main.height / 2;
 
-        this.scene.add.text(
+        const title = this.scene.add.text(
             centerX, 
             centerY - 160, 
             `Level ${level}! Choose a Power-Up:`, 
             { fontSize: '24px', color: '#ffffff' }
         ).setOrigin(0.5);
+        title.setData('powerUp', true);
 
         const allPowerUps: PowerUp[] = [
             { name: 'Health Boost', description: 'Increase maximum health by 200.', apply: () => { this.player.maxHealth += 200; this.player.health += 200 } },
@@ -80,13 +81,15 @@ export default class PowerUpManager {
                 50, 
                 0x555555
             ).setInteractive();
+            button.setData('powerUp', true);
 
-            this.scene.add.text(
+            const buttonText = this.scene.add.text(
                 centerX, 
                 buttonY, 
                 `${index + 1}: ${powerUp.name}`, 
                 { fontSize: '20px', color: '#ffffff' }
             ).setOrigin(0.5);
+            buttonText.setData('powerUp', true);
 
             button.on('pointerdown', () => {
                 powerUp.apply();
@@ -113,12 +116,15 @@ export default class PowerUpManager {
             40, 
             0xff4444
         ).setInteractive();
-        this.scene.add.text(
+        cancelButton.setData('powerUp', true);
+
+        const cancelText = this.scene.add.text(
             centerX, 
             cancelY, 
             'Cancel', 
             { fontSize: '18px', color: '#ffffff' }
         ).setOrigin(0.5);
+        cancelText.setData('powerUp', true);
 
         cancelButton.on('pointerdown', () => {
             this.closePowerUpSelection();
@@ -129,8 +135,9 @@ export default class PowerUpManager {
         this.powerUpBackground.setVisible(false);
 
         this.scene.children.getAll().forEach(child => {
-            const gameObject = child as Phaser.GameObjects.GameObject;
-            gameObject.destroy();
+            if (child.getData('powerUp')) {
+                child.destroy();
+            }
         });
 
         if (this.scene.input.keyboard) {
