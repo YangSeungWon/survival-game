@@ -42,6 +42,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setDepth(1);
 
         this.scene = scene as GameScene;
+        console.log('Player initialized with scene:', this.scene);
 
         this.color = color;
 
@@ -62,7 +63,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.experience = 0; // 경험치 초기화
         this.level = 1; // 초기 레벨 설정
-        this.experienceThreshold = 100; // 레벨업을 위한 경험치 임계값
+        this.experienceThreshold = 50; // 레벨업을 위한 경험치 임계값
 
         // Listen for enemy health change events
         this.scene.events.on('enemyHealthChanged', this.onEnemyHealthChanged, this);
@@ -79,7 +80,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     initDefaultAttacks() {
         // Example: Initialize a default projectile attack
         const projectileAttackConfig = {
-            attackSpeed: 300,
+            attackSpeed: 200,
             projectileSpeed: 400,
             attackPower: 10,
             projectileColor: 0xffffff,
@@ -236,11 +237,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
      * @param amount - Amount of experience to add.
      */
     addExperience(amount: number) {
+        if (!this.scene) {
+            console.error('Scene is undefined when adding experience');
+            return;
+        }
         this.experience += amount;
         this.checkLevelUp();
-        if (this.scene != undefined) {
-            this.scene.events.emit('experienceUpdated', this.experience);
-        }
+        this.scene.events.emit('experienceUpdated', this.experience);
     }
 
     /**
