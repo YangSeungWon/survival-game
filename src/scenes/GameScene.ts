@@ -46,7 +46,7 @@ export default class GameScene extends Phaser.Scene {
         this.score = 0;
         this.elapsedTimeMillis = 0;
         this.mapSize = 1000;
-        this.enemySpawnInterval = 400; // 0.5초 간격
+        this.enemySpawnInterval = 500; // 0.5초 간격
         this.heartSpawnInterval = 10000; // 10초 간격
         this.lastUpdateTime = 0;
         this.isPaused = false;
@@ -267,9 +267,9 @@ export default class GameScene extends Phaser.Scene {
         statsText += `XP Threshold: ${this.player!.experienceThreshold}\n`;
         statsText += `Enemy Spawn Interval: ${this.enemySpawnInterval}\n`;
         statsText += `Speed: ${this.player!.speed}\n`;
-        statsText += `Life Steal: ${this.player!.lifeSteal}\n`;
+        statsText += `Life Steal (%): ${this.player!.percentLifeSteal}\n`;
         statsText += `Defense: ${this.player!.defense}\n`;
-        statsText += `Critical Hit Chance: ${this.player!.critChance}\n`;
+        statsText += `Critical Hit Chance (%): ${this.player!.percentCritChance}\n`;
         statsText += `Attacks: ${this.player!.attacks.length}`;
         for (const attack of this.player!.attacks) {
             statsText += `\n\t- P${attack.attackPower} S${attack.attackSpeed} R${attack.attackRange}`;
@@ -320,7 +320,7 @@ export default class GameScene extends Phaser.Scene {
     updateExperienceBar() {
         this.experienceBar!.clear();
         this.experienceBar!.fillStyle(0xffff00, 1); // Yellow color for current experience
-        const experiencePercentage = this.player!.experience / this.player!.experienceThreshold;
+        const experiencePercentage = (this.player!.experience - this.player!.previousExperienceThreshold) / (this.player!.experienceThreshold - this.player!.previousExperienceThreshold);
         const experienceBarWidth = 200 * experiencePercentage; // Calculate width
         if (experienceBarWidth < 0 || experienceBarWidth > 200) {
             console.error("Invalid experience bar width:", experienceBarWidth);
@@ -341,7 +341,7 @@ export default class GameScene extends Phaser.Scene {
         this.powerUpManager!.showPowerUpSelection(newLevel);
 
         // Adjust enemy spawn interval based on player level
-        this.enemySpawnInterval = Math.max(50, 400 - newLevel * 20); // Decrease interval with level, minimum 50ms
+        this.enemySpawnInterval = Math.max(50, 500 - newLevel * 10); // Decrease interval with level, minimum 50ms
 
         // Reset the enemy spawn event with the new interval
         if (this.enemySpawnEvent) {
@@ -392,19 +392,22 @@ export default class GameScene extends Phaser.Scene {
         this.attackEvents.forEach(event => event.paused = false);
     }
 
-    showCriticalHit(x: number, y: number) {
-        const critText = this.add.text(x, y - 30, 'Critical!', {
-            fontSize: '16px',
-            color: '#ffcc00' // Yellow color for critical hit text
-        }).setOrigin(0.5).setDepth(11);
+    showDamageText(enemyX: number, enemyY: number, damage: number, color: string, isPlayer: boolean = false) {
+        const fontSize = isPlayer ? '24px' : '18px';
+        const deltaY = isPlayer ? -10 : -5;
+        const duration = isPlayer ? 1000 : 500;
+        const damageText = this.add.text(enemyX, enemyY, (isPlayer && damage > 0 ? '+' : '') + damage.toString(), { fontSize: fontSize, color: color })
+            .setScrollFactor(1) // Make the text move with the camera
+            .setDepth(1);
 
+        damageText.setAlpha(1);
         this.tweens.add({
-            targets: critText,
-            y: y - 50,
-            alpha: 0,
-            duration: 200,
+            targets: damageText,
+            y: enemyY + deltaY,
+            alpha: 0.7,
+            duration: duration,
             onComplete: () => {
-                critText.destroy();
+                damageText.destroy();
             }
         });
     }

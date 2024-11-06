@@ -7,7 +7,6 @@ export default class ExperiencePoint extends Phaser.Physics.Arcade.Sprite {
     private magnetRadius: number;
     private magnetSpeed: number;
     private glow: Phaser.GameObjects.Graphics;
-    private glowTween: Phaser.Tweens.Tween | null;
 
     constructor(scene: Phaser.Scene) {
         super(scene, 0, 0, 'experienceTexture');
@@ -24,7 +23,7 @@ export default class ExperiencePoint extends Phaser.Physics.Arcade.Sprite {
         this.experienceAmount = 0;
 
         // Initialize magnet properties
-        this.magnetRadius = 200; // The radius within which the experience point is attracted to the player
+        this.magnetRadius = 100; // The radius within which the experience point is attracted to the player
         this.magnetSpeed = 150;   // The speed at which it moves toward the player
 
         // Initialize glow effect
@@ -32,9 +31,6 @@ export default class ExperiencePoint extends Phaser.Physics.Arcade.Sprite {
         this.glow.setDepth(this.depth + 1);
         this.glow.setVisible(false);
         this.drawGlow();
-
-        // Initialize glowTween
-        this.glowTween = null;
     }
 
     /**
@@ -79,15 +75,17 @@ export default class ExperiencePoint extends Phaser.Physics.Arcade.Sprite {
         if (distance <= this.magnetRadius) {
             // Calculate direction towards player
             const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
-            const velocityX = Math.cos(angle) * this.magnetSpeed;
-            const velocityY = Math.sin(angle) * this.magnetSpeed;
+
+            // Increase speed as the distance decreases
+            const speedFactor = (this.magnetRadius - distance) / this.magnetRadius;
+            const velocityX = Math.cos(angle) * this.magnetSpeed * (1 + speedFactor);
+            const velocityY = Math.sin(angle) * this.magnetSpeed * (1 + speedFactor);
 
             this.setVelocity(velocityX, velocityY);
 
             // Show glow effect
             if (!this.glow.visible) {
                 this.glow.setVisible(true);
-                this.startGlowAnimation();
             }
         } else {
             // If not attracted, stop movement
@@ -96,40 +94,11 @@ export default class ExperiencePoint extends Phaser.Physics.Arcade.Sprite {
             // Hide glow effect
             if (this.glow.visible) {
                 this.glow.setVisible(false);
-                this.stopGlowAnimation();
             }
         }
 
         // Update glow position
         this.glow.setPosition(this.x, this.y);
-    }
-
-    /**
-     * Starts a pulsing animation for the glow effect.
-     */
-    private startGlowAnimation(): void {
-        // Ensure any existing tween is stopped before starting a new one
-        this.stopGlowAnimation();
-
-        this.glowTween = this.scene.tweens.add({
-            targets: this.glow,
-            scale: { from: 0.5, to: 1 },
-            yoyo: true,
-            repeat: -1,
-            duration: 1000,
-            ease: 'Sine.easeInOut'
-        });
-    }
-
-    /**
-     * Stops the pulsing animation for the glow effect.
-     */
-    private stopGlowAnimation(): void {
-        if (this.glowTween) {
-            this.glowTween.stop();
-            this.glowTween = null;
-            this.glow.setScale(1); // Reset scale to original
-        }
     }
 
     /**
@@ -141,7 +110,6 @@ export default class ExperiencePoint extends Phaser.Physics.Arcade.Sprite {
             this.setActive(false);
             this.setVisible(false);
             this.glow.setVisible(false);
-            this.stopGlowAnimation(); // Ensure the tween is stopped
             this.scene.events.emit('experienceCollected', this.experienceAmount); // Use the stored experience amount
             this.destroy();
         }
@@ -152,7 +120,6 @@ export default class ExperiencePoint extends Phaser.Physics.Arcade.Sprite {
      */
     destroy(fromScene?: boolean): void {
         this.glow.destroy();
-        this.stopGlowAnimation(); // Ensure the tween is stopped before destroying
         super.destroy(fromScene);
     }
 }

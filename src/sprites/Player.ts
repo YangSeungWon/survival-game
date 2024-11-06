@@ -12,12 +12,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     maxHealth: number;
     health: number;
     attacks: Attack[];
-    lifeSteal: number;
+    percentLifeSteal: number;
     defense: number;
-    critChance: number;
+    percentCritChance: number;
     facingAngle: number;
     experience: number;
     level: number;
+    previousExperienceThreshold: number;
     experienceThreshold: number;
     canAttack: boolean;
     canMove: boolean;
@@ -53,9 +54,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Attack-related properties
         this.attacks = []; // Array to hold attack instances
 
-        this.lifeSteal = 0; // 흡혈 속성 추가, 기본값은 0
+        this.percentLifeSteal = 0; // 흡혈 속성 추가, 기본값은 0
         this.defense = 0; // 방어력 속성 추가, 기본값은 0
-        this.critChance = 0; // 크리티컬 확률 속성 추가, 기본값은 0
+        this.percentCritChance = 0; // 크리티컬 확률 속성 추가, 기본값은 0
         this.facingAngle = 0;
 
         // Initialize default attacks
@@ -63,7 +64,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.experience = 0; // 경험치 초기화
         this.level = 1; // 초기 레벨 설정
-        this.experienceThreshold = 50; // 레벨업을 위한 경험치 임계값
+        this.previousExperienceThreshold = 0;
+        this.experienceThreshold = 100; // 레벨업을 위한 경험치 임계값
 
         // Listen for enemy health change events
         this.scene.events.on('enemyHealthChanged', this.onEnemyHealthChanged, this);
@@ -80,7 +82,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     initDefaultAttacks() {
         // Example: Initialize a default projectile attack
         const projectileAttackConfig = {
-            attackSpeed: 200,
+            attackSpeed: 500,
             projectileSpeed: 400,
             attackPower: 10,
             projectileColor: 0xffffff,
@@ -110,7 +112,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     onEnemyHealthChanged(data: { damageDealt: number }) {
         // Calculate life steal based on actual damage dealt
-        const lifeStealAvailable = Math.floor(data.damageDealt * this.lifeSteal);
+        const lifeStealAvailable = Math.ceil(data.damageDealt * this.percentLifeSteal / 100);
         const maxLifeStealAmount = this.maxHealth - this.health;
         const lifeStealAmount = Math.min(lifeStealAvailable, maxLifeStealAmount);
 
@@ -124,23 +126,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Determine the text to display based on health change
         const text = healthChange > 0 ? `+${healthChange}` : `${healthChange}`;
 
-        if (this.scene == undefined) return;
-        // Create a text object to show the health change
-        const healthChangeText = this.scene.add.text(this.x, this.y - 20, text, {
-            fontSize: '16px',
-            color: healthChange > 0 ? '#99ff99' : '#ff9999' // Green for healing, red for damage
-        });
-
-        // Animate the text to move up and fade out
-        this.scene.tweens.add({
-            targets: healthChangeText,
-            y: this.y - 40,
-            alpha: 0,
-            duration: 1000,
-            onComplete: () => {
-                healthChangeText.destroy(); // Remove the text object after animation
-            }
-        });
+        this.scene.showDamageText(this.x, this.y, healthChange, healthChange > 0 ? '#00ff00' : '#ff0000', true);
     }
 
     move(cursors: Phaser.Types.Input.Keyboard.CursorKeys, delta: number, joystick?: any) {
@@ -251,8 +237,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
      */
     checkLevelUp() {
         while (this.experience >= this.experienceThreshold) {
-            this.experience -= this.experienceThreshold;
             this.level += 1;
+            this.previousExperienceThreshold = this.experienceThreshold;
             this.experienceThreshold = Math.floor(this.experienceThreshold * 1.5); // 다음 레벨업 임계값 증가
             this.scene.events.emit('playerLevelUp', this.level);
         }

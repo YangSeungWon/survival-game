@@ -73,16 +73,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    calculateCriticalHit(critChance: number): boolean {
-        return Phaser.Math.FloatBetween(0, 1) < critChance;
+    calculateCriticalHit(percentCritChance: number): boolean {
+        return Phaser.Math.FloatBetween(0, 1) < percentCritChance / 100;
     }
 
     takeDamage(amount: number): void {
-        const isCriticalHit = this.calculateCriticalHit(this.scene.player!.critChance);
+        const isCriticalHit = this.calculateCriticalHit(this.scene.player!.percentCritChance);
         const damage = isCriticalHit ? amount * 2 : amount;
-        if (isCriticalHit) {
-            this.scene.showCriticalHit(this.x, this.y);
-        }
+        
+        // Display damage text
+        this.displayDamageText(damage, isCriticalHit);
 
         const initialHealth = this.health;
         this.health = Math.max(this.health - damage, 0); // Ensure health doesn't go below zero
@@ -113,6 +113,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             this.dropExperience();
             this.destroy();
         }
+    }
+
+    private displayDamageText(damage: number, isCriticalHit: boolean): void {
+        const color = isCriticalHit ? 'yellow' : 'white';
+        this.scene.showDamageText(this.x, this.y, damage, color);
     }
 
     /**

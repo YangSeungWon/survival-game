@@ -23,11 +23,7 @@ export default class GameOverScene extends Phaser.Scene {
 
         if (this.input.keyboard) {
             this.input.keyboard.once('keydown-SPACE', () => {
-                if (this.scene.get('GameScene')) {
-                    const gameScene = this.scene.get('GameScene') as GameScene;
-                    gameScene.player!.attacks.forEach(attack => attack.destroy());
-                }
-                this.scene.start('GameScene');
+                window.location.reload();
             });
         }
     }
