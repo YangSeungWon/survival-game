@@ -185,10 +185,21 @@ export default class GameScene extends Phaser.Scene {
             // Create cursor keys from joystick
             this.joystickCursors = this.joystick.createCursorKeys();
         }
+
+        // Add event listener for visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.log('Window is not visible, pausing game.');
+                this.pauseGame();
+            } else {
+                console.log('Window is visible, resuming game.');
+                this.resumeGame();
+            }
+        });
     }
 
     createEnemies() {
-        if (this.isPaused) return; // Check if the game is paused
+        if (this.isPaused || document.hidden) return; // Check if the game is paused or if the window is not visible
 
         const enemyType = Phaser.Math.RND.pick(['FastEnemy', 'FastEnemy', 'StrongEnemy', 'GunEnemy', 'GunEnemy']);
         var enemy;
@@ -342,8 +353,6 @@ export default class GameScene extends Phaser.Scene {
             callbackScope: this,
             loop: true
         });
-
-        alert(`Enemy spawn interval: ${this.enemySpawnInterval}`);
     }
 
     spawnHeart() {
@@ -360,24 +369,26 @@ export default class GameScene extends Phaser.Scene {
     }
 
     pauseGame() {
+        console.log('Pausing game...');
         // Pause the game physics
         this.physics.pause();
         this.isPaused = true;
 
         // Pause the timed events
-        this.enemySpawnEvent!.paused = true;
-        this.heartSpawnEvent!.paused = true;
+        if (this.enemySpawnEvent) this.enemySpawnEvent.paused = true;
+        if (this.heartSpawnEvent) this.heartSpawnEvent.paused = true;
         this.attackEvents.forEach(event => event.paused = true);
     }
 
     resumeGame() {
+        console.log('Resuming game...');
         // Resume the game physics
         this.physics.resume();
         this.isPaused = false;
 
         // Resume the timed events
-        this.enemySpawnEvent!.paused = false;
-        this.heartSpawnEvent!.paused = false;
+        if (this.enemySpawnEvent) this.enemySpawnEvent.paused = false;
+        if (this.heartSpawnEvent) this.heartSpawnEvent.paused = false;
         this.attackEvents.forEach(event => event.paused = false);
     }
 
