@@ -46,7 +46,7 @@ export default class GameScene extends Phaser.Scene {
         this.score = 0;
         this.elapsedTimeMillis = 0;
         this.mapSize = 1000;
-        this.enemySpawnInterval = 100; // 0.1초 간격
+        this.enemySpawnInterval = 500; // 0.5초 간격
         this.heartSpawnInterval = 10000; // 10초 간격
         this.lastUpdateTime = 0;
         this.isPaused = false;
