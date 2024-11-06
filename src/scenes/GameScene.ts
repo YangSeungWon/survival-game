@@ -46,7 +46,7 @@ export default class GameScene extends Phaser.Scene {
         this.score = 0;
         this.elapsedTimeMillis = 0;
         this.mapSize = 1000;
-        this.enemySpawnInterval = 500; // 0.5초 간격
+        this.enemySpawnInterval = 400; // 0.5초 간격
         this.heartSpawnInterval = 10000; // 10초 간격
         this.lastUpdateTime = 0;
         this.isPaused = false;
@@ -90,7 +90,7 @@ export default class GameScene extends Phaser.Scene {
         this.experiencePoints = this.physics.add.group();
         this.hearts = this.physics.add.group();
         this.enemySpawnEvent = this.time.addEvent({
-            delay: this.enemySpawnInterval, // 1 second
+            delay: this.enemySpawnInterval, 
             callback: this.createEnemies,
             callbackScope: this,
             loop: true
@@ -106,7 +106,7 @@ export default class GameScene extends Phaser.Scene {
 
         this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', color: '#fff' }).setScrollFactor(0).setDepth(1);
         this.healthText = this.add.text(16, 50, `Health: ${this.player.health}/${this.player.maxHealth}`, { fontSize: '32px', color: '#f00' }).setScrollFactor(0).setDepth(1);
-        this.playerStatsText = this.add.text(16, this.cameras.main.height - 150, '', { fontSize: '16px', color: '#fff' }).setScrollFactor(0).setDepth(1);
+        this.playerStatsText = this.add.text(16, this.cameras.main.height - 200, '', { fontSize: '16px', color: '#fff' }).setScrollFactor(0).setDepth(1);
         this.timeText = this.add.text(16, 84, 'Time: 0:00', { fontSize: '32px', color: '#fff' }).setScrollFactor(0).setDepth(1);
         this.experienceText = this.add.text(16, 118, 'XP: 0', { fontSize: '32px', color: '#00ff00' }).setScrollFactor(0).setDepth(1);
         this.fpsText = this.add.text(this.cameras.main.width / 2, 8, 'FPS: 0', { fontSize: '16px', color: '#ffffff' }).setScrollFactor(0).setDepth(1);
@@ -251,6 +251,10 @@ export default class GameScene extends Phaser.Scene {
 
         // Update player stats text
         var statsText = '';
+        statsText += `Level: ${this.player!.level}\n`;
+        statsText += `XP: ${this.player!.experience}\n`;
+        statsText += `XP Threshold: ${this.player!.experienceThreshold}\n`;
+        statsText += `Enemy Spawn Interval: ${this.enemySpawnInterval}\n`;
         statsText += `Speed: ${this.player!.speed}\n`;
         statsText += `Life Steal: ${this.player!.lifeSteal}\n`;
         statsText += `Defense: ${this.player!.defense}\n`;
@@ -324,6 +328,22 @@ export default class GameScene extends Phaser.Scene {
     onPlayerLevelUp(newLevel: number) {
         this.pauseGame();
         this.powerUpManager!.showPowerUpSelection(newLevel);
+
+        // Adjust enemy spawn interval based on player level
+        this.enemySpawnInterval = Math.max(50, 400 - newLevel * 20); // Decrease interval with level, minimum 50ms
+
+        // Reset the enemy spawn event with the new interval
+        if (this.enemySpawnEvent) {
+            this.enemySpawnEvent.remove(false); // Remove the old event without destroying it
+        }
+        this.enemySpawnEvent = this.time.addEvent({
+            delay: this.enemySpawnInterval,
+            callback: this.createEnemies,
+            callbackScope: this,
+            loop: true
+        });
+
+        alert(`Enemy spawn interval: ${this.enemySpawnInterval}`);
     }
 
     spawnHeart() {
