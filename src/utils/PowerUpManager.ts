@@ -18,6 +18,7 @@ interface ProjectileAttackConfig {
     attackRange: number;
     projectileColor: number;
     projectileSize: number;
+    piercingCount: number;
 }
 
 interface MeleeAttackConfig {
@@ -156,7 +157,8 @@ export default class PowerUpManager {
             attackPower: 30,
             attackRange: 1000,
             projectileColor: 0x00ff00,
-            projectileSize: 8
+            projectileSize: 8,
+            piercingCount: 1
         };
         const newProjectileAttack = new ProjectileAttack(this.scene, this.player, projectileAttackConfig);
         this.player.addAttack(newProjectileAttack);

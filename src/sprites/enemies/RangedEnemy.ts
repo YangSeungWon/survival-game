@@ -35,7 +35,8 @@ export default class RangedEnemy extends Enemy {
             attackPower: this.attackPower,
             projectileColor: this.projectileColor,
             projectileSize: this.projectileSize,
-            attackRange: this.attackRange
+            attackRange: this.attackRange,
+            piercingCount: 0
         });
     }
 

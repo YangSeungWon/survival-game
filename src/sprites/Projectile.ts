@@ -11,6 +11,8 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     speed: number;
     attackPower: number;
     owner: Player | Enemy;
+    piercingCount: number = 0;
+    hitTargets: Set<Phaser.GameObjects.GameObject> = new Set();
 
     constructor(scene: GameScene, x: number, y: number) {
         super(scene, x, y, 'projectileTexture');
@@ -24,6 +26,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.attackPower = 0;
         this.owner = {} as Player | Enemy;
         this.scene = scene;
+        this.hitTargets = new Set();
     }
 
     fire(
@@ -32,7 +35,8 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         speed: number,
         attackPower: number,
         color: number,
-        projectileSize: number
+        projectileSize: number,
+        piercingCount: number
     ): void {
         const textureKey = this.getTextureKey(projectileSize, color);
         if (!this.scene.textures.exists(textureKey)) {
@@ -51,6 +55,9 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.owner = owner;
 
         this.setTint(color);
+
+        this.piercingCount = piercingCount;
+        this.hitTargets.clear();
 
         const handleCollision = this.handleCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback;
         if (owner instanceof Player) {
@@ -72,15 +79,23 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     ): void {
         const projectileSprite = projectile as Projectile;
         const targetEntity = target as Player | Enemy;
+
         if (projectileSprite.active && projectileSprite.visible) {
             if (
                 (projectileSprite.owner instanceof Player && targetEntity instanceof Enemy) ||
                 (projectileSprite.owner instanceof Enemy && targetEntity instanceof Player)
             ) {
-                targetEntity.takeDamage(projectileSprite.attackPower);
+                if (!projectileSprite.hitTargets.has(targetEntity)) {
+                    targetEntity.takeDamage(projectileSprite.attackPower);
+                    projectileSprite.hitTargets.add(targetEntity);
 
-                projectileSprite.setActive(false);
-                projectileSprite.setVisible(false);
+                    if (projectileSprite.piercingCount <= 0) {
+                        projectileSprite.setActive(false);
+                        projectileSprite.setVisible(false);
+                    }
+
+                    projectileSprite.piercingCount--;
+                }
             }
         }
     }

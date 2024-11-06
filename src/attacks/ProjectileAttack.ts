@@ -9,6 +9,7 @@ interface ProjectileConfig {
     projectileSpeed: number;
     projectileColor: number;
     projectileSize: number;
+    piercingCount: number;
 }
 
 export default class ProjectileAttack extends Attack {
@@ -16,7 +17,7 @@ export default class ProjectileAttack extends Attack {
     private projectileSpeed: number;
     private projectileColor: number;
     private projectileSize: number;
-
+    private piercingCount: number;
     constructor(scene: GameScene, owner: Enemy | Player, config: ProjectileConfig & AttackConfig) {
         super(scene, owner, config);
 
@@ -24,6 +25,7 @@ export default class ProjectileAttack extends Attack {
         this.projectileSpeed = config.projectileSpeed;
         this.projectileColor = config.projectileColor;
         this.projectileSize = config.projectileSize;
+        this.piercingCount = config.piercingCount;
         this.initAttackBar(scene);
     }
 
@@ -60,6 +62,7 @@ export default class ProjectileAttack extends Attack {
             this.attackPower,
             this.projectileColor,
             this.projectileSize,
+            this.piercingCount
         );
 
         // Reset attack state after attackSpeed delay

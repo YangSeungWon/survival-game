@@ -87,7 +87,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             attackPower: 10,
             projectileColor: 0xffffff,
             projectileSize: 4,
-            attackRange: 500
+            attackRange: 500,
+            piercingCount: 0
         };
         const projectileAttack = new ProjectileAttack(this.scene, this, projectileAttackConfig);
         this.addAttack(projectileAttack);
