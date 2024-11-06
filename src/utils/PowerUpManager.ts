@@ -60,8 +60,8 @@ export default class PowerUpManager {
 
         const allPowerUps: PowerUp[] = [
             { name: 'Health Boost', description: 'Increase maximum health by 200.', apply: () => { this.player.maxHealth += 200; this.player.health += 200 } },
-            { name: 'Speed Boost', description: 'Increase movement speed by 40.', apply: () => { this.player.speed += 40 } },
-            { name: 'Life Steal', description: 'Gain health equal to 10% of damage dealt.', apply: () => { this.player.lifeSteal += 0.1 } },
+            { name: 'Speed Boost', description: 'Increase movement speed by 40.', apply: () => { this.player.speed += 20 } },
+            { name: 'Life Steal', description: 'Gain health equal to 5% of damage dealt.', apply: () => { this.player.lifeSteal += 0.05 } },
             { name: 'Defense Boost', description: 'Increase defense by 10.', apply: () => { this.player.defense += 1 } },
             { name: 'Critical Hit Chance', description: 'Increase critical hit chance by 5%.', apply: () => { this.player.critChance += 0.05 } },
             { name: 'Projectile Attack', description: 'Add a projectile attack.', apply: () => { this.applyProjectilePowerUp() } },
