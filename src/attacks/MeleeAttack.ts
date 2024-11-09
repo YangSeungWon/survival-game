@@ -13,6 +13,7 @@ interface MeleeConfig {
 export default class MeleeAttack extends Attack {
     scene: GameScene;
     private attackAngle: number;
+    private initialFacingAngle: number | null = null;
 
     constructor(scene: GameScene, owner: Player | Enemy, config: AttackConfig & MeleeConfig) {
         super(scene, owner, config);
@@ -36,35 +37,34 @@ export default class MeleeAttack extends Attack {
 
         this.isAttacking = true;
 
+        this.initialFacingAngle = (this.owner as any).facingAngle;
+
         this.showAttackMotion();
 
         this.giveDamage();
 
-        // Reset attack state after attackSpeed delay
         this.scene.attackEvents.push(this.scene.time.delayedCall(this.attackSpeed, () => {
             this.isAttacking = false;
         }, [], this));
     }
 
     private showAttackMotion(): void {
-        // Show and animate the attack bar
-        this.attackBar.setVisible(true);
         this.attackBar.setPosition(this.owner.x, this.owner.y);
 
-        // Calculate angle towards the player
-        const facingAngle = (this.owner as any).facingAngle;
+        const facingAngle = this.initialFacingAngle!;
         const halfArc = this.attackAngle / 2;
         this.attackBar.setRotation(facingAngle - halfArc);
+        this.attackBar.setVisible(true);
 
-        // Animate the swing (e.g., a quick rotation)
         this.scene.tweens.add({
             targets: this.attackBar,
             rotation: facingAngle + halfArc,
             duration: 100,
-            yoyo: true,
+            yoyo: false,
             onComplete: () => {
                 if (this.attackBar) {
                     this.attackBar.setVisible(false);
+                    this.initialFacingAngle = null;
                 }
             }
         });
@@ -72,11 +72,10 @@ export default class MeleeAttack extends Attack {
 
     private giveDamage(): void {
         const target = this.owner instanceof Player ? this.scene.enemies : this.scene.player;
-        const attackAngle = (this.owner as any).facingAngle;
+        const attackAngle = this.initialFacingAngle!;
         const halfArc = this.attackAngle / 2;
 
         if (target instanceof Phaser.Physics.Arcade.Group) {
-            // For enemies group
             target.getChildren().forEach((enemy: any) => {
                 const angleToTarget = Phaser.Math.Angle.Between(
                     this.owner.x, 
@@ -98,7 +97,6 @@ export default class MeleeAttack extends Attack {
                 }
             });
         } else {
-            // For single player target
             const angleToTarget = Phaser.Math.Angle.Between(
                 this.owner.x,
                 this.owner.y,
