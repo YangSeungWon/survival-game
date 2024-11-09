@@ -6,7 +6,6 @@ import Character from '../sprites/Character';
 
 export interface ProjectileAttackConfig {
     projectileSpeed: number;
-    projectileColor: number;
     projectileSize: number;
     piercingCount: number;
 }
@@ -14,7 +13,6 @@ export interface ProjectileAttackConfig {
 export default class ProjectileAttack extends Attack {
     scene: GameScene;
     private projectileSpeed: number;
-    private projectileColor: number;
     private projectileSize: number;
     private piercingCount: number;
     constructor(scene: GameScene, owner: Character, config: ProjectileAttackConfig & AttackConfig) {
@@ -22,7 +20,6 @@ export default class ProjectileAttack extends Attack {
 
         this.scene = scene;
         this.projectileSpeed = config.projectileSpeed;
-        this.projectileColor = config.projectileColor;
         this.projectileSize = config.projectileSize;
         this.piercingCount = config.piercingCount;
         this.initAttackBar(scene);
@@ -31,8 +28,8 @@ export default class ProjectileAttack extends Attack {
     initAttackBar(scene: GameScene): void {
         const barLength = 20 + this.attackRange * 0.01;
         const barHeight = 5 + this.attackPower * 0.01; // Thickness of the bar
-        const barKey = `attackBar_${this.constructor.name}_${this.projectileColor}_${barLength}_${barHeight}`;
-        createAttackBarTexture(scene, barKey, this.projectileColor, barLength, barHeight);
+        const barKey = `attackBar_${this.constructor.name}_${this.attackColor}_${barLength}_${barHeight}`;
+        createAttackBarTexture(scene, barKey, this.attackColor, barLength, barHeight);
         super.initAttackBar(scene, barKey);
     }
     
@@ -42,7 +39,7 @@ export default class ProjectileAttack extends Attack {
         this.isAttacking = true;
 
         // Show and animate the attack bar
-        this.attackBar.setPosition(this.owner.x, this.owner.y);
+        this.attackBar!.setPosition(this.owner.x, this.owner.y);
 
         // Scale the attack bar down and then back up
         this.scene.tweens.add({
@@ -56,10 +53,10 @@ export default class ProjectileAttack extends Attack {
         // Fire the projectile towards the player
         this.scene.projectilePool!.fireProjectile(
             this.owner,
-            Phaser.Math.DegToRad(this.attackBar.angle),
+            Phaser.Math.DegToRad(this.attackBar!.angle),
             this.projectileSpeed,
             this.attackPower,
-            this.projectileColor,
+            this.attackColor,
             this.projectileSize,
             this.piercingCount,
             this.statusEffect

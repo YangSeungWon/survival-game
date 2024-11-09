@@ -6,12 +6,14 @@ export interface AttackConfig {
     attackRange: number;
     attackSpeed: number;
     attackPower: number;
+    attackColor: number;
     statusEffect?: StatusEffect | null;
 }
 
 export interface StatusEffect {
     type: StatusEffectType;
     duration: number;
+    tickRate: number;
     lastTick?: number;
 }
 
@@ -28,8 +30,9 @@ export default abstract class Attack {
     attackRange: number;
     attackSpeed: number;
     attackPower: number;
+    attackColor: number;
     isAttacking: boolean;
-    attackBar!: Phaser.Physics.Arcade.Sprite | Phaser.GameObjects.Sprite;
+    attackBar!: Phaser.Physics.Arcade.Sprite | Phaser.GameObjects.Sprite | null;
     statusEffect: StatusEffect | null;
 
     constructor(scene: GameScene, owner: Character, config: AttackConfig) {
@@ -38,6 +41,7 @@ export default abstract class Attack {
         this.attackRange = config.attackRange;
         this.attackSpeed = config.attackSpeed;
         this.attackPower = config.attackPower;
+        this.attackColor = config.attackColor;
         this.statusEffect = config.statusEffect || null;
         this.isAttacking = false;
     }

@@ -18,18 +18,18 @@ export default class MeleeAttack extends Attack {
     constructor(scene: GameScene, owner: Character, config: AttackConfig & MeleeAttackConfig) {
         super(scene, owner, config);
         this.scene = scene;
-        this.attackAngle = Phaser.Math.DegToRad(config.attackAngle || 40); // Default to 40 degrees if not provided
+        this.attackAngle = Phaser.Math.DegToRad(config.attackAngle);
         this.initAttackBar(scene);
     }
 
     initAttackBar(scene: GameScene): void {
         const barLength = this.attackRange;
         const barHeight = 5 + this.attackPower * 0.01; // Thickness of the bar
-        const barKey = `attackBar_${this.constructor.name}_${this.owner.color}_${barLength}_${barHeight}`;
-        createAttackBarTexture(scene, barKey, this.owner.color, barLength, barHeight);
+        const barKey = `attackBar_${this.constructor.name}_${this.attackColor}_${barLength}_${barHeight}`;
+        createAttackBarTexture(scene, barKey, this.attackColor, barLength, barHeight);
         super.initAttackBar(scene, barKey);
 
-        this.attackBar.setVisible(false);
+        this.attackBar!.setVisible(false);
     }
 
     performAttack(): void {
@@ -49,12 +49,12 @@ export default class MeleeAttack extends Attack {
     }
 
     private showAttackMotion(): void {
-        this.attackBar.setPosition(this.owner.x, this.owner.y);
+        this.attackBar!.setPosition(this.owner.x, this.owner.y);
 
         const facingAngle = this.initialFacingAngle!;
         const halfArc = this.attackAngle / 2;
-        this.attackBar.setRotation(facingAngle - halfArc);
-        this.attackBar.setVisible(true);
+        this.attackBar!.setRotation(facingAngle - halfArc);
+        this.attackBar!.setVisible(true);
 
         this.scene.tweens.add({
             targets: this.attackBar,

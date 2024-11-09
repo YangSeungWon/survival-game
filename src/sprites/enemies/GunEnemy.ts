@@ -17,9 +17,8 @@ export default class GunEnemy extends RangedEnemy {
         const experiencePoint: number = 10;
 
         const projectileSpeed: number = 300;    
-        const projectileColor: number = 0xababff;
         const projectileSize: number = 5;       
 
-        super(scene, color, size, speed, health, attackSpeed, attackPower, attackRange, experiencePoint, projectileSpeed, projectileColor, projectileSize);
+        super(scene, color, size, speed, health, attackSpeed, attackPower, attackRange, experiencePoint, projectileSpeed, projectileSize);
     }
 }

@@ -61,6 +61,7 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
         const copiedEffect = {
             type: effect.type,
             duration: effect.duration,
+            tickRate: effect.tickRate,
             lastTick: 0,
         }
         this.statusEffects.push(copiedEffect);
@@ -139,7 +140,7 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
             effect.lastTick += delta; // Update the last tick time
 
             // Apply effect logic only if 200ms have passed
-            if (effect.lastTick >= 200) {
+            if (effect.lastTick >= effect.tickRate) {
                 this.applyEffectLogic(effect.type, effect.lastTick);
                 effect.lastTick = 0; // Reset the last tick
             }

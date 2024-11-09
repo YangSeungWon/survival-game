@@ -143,11 +143,11 @@ export default class PowerUpManager {
         const projectileAttackConfig: ProjectileAttackConfig & AttackConfig = {
             attackSpeed: 1000,
             projectileSpeed: 300,
-            attackPower: 300,
+            attackPower: 100,
             attackRange: 1000,
-            projectileColor: 0x00ff00,
+            attackColor: 0x00ff00,
             projectileSize: 8,
-            piercingCount: 1
+            piercingCount: 10
         };
         const newProjectileAttack = new ProjectileAttack(this.scene, this.player, projectileAttackConfig);
         this.player.addAttack(newProjectileAttack);
@@ -157,8 +157,9 @@ export default class PowerUpManager {
         const meleeAttackConfig: MeleeAttackConfig & AttackConfig = {
             attackSpeed: 2000,
             attackPower: 500,
-            attackRange: 150,
-            attackAngle: 60
+            attackRange: 100,
+            attackAngle: 90,
+            attackColor: 0xc0ffee
         };
         const newMeleeAttack = new MeleeAttack(this.scene, this.player, meleeAttackConfig);
         this.player.addAttack(newMeleeAttack);
@@ -166,13 +167,15 @@ export default class PowerUpManager {
 
     private applyAreaOfEffectPowerUp(): void {
         const areaOfEffectAttackConfig: AreaOfEffectAttackConfig & AttackConfig = {
-            attackSpeed: 2000,
-            attackPower: 100,
-            attackRange: 150,
+            attackSpeed: 1000,
+            attackPower: 0,
+            attackRange: 100,
             statusEffect: {
                 type: 'burn' as StatusEffectType,
                 duration: 1000,
-            }
+                tickRate: 300
+            },
+            attackColor: 0xff0000
         }
         const newAreaOfEffectAttack = new AreaOfEffectAttack(this.scene, this.player, areaOfEffectAttackConfig);
         this.player.addAttack(newAreaOfEffectAttack);

@@ -4,7 +4,6 @@ import { moveObject } from '../../utils/MovementUtils';
 import GameScene from '../../scenes/GameScene';
 import Character from '../Character';
 import Player from '../Player';
-import { StatusEffect } from '../../attacks/Attack';
 
 export default class Enemy extends Character {
     attackSpeed: number;
@@ -83,7 +82,7 @@ export default class Enemy extends Character {
 
     takeDamage(amount: number): number {
         if (!this.scene) return 0;
-        
+
         const isCriticalHit = this.calculateCriticalHit(this.scene.player!.percentCritChance);
         const damage = isCriticalHit ? amount * 2 : amount;
 

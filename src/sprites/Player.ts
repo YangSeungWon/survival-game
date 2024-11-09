@@ -44,7 +44,7 @@ export default class Player extends Character {
         this.experience = 0; // Initialize experience
         this.level = 1; // Initial level
         this.previousExperienceThreshold = 0;
-        this.experienceThreshold = 100; // Experience required for next level
+        this.experienceThreshold = 50; // Experience required for next level
 
         // Listen for enemy health change events
         this.scene.events.on('enemyHealthChanged', this.onEnemyHealthChanged, this);
@@ -73,7 +73,7 @@ export default class Player extends Character {
             attackSpeed: 500,
             projectileSpeed: 400,
             attackPower: 100,
-            projectileColor: 0xffffff,
+            attackColor: 0xffffff,
             projectileSize: 4,
             attackRange: 500,
             piercingCount: 0,
@@ -208,8 +208,9 @@ export default class Player extends Character {
     checkLevelUp() {
         while (this.experience >= this.experienceThreshold) {
             this.level += 1;
-            this.previousExperienceThreshold = this.experienceThreshold;
-            this.experienceThreshold = Math.floor(this.experienceThreshold * 1.5); // Increase experience threshold for next level
+            const tmpExperienceThreshold = this.experienceThreshold;
+            this.experienceThreshold = Math.floor((tmpExperienceThreshold - this.previousExperienceThreshold) * 1.5) + tmpExperienceThreshold; // Increase experience threshold for next level
+            this.previousExperienceThreshold = tmpExperienceThreshold;
             this.scene.events.emit('playerLevelUp', this.level);
         }
     }

@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import Attack, { AttackConfig } from './Attack';
 import GameScene from '../scenes/GameScene';
-import { createAttackBarTexture } from '../utils/TextureGenerator';
 import Character from '../sprites/Character';
 import Player from '../sprites/Player';
 
@@ -10,6 +9,7 @@ export interface AreaOfEffectAttackConfig {
 
 export default class AreaOfEffectAttack extends Attack {
     scene: GameScene;
+    attackCircle!: Phaser.GameObjects.Ellipse;
 
     constructor(scene: GameScene, owner: Character, config: AttackConfig & AreaOfEffectAttackConfig) {
         super(scene, owner, config);
@@ -18,11 +18,15 @@ export default class AreaOfEffectAttack extends Attack {
     }
 
     initAttackBar(scene: GameScene): void {
-        const barLength = this.attackRange * 2;
-        const barHeight = 5 + this.attackPower * 0.01;
-        const barKey = `attackBar_${this.constructor.name}_${this.owner.color}_${barLength}_${barHeight}`;
-        createAttackBarTexture(scene, barKey, this.owner.color, barLength, barHeight);
-        super.initAttackBar(scene, barKey);
+        this.attackBar = null;
+        this.attackCircle = this.scene.add.ellipse(this.owner.x, this.owner.y, this.attackRange * 2, this.attackRange * 2, this.attackColor, 0.5);
+        this.attackCircle.setDepth(1);
+        this.attackCircle.setAlpha(0.3);
+    }
+
+    updateAttackBar(): void {
+        super.updateAttackBar();
+        this.attackCircle.setPosition(this.owner.x, this.owner.y);
     }
 
     performAttack(): void {
@@ -30,18 +34,22 @@ export default class AreaOfEffectAttack extends Attack {
 
         this.isAttacking = true;
 
-        // Show the AoE attack bar
-        this.attackBar.setPosition(this.owner.x, this.owner.y);
-        this.attackBar.setDisplaySize(this.attackRange * 2, this.attackBar.height);
-        this.attackBar.setVisible(true);
-
-        // Trigger AoE effect
         this.applyAreaOfEffect();
 
-        // Reset attack state after attackSpeed delay
+        // Trigger AoE effect
+        // Create a flash animation
+        this.scene.tweens.add({
+            targets: this.attackCircle,
+            alpha: { from: 0.3, to: 1 },
+            duration: 30,
+            yoyo: false,
+            onComplete: () => {
+                this.attackCircle.setAlpha(0.3);
+            }
+        });
+
         this.scene.time.delayedCall(this.attackSpeed, () => {
             this.isAttacking = false;
-            this.attackBar.setVisible(false);
         }, [], this);
     }
 
@@ -63,12 +71,5 @@ export default class AreaOfEffectAttack extends Attack {
                 }
             }
         });
-    }
-
-    destroy(): void {
-        if (this.attackBar) {
-            this.attackBar.destroy();
-        }
-        super.destroy();
     }
 }
