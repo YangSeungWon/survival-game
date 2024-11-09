@@ -41,6 +41,12 @@ export default class GameScene extends Phaser.Scene {
     experienceBarBackground: Phaser.GameObjects.Graphics | null;
     experienceBar: Phaser.GameObjects.Graphics | null;
 
+    private defaultTextStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+        fontFamily: '"Noto Sans", sans-serif',
+        fontSize: '32px',
+        color: '#fff'
+    };
+
     constructor() {
         super({ key: 'GameScene' });
         this.score = 0;
@@ -104,12 +110,12 @@ export default class GameScene extends Phaser.Scene {
 
         this.cursors = this.input.keyboard!.createCursorKeys() ? this.input.keyboard!.createCursorKeys() : null;
 
-        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', color: '#fff' }).setScrollFactor(0).setDepth(1);
-        this.healthText = this.add.text(16, 50, `Health: ${this.player.health}/${this.player.maxHealth}`, { fontSize: '32px', color: '#f00' }).setScrollFactor(0).setDepth(1);
-        this.playerStatsText = this.add.text(16, this.cameras.main.height - 200, '', { fontSize: '16px', color: '#fff' }).setScrollFactor(0).setDepth(1);
-        this.timeText = this.add.text(16, 84, 'Time: 0:00', { fontSize: '32px', color: '#fff' }).setScrollFactor(0).setDepth(1);
-        this.experienceText = this.add.text(16, 118, 'XP: 0', { fontSize: '32px', color: '#00ff00' }).setScrollFactor(0).setDepth(1);
-        this.fpsText = this.add.text(this.cameras.main.width / 2, 8, 'FPS: 0', { fontSize: '16px', color: '#ffffff' }).setScrollFactor(0).setDepth(1);
+        this.scoreText = this.add.text(16, 16, 'Score: 0', this.defaultTextStyle).setScrollFactor(0).setDepth(1);
+        this.healthText = this.add.text(16, 50, `Health: ${this.player.health}/${this.player.maxHealth}`, { ...this.defaultTextStyle, color: '#f00' }).setScrollFactor(0).setDepth(1);
+        this.playerStatsText = this.add.text(16, this.cameras.main.height - 200, '', { ...this.defaultTextStyle, fontSize: '16px' }).setScrollFactor(0).setDepth(1);
+        this.timeText = this.add.text(16, 84, 'Time: 0:00', this.defaultTextStyle).setScrollFactor(0).setDepth(1);
+        this.experienceText = this.add.text(16, 118, 'XP: 0', { ...this.defaultTextStyle, color: '#00ff00' }).setScrollFactor(0).setDepth(1);
+        this.fpsText = this.add.text(this.cameras.main.width / 2, 8, 'FPS: 0', { ...this.defaultTextStyle, fontSize: '16px' }).setScrollFactor(0).setDepth(1);
 
         this.powerUpManager = new PowerUpManager(this, this.player);
 
@@ -329,6 +335,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     gameOver() {
+        document.removeEventListener('visibilitychange', () => { });
         this.scene.start('GameOverScene', { score: this.score, time: this.elapsedTimeMillis, experience: this.player!.experience });
     }
 
@@ -396,7 +403,7 @@ export default class GameScene extends Phaser.Scene {
         const fontSize = isPlayer ? '24px' : '18px';
         const deltaY = isPlayer ? -10 : -5;
         const duration = isPlayer ? 1000 : 500;
-        const damageText = this.add.text(enemyX, enemyY, (isPlayer && damage > 0 ? '+' : '') + damage.toString(), { fontSize: fontSize, color: color })
+        const damageText = this.add.text(enemyX, enemyY, (isPlayer && damage > 0 ? '+' : '') + damage.toString(), { fontSize: fontSize, color: color, fontStyle: isPlayer ? 'bold' : '' })
             .setScrollFactor(1) // Make the text move with the camera
             .setDepth(1);
 

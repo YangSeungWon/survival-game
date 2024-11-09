@@ -24,7 +24,7 @@ export default class ExperiencePoint extends Phaser.Physics.Arcade.Sprite {
 
         // Initialize magnet properties
         this.magnetRadius = 100; // The radius within which the experience point is attracted to the player
-        this.magnetSpeed = 150;   // The speed at which it moves toward the player
+        this.magnetSpeed = 100;   // The speed at which it moves toward the player
 
         // Initialize glow effect
         this.glow = scene.add.graphics({ x: this.x, y: this.y });
@@ -76,10 +76,10 @@ export default class ExperiencePoint extends Phaser.Physics.Arcade.Sprite {
             // Calculate direction towards player
             const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
 
-            // Increase speed as the distance decreases
+            // Increase speed as the distance increases
             const speedFactor = (this.magnetRadius - distance) / this.magnetRadius;
-            const velocityX = Math.cos(angle) * this.magnetSpeed * (1 + speedFactor);
-            const velocityY = Math.sin(angle) * this.magnetSpeed * (1 + speedFactor);
+            const velocityX = Math.cos(angle) * this.magnetSpeed * ((1 + speedFactor) ** 3);
+            const velocityY = Math.sin(angle) * this.magnetSpeed * ((1 + speedFactor) ** 3);
 
             this.setVelocity(velocityX, velocityY);
 
