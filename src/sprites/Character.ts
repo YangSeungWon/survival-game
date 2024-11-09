@@ -57,6 +57,15 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
     applyStatusEffect(effect: StatusEffect): void {
         if (!this.scene) return;
 
+        if (this.statusEffects.some(e => e.type === effect.type)) {
+            //update the duration
+            const existingEffect = this.statusEffects.find(e => e.type === effect.type);
+            if (existingEffect) {
+                existingEffect.duration = effect.duration;
+            }
+            return;
+        }
+
         this.enterStatusEffect(effect);
         const copiedEffect = {
             type: effect.type,
@@ -65,11 +74,6 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
             lastTick: 0,
         }
         this.statusEffects.push(copiedEffect);
-
-        // Remove the status effect after the duration
-        this.scene.time.delayedCall(effect.duration, () => {
-            this.removeStatusEffect(copiedEffect);
-        }, [], this);
     }
 
     enterStatusEffect(effect: StatusEffect): void {
@@ -140,7 +144,7 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
             effect.lastTick += delta; // Update the last tick time
 
             // Apply effect logic only if 200ms have passed
-            if (effect.lastTick >= effect.tickRate) {
+            if (effect.tickRate && effect.lastTick >= effect.tickRate) {
                 this.applyEffectLogic(effect.type, effect.lastTick);
                 effect.lastTick = 0; // Reset the last tick
             }

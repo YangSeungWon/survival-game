@@ -53,9 +53,12 @@ export default class PowerUpManager {
             { name: 'Life Steal', description: 'Gain health equal to 5% of damage dealt.', apply: () => { this.player.percentLifeSteal += 5 } },
             { name: 'Defense Boost', description: 'Increase defense by 1.', apply: () => { this.player.defense += 1 } },
             { name: 'Critical Hit Chance', description: 'Increase critical hit chance by 10%.', apply: () => { this.player.percentCritChance += 10 } },
-            { name: 'Projectile Attack', description: 'Add a projectile attack.', apply: () => { this.applyProjectilePowerUp() } },
+            { name: 'Piercing Projectile', description: 'Add a projectile attack with piercing (10).', apply: () => { this.applyProjectilePowerUp() } },
             { name: 'Melee Attack', description: 'Add a melee attack.', apply: () => { this.applyMeleePowerUp() } },
-            { name: 'Area of Effect', description: 'Add an area of effect attack.', apply: () => { this.applyAreaOfEffectPowerUp() } }
+            { name: 'Burning AoE', description: 'Add an area of effect attack with burning effect.', apply: () => { this.applyAreaOfEffectBurningPowerUp() } },
+            { name: 'Freezing AoE', description: 'Add an area of effect attack with freezing effect.', apply: () => { this.applyAreaOfEffectFreezingPowerUp() } },
+            { name: 'Poisoning AoE', description: 'Add an area of effect attack with poisoning effect.', apply: () => { this.applyAreaOfEffectPoisoningPowerUp() } },
+            { name: 'Stun Projectile', description: 'Add a projectile attack with stun effect.', apply: () => { this.applyProjectileStunPowerUp() } }
         ];
 
         Phaser.Utils.Array.Shuffle(allPowerUps);
@@ -165,9 +168,9 @@ export default class PowerUpManager {
         this.player.addAttack(newMeleeAttack);
     }
 
-    private applyAreaOfEffectPowerUp(): void {
+    private applyAreaOfEffectBurningPowerUp(): void {
         const areaOfEffectAttackConfig: AreaOfEffectAttackConfig & AttackConfig = {
-            attackSpeed: 1000,
+            attackSpeed: 100,
             attackPower: 0,
             attackRange: 100,
             statusEffect: {
@@ -179,5 +182,54 @@ export default class PowerUpManager {
         }
         const newAreaOfEffectAttack = new AreaOfEffectAttack(this.scene, this.player, areaOfEffectAttackConfig);
         this.player.addAttack(newAreaOfEffectAttack);
+    }
+
+    private applyAreaOfEffectFreezingPowerUp(): void {
+        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig & AttackConfig = {
+            attackSpeed: 100,
+            attackPower: 0,
+            attackRange: 200,
+            statusEffect: {
+                type: 'freeze' as StatusEffectType,
+                duration: 500,
+            },
+            attackColor: 0x0000ff
+        }
+        const newAreaOfEffectAttack = new AreaOfEffectAttack(this.scene, this.player, areaOfEffectAttackConfig);
+        this.player.addAttack(newAreaOfEffectAttack);
+    }
+
+    private applyAreaOfEffectPoisoningPowerUp(): void {
+        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig & AttackConfig = {
+            attackSpeed: 100,
+            attackPower: 0,
+            attackRange: 100,
+            statusEffect: {
+                type: 'poison' as StatusEffectType,
+                duration: 1000,
+                tickRate: 300
+            },
+            attackColor: 0x00ff00
+        }
+        const newAreaOfEffectAttack = new AreaOfEffectAttack(this.scene, this.player, areaOfEffectAttackConfig);
+        this.player.addAttack(newAreaOfEffectAttack);
+    }
+
+    private applyProjectileStunPowerUp(): void {
+        const projectileAttackConfig: ProjectileAttackConfig & AttackConfig = {
+            attackSpeed: 200,
+            projectileSpeed: 700,
+            attackPower: 10,
+            attackRange: 1000,
+            attackColor: 0xffff00,
+            projectileSize: 7,
+            piercingCount: 0,
+            statusEffect: {
+                type: 'stun' as StatusEffectType,
+                duration: 1000,
+            }
+        }   
+        const newProjectileAttack = new ProjectileAttack(this.scene, this.player, projectileAttackConfig);
+        this.player.addAttack(newProjectileAttack);
     }
 }
