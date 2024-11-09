@@ -33,6 +33,7 @@ export default class GameScene extends Phaser.Scene {
     experienceText: Phaser.GameObjects.Text | null;
     fpsText: Phaser.GameObjects.Text | null;
     isPaused: boolean;
+    isPausedInGame: boolean;
     joystick?: any; // rexvirtualjoystick 타입 정의 필요
     joystickCursors?: Phaser.Types.Input.Keyboard.CursorKeys;
     powerUpManager: PowerUpManager | null;
@@ -56,6 +57,7 @@ export default class GameScene extends Phaser.Scene {
         this.heartSpawnInterval = 10000; // 10초 간격
         this.lastUpdateTime = 0;
         this.isPaused = false;
+        this.isPausedInGame = false;
         this.attackEvents = [];
 
         this.player = null;
@@ -199,7 +201,9 @@ export default class GameScene extends Phaser.Scene {
                 this.pauseGame();
             } else {
                 console.log('Window is visible, resuming game.');
-                this.resumeGame();
+                if (!this.isPausedInGame) {
+                    this.resumeGame();
+                }
             }
         });
     }
@@ -345,6 +349,7 @@ export default class GameScene extends Phaser.Scene {
      */
     onPlayerLevelUp(newLevel: number) {
         this.pauseGame();
+        this.isPausedInGame = true;
         this.powerUpManager!.showPowerUpSelection(newLevel);
 
         // Adjust enemy spawn interval based on player level
