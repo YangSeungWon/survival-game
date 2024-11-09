@@ -4,6 +4,7 @@ import { moveObject } from '../../utils/MovementUtils';
 import GameScene from '../../scenes/GameScene';
 import Character from '../Character';
 import Player from '../Player';
+import { StatusEffect } from '../../attacks/Attack';
 
 export default class Enemy extends Character {
     attackSpeed: number;
@@ -43,8 +44,26 @@ export default class Enemy extends Character {
         this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, scene.player!.x, scene.player!.y);
     }
 
+    handleHealthChanged(amount: number): void {    
+        // Display damage text
+        if (amount < 0) {
+            this.scene.events.emit('enemyHealthChanged', {
+                enemy: this,
+                newHealth: this.health,
+                damageDealt: -amount
+            });
+        }
+
+        if (this.health <= 0) {
+            this.dropExperience();
+            this.destroy();
+        }
+    }
+
     update(player: Player, delta: number): void {
         if (!player) return;
+
+        this.updateStatusEffects(delta);
 
         // Update attack bar position
         this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
@@ -62,36 +81,15 @@ export default class Enemy extends Character {
         }
     }
 
-    /**
-     * Applies a status effect to the enemy.
-     * @param effectType - The type of status effect (e.g., 'burn', 'freeze').
-     * @param duration - Duration of the effect in milliseconds.
-     */
-    applyStatusEffect(effectType: string, duration: number): void {
-        super.applyStatusEffect(effectType, duration);
-    }
-
     takeDamage(amount: number): number {
+        if (!this.scene) return 0;
+        
         const isCriticalHit = this.calculateCriticalHit(this.scene.player!.percentCritChance);
         const damage = isCriticalHit ? amount * 2 : amount;
 
         const damageDealt = super.takeDamage(damage);
-        
-        // Display damage text
-        this.displayDamageText(damage, isCriticalHit);
-
         if (damageDealt > 0) {
-            // Emit an event with the actual damage dealt
-            this.scene.events.emit('enemyHealthChanged', {
-                enemy: this,
-                newHealth: this.health,
-                damageDealt: damageDealt
-            });
-        }
-
-        if (this.health <= 0) {
-            this.dropExperience();
-            this.destroy();
+            this.displayDamageText(damageDealt, isCriticalHit);
         }
 
         return damageDealt;
@@ -105,7 +103,9 @@ export default class Enemy extends Character {
 
     private displayDamageText(damage: number, isCriticalHit: boolean): void {
         const color = isCriticalHit ? 'yellow' : 'white';
-        this.scene.showDamageText(this.x, this.y, damage, color);
+        if (this.scene) {
+            this.scene.showDamageText(this.x, this.y, damage, color);
+        }
     }
 
     calculateCriticalHit(percentCritChance: number): boolean {

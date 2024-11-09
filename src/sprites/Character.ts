@@ -1,11 +1,7 @@
 import Phaser from 'phaser';
 import GameScene from '../scenes/GameScene';
 import Attack from '../attacks/Attack';
-
-interface StatusEffect {
-    type: string;
-    duration: number; // Duration in milliseconds
-}
+import { StatusEffect } from '../attacks/Attack';
 
 export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
     scene: GameScene;
@@ -18,6 +14,13 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
     facingAngle: number;
     attacks: Attack[];
     statusEffects: StatusEffect[] = [];
+    paused: boolean = false;
+
+    // Particle emitters for status effects
+    private fireParticles?: Phaser.GameObjects.Particles.ParticleEmitter;
+    private iceParticles?: Phaser.GameObjects.Particles.ParticleEmitter;
+    private poisonParticles?: Phaser.GameObjects.Particles.ParticleEmitter;
+    private stunParticles?: Phaser.GameObjects.Particles.ParticleEmitter;
 
     constructor(
         scene: GameScene,
@@ -51,35 +54,44 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
      * @param effectType - The type of status effect (e.g., 'burn', 'freeze').
      * @param duration - Duration of the effect in milliseconds.
      */
-    applyStatusEffect(effectType: string, duration: number): void {
-        // Check if the effect already exists
-        const existingEffect = this.statusEffects.find(effect => effect.type === effectType);
-        if (existingEffect) {
-            // Refresh the duration
-            existingEffect.duration = duration;
-        } else {
-            // Add new status effect
-            this.statusEffects.push({ type: effectType, duration });
-            this.handleStatusEffectStart(effectType);
+    applyStatusEffect(effect: StatusEffect): void {
+        if (!this.scene) return;
+
+        this.enterStatusEffect(effect);
+        const copiedEffect = {
+            type: effect.type,
+            duration: effect.duration,
+            lastTick: 0,
         }
+        this.statusEffects.push(copiedEffect);
+
+        // Remove the status effect after the duration
+        this.scene.time.delayedCall(effect.duration, () => {
+            this.removeStatusEffect(copiedEffect);
+        }, [], this);
     }
 
-    /**
-     * Handles the initiation of a status effect.
-     * Override this method if specific behavior is needed for certain effects.
-     * @param effectType - The type of status effect.
-     */
-    protected handleStatusEffectStart(effectType: string): void {
-        switch (effectType) {
+    enterStatusEffect(effect: StatusEffect): void {
+        switch (effect.type) {
             case 'burn':
-                // Example: Start burning effect
+                this.addBurnParticles();
+                this.setTintFill(0xff0000);
                 break;
             case 'freeze':
-                // Example: Start freezing effect
+                this.moveSpeed *= 0.5;
+                this.setTintFill(0x00ffff);
+                this.addFreezeParticles();
                 break;
-            // Add more effects as needed
-            default:
-                console.warn(`Unknown status effect: ${effectType}`);
+            case 'poison':
+                this.addPoisonParticles();
+                this.setTintFill(0x00ff00);
+                break;
+            case 'stun':
+                this.addStunParticles();
+                this.canMove = false;
+                this.canAttack = false;
+                this.setTintFill(0xffff00);
+                break;
         }
     }
 
@@ -91,16 +103,27 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected handleStatusEffectEnd(effectType: string): void {
         switch (effectType) {
             case 'burn':
-                // Example: End burning effect
+                this.removeBurnParticles();
                 break;
             case 'freeze':
-                // Example: End freezing effect
+                this.moveSpeed /= 0.5;
+                this.removeFreezeParticles();
                 break;
-            // Add more effects as needed
+            case 'poison':
+                this.removePoisonParticles();
+                break;
+            case 'stun':
+                this.canMove = true;
+                this.canAttack = true;
+                this.removeStunParticles();
+                break;
             default:
                 console.warn(`Unknown status effect: ${effectType}`);
         }
+        this.clearTint();
     }
+
+    
 
     /**
      * Updates active status effects.
@@ -108,20 +131,27 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
      * @param delta - Time elapsed since the last frame in milliseconds.
      */
     updateStatusEffects(delta: number): void {
+        if (this.paused) return;
+
         this.statusEffects.forEach(effect => {
             effect.duration -= delta;
-            this.applyEffectLogic(effect.type, delta);
-        });
+            if (!effect.lastTick) effect.lastTick = 0;
+            effect.lastTick += delta; // Update the last tick time
 
-        // Remove expired effects
-        this.statusEffects = this.statusEffects.filter(effect => {
+            // Apply effect logic only if 200ms have passed
+            if (effect.lastTick >= 200) {
+                this.applyEffectLogic(effect.type, effect.lastTick);
+                effect.lastTick = 0; // Reset the last tick
+            }
+
             if (effect.duration <= 0) {
                 this.handleStatusEffectEnd(effect.type);
-                return false;
+                this.statusEffects = this.statusEffects.filter(e => e !== effect);
             }
-            return true;
         });
     }
+
+    abstract handleHealthChanged(amount: number): void;
 
     /**
      * Defines the logic for each status effect.
@@ -131,21 +161,105 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected applyEffectLogic(effectType: string, delta: number): void {
         switch (effectType) {
             case 'burn':
-                // Apply burn damage over time
-                this.health -= 0.05 * delta; // Example: 0.05 damage per millisecond
-                if (this.health < 0) this.health = 0;
-                this.scene.events.emit('playerHealthChanged', -0.05 * delta);
+                const burnDamage = (this.maxHealth * 0.05);
+                this.takeDamage(burnDamage);
                 break;
+
             case 'freeze':
-                // Example: Reduce move speed or prevent movement
-                // Implement as needed
                 break;
-            // Add more effects as needed
+
+            case 'poison':
+                const poisonDamage = (this.health * 0.1);
+                this.takeDamage(poisonDamage);
+                break;
+
+            case 'stun':
+                break;
+
             default:
                 console.warn(`Unknown status effect logic: ${effectType}`);
         }
     }
 
+    private addBurnParticles(): void {
+        if (this.fireParticles) return; // Prevent multiple emitters
+        this.fireParticles = this.scene.add.particles(this.x, this.y, 'particle_red', {
+            lifespan: 200,
+            speed: { min: 40, max: 80 },
+            scale: { start: 0.3, end: 0 },
+            blendMode: 'ADD',
+            emitZone: { source: new Phaser.Geom.Circle(0, 0, 10), type: 'edge', quantity: 10 }
+        });
+        this.fireParticles.setDepth(2);
+    }
+
+    private addFreezeParticles(): void {
+        if (this.iceParticles) return;
+
+        this.iceParticles = this.scene.add.particles(this.x, this.y, 'particle_blue', {
+            lifespan: 200,
+            speed: { min: 40, max: 80 },
+            scale: { start: 0.3, end: 0 },
+            alpha: { start: 0.6, end: 0 },
+            emitZone: { source: new Phaser.Geom.Circle(0, 0, 15), type: 'edge', quantity: 15 }
+        });
+        this.iceParticles.setDepth(2);
+    }
+
+    private addPoisonParticles(): void {
+        if (this.poisonParticles) return;
+
+        this.poisonParticles = this.scene.add.particles(this.x, this.y, 'particle_green', {
+            lifespan: 200,
+            speed: { min: 30, max: 60 },
+            scale: { start: 0.4, end: 0 },
+            alpha: { start: 0.7, end: 0 },
+            emitZone: { source: new Phaser.Geom.Circle(0, 0, 12), type: 'edge', quantity: 12 }
+        });
+        this.poisonParticles.setDepth(2);
+    }
+
+    private addStunParticles(): void {
+        if (this.stunParticles) return;
+
+        this.stunParticles = this.scene.add.particles(this.x, this.y, 'particle_yellow', {
+            lifespan: 200,
+            speed: 100,
+            scale: { start: 0.4, end: 0 },
+            rotate: { start: 0, end: 360 },
+            frequency: 100,
+            emitZone: { source: new Phaser.Geom.Rectangle(-10, -10, 20, 20), type: 'edge', quantity: 5 }
+        });
+        this.stunParticles.setDepth(2);
+    }
+
+    private removeBurnParticles(): void {
+        if (this.fireParticles) {
+            this.fireParticles.stop();
+            this.fireParticles = undefined;
+        }
+    }
+
+    private removeFreezeParticles(): void {
+        if (this.iceParticles) {
+            this.iceParticles.stop();
+            this.iceParticles = undefined;
+        }
+    }
+
+    private removePoisonParticles(): void {
+        if (this.poisonParticles) {
+            this.poisonParticles.stop();
+            this.poisonParticles = undefined;
+        }
+    }
+
+    private removeStunParticles(): void {
+        if (this.stunParticles) {
+            this.stunParticles.stop();
+            this.stunParticles = undefined;
+        }
+    }
 
     takeDamage(amount: number): number {
         const initialHealth = this.health;
@@ -165,13 +279,49 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
             }
         });
 
+        this.handleHealthChanged(-damageDealt);
+
         return damageDealt;
     }
 
     destroy(fromScene?: boolean): void {
+        // Clean up all particle emitters
+        this.removeBurnParticles();
+        this.removeFreezeParticles();
+        this.removePoisonParticles();
+        this.removeStunParticles();
+
         this.attacks.forEach(attack => {
             attack.destroy();
         });
         super.destroy(fromScene);
+    }
+
+    pause(): void {
+        this.paused = true;
+    }
+
+    resume(): void {
+        this.paused = false;
+    }
+
+    // Method to remove a status effect
+    private removeStatusEffect(effect: StatusEffect): void {
+        switch (effect.type) {
+            case 'burn':
+                this.removeBurnParticles();
+                break;
+            case 'freeze':
+                this.removeFreezeParticles();
+                break;
+            case 'poison':
+                this.removePoisonParticles();
+                break;
+            case 'stun':
+                this.removeStunParticles();
+                break;
+            default:
+                console.warn(`Unknown status effect: ${effect}`);
+        }
     }
 }

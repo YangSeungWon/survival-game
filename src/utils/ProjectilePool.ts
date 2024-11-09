@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import Projectile from '../sprites/Projectile';
 import Character from '../sprites/Character';
 import GameScene from '../scenes/GameScene';
+import { StatusEffect } from '../attacks/Attack';
 
 export default class ProjectilePool {
     private scene: GameScene;
@@ -32,7 +33,8 @@ export default class ProjectilePool {
         attackPower: number,
         color: number,
         projectileSize: number,
-        piercingCount: number
+        piercingCount: number,
+        statusEffect: StatusEffect | null
     ): void {
         let projectile = this.projectiles.getFirstDead() as Projectile;
         // if failed to get projectile, create new one
@@ -40,7 +42,7 @@ export default class ProjectilePool {
             projectile = new Projectile(this.scene, owner.x, owner.y);
             this.projectiles.add(projectile);
         }
-        projectile.fire(owner, angle, speed, attackPower, color, projectileSize, piercingCount);
+        projectile.fire(owner, angle, speed, attackPower, color, projectileSize, piercingCount, statusEffect);
     }
 
     preUpdate(): void {

@@ -71,28 +71,33 @@ export default class MeleeAttack extends Attack {
     }
 
     private giveDamage(): void {
-        const target = this.owner instanceof Player ? this.scene.enemies!.getChildren() : [this.scene.player];
+        const targets = this.owner instanceof Player 
+            ? this.scene.enemies!.getChildren() 
+            : [this.scene.player];
         const attackAngle = this.initialFacingAngle!;
         const halfArc = this.attackAngle / 2;
 
-        target.forEach((enemy: any) => {
+        targets.forEach((target: any) => {
             const angleToTarget = Phaser.Math.Angle.Between(
                 this.owner.x,
                 this.owner.y,
-                enemy.x,
-                enemy.y
+                target.x,
+                target.y
             );
 
             let angleDiff = Math.abs(Phaser.Math.Angle.Wrap(angleToTarget - attackAngle));
             const distance = Phaser.Math.Distance.Between(
                 this.owner.x,
                 this.owner.y,
-                enemy.x,
-                enemy.y
+                target.x,
+                target.y
             );
 
             if (distance <= this.attackRange && angleDiff <= halfArc) {
-                enemy.takeDamage(this.attackPower);
+                target.takeDamage(this.attackPower);
+                if (this.statusEffect) {
+                    target.applyStatusEffect(this.statusEffect);
+                }
             }
         });
     }

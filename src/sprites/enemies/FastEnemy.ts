@@ -7,11 +7,11 @@ export default class FastEnemy extends MeleeEnemy {
         const color = 0xff0000;   
         const size = 10;
         const speed = 100;
-        const health = 10;
+        const health = 100;
         
         // 공격 속성 정의
         const attackSpeed = 600;
-        const attackPower = 50;
+        const attackPower = 500;
         const attackRange = 30;
         const attackAngle = 20;
         const experiencePoint = 10;

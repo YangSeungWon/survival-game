@@ -5,6 +5,7 @@ import GameScene from '../scenes/GameScene';
 import Character from './Character';
 import Player from './Player';
 import Enemy from './enemies/Enemy';
+import { StatusEffect } from '../attacks/Attack';
 
 export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     scene: GameScene;
@@ -14,6 +15,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     owner: Character;
     piercingCount: number = 0;
     hitTargets: Set<Phaser.GameObjects.GameObject> = new Set();
+    statusEffect: StatusEffect | null = null;
 
     constructor(scene: GameScene, x: number, y: number) {
         super(scene, x, y, 'projectileTexture');
@@ -37,7 +39,8 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         attackPower: number,
         color: number,
         projectileSize: number,
-        piercingCount: number
+        piercingCount: number,
+        statusEffect: StatusEffect | null
     ): void {
         const textureKey = this.getTextureKey(projectileSize, color);
         if (!this.scene.textures.exists(textureKey)) {
@@ -59,6 +62,8 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
 
         this.piercingCount = piercingCount;
         this.hitTargets.clear();
+        
+        this.statusEffect = statusEffect;
 
         const handleCollision = this.handleCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback;
         if (owner instanceof Player) {
@@ -89,6 +94,10 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
                 if (!projectileSprite.hitTargets.has(targetEntity)) {
                     targetEntity.takeDamage(projectileSprite.attackPower);
                     projectileSprite.hitTargets.add(targetEntity);
+
+                    if (projectileSprite.statusEffect) {
+                        targetEntity.applyStatusEffect(projectileSprite.statusEffect);
+                    }
 
                     if (projectileSprite.piercingCount <= 0) {
                         projectileSprite.setActive(false);

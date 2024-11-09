@@ -3,7 +3,7 @@ import ProjectileAttack from '../attacks/ProjectileAttack';
 import MeleeAttack from '../attacks/MeleeAttack';
 import Player from '../sprites/Player';
 import GameScene from '../scenes/GameScene';
-import { AttackConfig } from '../attacks/Attack';
+import { AttackConfig, StatusEffectType } from '../attacks/Attack';
 import AreaOfEffectAttack from '../attacks/AreaOfEffectAttack';
 import { ProjectileAttackConfig } from '../attacks/ProjectileAttack';
 import { MeleeAttackConfig } from '../attacks/MeleeAttack';
@@ -143,7 +143,7 @@ export default class PowerUpManager {
         const projectileAttackConfig: ProjectileAttackConfig & AttackConfig = {
             attackSpeed: 1000,
             projectileSpeed: 300,
-            attackPower: 30,
+            attackPower: 300,
             attackRange: 1000,
             projectileColor: 0x00ff00,
             projectileSize: 8,
@@ -156,7 +156,7 @@ export default class PowerUpManager {
     private applyMeleePowerUp(): void {
         const meleeAttackConfig: MeleeAttackConfig & AttackConfig = {
             attackSpeed: 2000,
-            attackPower: 50,
+            attackPower: 500,
             attackRange: 150,
             attackAngle: 60
         };
@@ -167,9 +167,12 @@ export default class PowerUpManager {
     private applyAreaOfEffectPowerUp(): void {
         const areaOfEffectAttackConfig: AreaOfEffectAttackConfig & AttackConfig = {
             attackSpeed: 2000,
-            radius: 150,
-            attackPower: 50,
+            attackPower: 100,
             attackRange: 150,
+            statusEffect: {
+                type: 'burn' as StatusEffectType,
+                duration: 1000,
+            }
         }
         const newAreaOfEffectAttack = new AreaOfEffectAttack(this.scene, this.player, areaOfEffectAttackConfig);
         this.player.addAttack(newAreaOfEffectAttack);

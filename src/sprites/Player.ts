@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import ProjectileAttack from '../attacks/ProjectileAttack';
-import Attack from '../attacks/Attack';
+import Attack, { StatusEffectType } from '../attacks/Attack';
 import { moveObject } from '../utils/MovementUtils';
 import GameScene from '../scenes/GameScene';
 import Enemy from './enemies/Enemy';
@@ -26,7 +26,7 @@ export default class Player extends Character {
         const x = Number(scene.game.config.width) / 2;
         const y = Number(scene.game.config.height) / 2;
 
-        super(scene as GameScene, x, y, 'playerTexture', color, 200, 1000); // moveSpeed: 200, health: 1000
+        super(scene as GameScene, x, y, 'playerTexture', color, 200, 10000); // moveSpeed: 200, health: 10000
 
         console.log('Player initialized with scene:', this.scene);
 
@@ -59,16 +59,24 @@ export default class Player extends Character {
         this.canMove = true;
     }
 
+    handleHealthChanged(amount: number): void {
+        this.scene.events.emit('playerHealthChanged', amount);
+
+        if (this.health <= 0) {
+            this.scene.events.emit('playerDead');
+        }
+    }
+
     initDefaultAttacks() {
         // Example: Initialize a default projectile attack
         const projectileAttackConfig = {
             attackSpeed: 500,
             projectileSpeed: 400,
-            attackPower: 10,
+            attackPower: 100,
             projectileColor: 0xffffff,
             projectileSize: 4,
             attackRange: 500,
-            piercingCount: 0
+            piercingCount: 0,
         };
         const projectileAttack = new ProjectileAttack(this.scene, this, projectileAttackConfig);
         this.addAttack(projectileAttack);
@@ -89,15 +97,6 @@ export default class Player extends Character {
     removeAttack(attack: Attack) {
         attack.destroy();
         this.attacks = this.attacks.filter(a => a !== attack);
-    }
-
-    /**
-     * Applies a status effect to the player.
-     * @param effectType - The type of status effect (e.g., 'burn', 'freeze').
-     * @param duration - Duration of the effect in milliseconds.
-     */
-    applyStatusEffect(effectType: string, duration: number): void {
-        super.applyStatusEffect(effectType, duration);
     }
 
     onEnemyHealthChanged(data: { damageDealt: number }) {
@@ -167,15 +166,6 @@ export default class Player extends Character {
         const actualDamage = Math.max(amount - this.defense, 0); // Ensure damage doesn't go below zero
 
         const damageDealt = super.takeDamage(actualDamage);
-
-        if (damageDealt > 0) {
-            this.scene.events.emit('playerHealthChanged', -damageDealt);
-        }
-
-        if (this.health <= 0) {
-            this.scene.events.emit('playerDead');
-        }
-
         return damageDealt;
     }
 

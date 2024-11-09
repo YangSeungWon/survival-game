@@ -206,6 +206,7 @@ export default class GameScene extends Phaser.Scene {
                 }
             }
         });
+
     }
 
     createEnemies() {
@@ -250,6 +251,8 @@ export default class GameScene extends Phaser.Scene {
         this.tweens.timeScale = deltaMultiplier;
         this.time.timeScale = deltaMultiplier;
 
+
+        this.player!.updateStatusEffects(deltaTime);
 
         // Update player movement based on joystick if smartphone, else use keyboard
         if (this.joystick && this.joystickCursors) {
