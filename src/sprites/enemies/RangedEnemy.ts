@@ -29,7 +29,7 @@ export default class RangedEnemy extends Enemy {
         this.projectileSize = projectileSize;
 
         // Initialize ProjectileAttack instance
-        this.attackTool = new ProjectileAttack(scene, this, {
+        this.attacks.push(new ProjectileAttack(scene, this, {
             attackSpeed: this.attackSpeed,
             projectileSpeed: this.projectileSpeed,
             attackPower: this.attackPower,
@@ -37,11 +37,6 @@ export default class RangedEnemy extends Enemy {
             projectileSize: this.projectileSize,
             attackRange: this.attackRange,
             piercingCount: 0
-        });
-    }
-
-    public destroy(): void {
-        super.destroy();
-        this.attackTool?.destroy();
+        }));
     }
 }

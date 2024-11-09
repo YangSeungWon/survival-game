@@ -4,28 +4,16 @@ import MeleeAttack from '../attacks/MeleeAttack';
 import Player from '../sprites/Player';
 import GameScene from '../scenes/GameScene';
 import { AttackConfig } from '../attacks/Attack';
+import AreaOfEffectAttack from '../attacks/AreaOfEffectAttack';
+import { ProjectileAttackConfig } from '../attacks/ProjectileAttack';
+import { MeleeAttackConfig } from '../attacks/MeleeAttack';
+import { AreaOfEffectAttackConfig } from '../attacks/AreaOfEffectAttack';
+
 
 interface PowerUp {
     name: string;
     description: string;
     apply: () => void;
-}
-
-interface ProjectileAttackConfig {
-    attackSpeed: number;
-    projectileSpeed: number;
-    attackPower: number;
-    attackRange: number;
-    projectileColor: number;
-    projectileSize: number;
-    piercingCount: number;
-}
-
-interface MeleeAttackConfig {
-    attackSpeed: number;
-    attackPower: number;
-    attackRange: number;
-    attackAngle: number;
 }
 
 export default class PowerUpManager {
@@ -61,12 +49,13 @@ export default class PowerUpManager {
 
         const allPowerUps: PowerUp[] = [
             { name: 'Health Boost', description: 'Increase maximum health by 500.', apply: () => { this.player.maxHealth += 500; this.player.health += 500 } },
-            { name: 'Speed Boost', description: 'Increase movement speed by 40.', apply: () => { this.player.speed += 40 } },
+            { name: 'Move Speed', description: 'Increase movement speed by 40.', apply: () => { this.player.moveSpeed += 40 } },
             { name: 'Life Steal', description: 'Gain health equal to 5% of damage dealt.', apply: () => { this.player.percentLifeSteal += 5 } },
             { name: 'Defense Boost', description: 'Increase defense by 1.', apply: () => { this.player.defense += 1 } },
             { name: 'Critical Hit Chance', description: 'Increase critical hit chance by 10%.', apply: () => { this.player.percentCritChance += 10 } },
             { name: 'Projectile Attack', description: 'Add a projectile attack.', apply: () => { this.applyProjectilePowerUp() } },
-            { name: 'Melee Attack', description: 'Add a melee attack.', apply: () => { this.applyMeleePowerUp() } }
+            { name: 'Melee Attack', description: 'Add a melee attack.', apply: () => { this.applyMeleePowerUp() } },
+            { name: 'Area of Effect', description: 'Add an area of effect attack.', apply: () => { this.applyAreaOfEffectPowerUp() } }
         ];
 
         Phaser.Utils.Array.Shuffle(allPowerUps);
@@ -173,5 +162,16 @@ export default class PowerUpManager {
         };
         const newMeleeAttack = new MeleeAttack(this.scene, this.player, meleeAttackConfig);
         this.player.addAttack(newMeleeAttack);
+    }
+
+    private applyAreaOfEffectPowerUp(): void {
+        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig & AttackConfig = {
+            attackSpeed: 2000,
+            radius: 150,
+            attackPower: 50,
+            attackRange: 150,
+        }
+        const newAreaOfEffectAttack = new AreaOfEffectAttack(this.scene, this.player, areaOfEffectAttackConfig);
+        this.player.addAttack(newAreaOfEffectAttack);
     }
 }

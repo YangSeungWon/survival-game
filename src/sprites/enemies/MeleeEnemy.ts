@@ -17,16 +17,11 @@ export default class MeleeEnemy extends Enemy {
         attackAngle: number
     ) {
         super(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, experiencePoint);
-        this.attackTool = new MeleeAttack(scene, this, {
+        this.attacks.push(new MeleeAttack(scene, this, {
             attackSpeed: attackSpeed,
             attackPower: attackPower,
             attackRange: attackRange,
             attackAngle: attackAngle
-        });
-    }
-
-    public destroy(): void {
-        super.destroy();
-        this.attackTool?.destroy();
+        }));
     }
 }

@@ -1,8 +1,6 @@
 import Phaser from 'phaser';
-import Enemy from '../sprites/enemies/Enemy';
-import Player from '../sprites/Player';
-import { createAttackBarTexture } from '../utils/TextureGenerator';
 import GameScene from '../scenes/GameScene';
+import Character from '../sprites/Character';
 
 export interface AttackConfig {
     attackRange: number;
@@ -12,14 +10,14 @@ export interface AttackConfig {
 
 export default abstract class Attack {
     scene: GameScene;
-    owner: Player | Enemy;
+    owner: Character;
     attackRange: number;
     attackSpeed: number;
     attackPower: number;
     isAttacking: boolean;
     attackBar!: Phaser.Physics.Arcade.Sprite | Phaser.GameObjects.Sprite;
 
-    constructor(scene: GameScene, owner: Player | Enemy, config: AttackConfig) {
+    constructor(scene: GameScene, owner: Character, config: AttackConfig) {
         this.scene = scene;
         this.owner = owner;
         this.attackRange = config.attackRange;

@@ -276,7 +276,7 @@ export default class GameScene extends Phaser.Scene {
         statsText += `XP: ${this.player!.experience}\n`;
         statsText += `XP Threshold: ${this.player!.experienceThreshold}\n`;
         statsText += `Enemy Spawn Interval: ${this.enemySpawnInterval}\n`;
-        statsText += `Speed: ${this.player!.speed}\n`;
+        statsText += `Move Speed: ${this.player!.moveSpeed}\n`;
         statsText += `Life Steal (%): ${this.player!.percentLifeSteal}\n`;
         statsText += `Defense: ${this.player!.defense}\n`;
         statsText += `Critical Hit Chance (%): ${this.player!.percentCritChance}\n`;

@@ -5,7 +5,7 @@ import Player from '../sprites/Player';
 import Enemy from '../sprites/enemies/Enemy';
 import { createAttackBarTexture } from '../utils/TextureGenerator';
 
-interface ProjectileConfig {
+export interface ProjectileAttackConfig {
     projectileSpeed: number;
     projectileColor: number;
     projectileSize: number;
@@ -18,7 +18,7 @@ export default class ProjectileAttack extends Attack {
     private projectileColor: number;
     private projectileSize: number;
     private piercingCount: number;
-    constructor(scene: GameScene, owner: Enemy | Player, config: ProjectileConfig & AttackConfig) {
+    constructor(scene: GameScene, owner: Enemy | Player, config: ProjectileAttackConfig & AttackConfig) {
         super(scene, owner, config);
 
         this.scene = scene;

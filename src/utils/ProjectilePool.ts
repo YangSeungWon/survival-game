@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import Projectile from '../sprites/Projectile';
-import Player from '../sprites/Player';
-import Enemy from '../sprites/enemies/Enemy';
+import Character from '../sprites/Character';
 import GameScene from '../scenes/GameScene';
 
 export default class ProjectilePool {
@@ -27,7 +26,7 @@ export default class ProjectilePool {
     }
 
     fireProjectile(
-        owner: Player | Enemy,
+        owner: Character,
         angle: number,
         speed: number,
         attackPower: number,

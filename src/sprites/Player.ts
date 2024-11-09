@@ -4,24 +4,16 @@ import Attack from '../attacks/Attack';
 import { moveObject } from '../utils/MovementUtils';
 import GameScene from '../scenes/GameScene';
 import Enemy from './enemies/Enemy';
+import Character from './Character';
 
-export default class Player extends Phaser.Physics.Arcade.Sprite {
-    scene: GameScene;
-    color: number;
-    speed: number;
-    maxHealth: number;
-    health: number;
-    attacks: Attack[];
+export default class Player extends Character {
     percentLifeSteal: number;
     defense: number;
     percentCritChance: number;
-    facingAngle: number;
     experience: number;
     level: number;
     previousExperienceThreshold: number;
     experienceThreshold: number;
-    canAttack: boolean;
-    canMove: boolean;
 
     constructor(scene: Phaser.Scene) {
         const graphics = scene.add.graphics();
@@ -34,38 +26,25 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const x = Number(scene.game.config.width) / 2;
         const y = Number(scene.game.config.height) / 2;
 
-        super(scene, x, y, 'playerTexture');
-        scene.add.existing(this);
-        scene.physics.add.existing(this);
-        this.setCollideWorldBounds(true);
-        this.setBounce(1);
+        super(scene as GameScene, x, y, 'playerTexture', color, 200, 1000); // moveSpeed: 200, health: 1000
 
-        this.setDepth(1);
-
-        this.scene = scene as GameScene;
         console.log('Player initialized with scene:', this.scene);
-
-        this.color = color;
-
-        this.speed = 200; // 이동 속도를 변수로 설정
-        this.maxHealth = 1000; // 최대 체력을 변수로 설정
-        this.health = this.maxHealth; // 초기 체력 설정
 
         // Attack-related properties
         this.attacks = []; // Array to hold attack instances
 
-        this.percentLifeSteal = 0; // 흡혈 속성 추가, 기본값은 0
-        this.defense = 0; // 방어력 속성 추가, 기본값은 0
-        this.percentCritChance = 0; // 크리티컬 확률 속성 추가, 기본값은 0
+        this.percentLifeSteal = 0; // Default value
+        this.defense = 0; // Default value
+        this.percentCritChance = 0; // Default value
         this.facingAngle = 0;
 
         // Initialize default attacks
         this.initDefaultAttacks();
 
-        this.experience = 0; // 경험치 초기화
-        this.level = 1; // 초기 레벨 설정
+        this.experience = 0; // Initialize experience
+        this.level = 1; // Initial level
         this.previousExperienceThreshold = 0;
-        this.experienceThreshold = 100; // 레벨업을 위한 경험치 임계값
+        this.experienceThreshold = 100; // Experience required for next level
 
         // Listen for enemy health change events
         this.scene.events.on('enemyHealthChanged', this.onEnemyHealthChanged, this);
@@ -73,6 +52,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Listen for player health change events
         this.scene.events.on('playerHealthChanged', this.onPlayerHealthChanged, this);
 
+        // Listen for experience point collection
         this.scene.events.on('experiencePointCollected', this.addExperience, this);
 
         this.canAttack = true;
@@ -111,6 +91,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.attacks = this.attacks.filter(a => a !== attack);
     }
 
+    /**
+     * Applies a status effect to the player.
+     * @param effectType - The type of status effect (e.g., 'burn', 'freeze').
+     * @param duration - Duration of the effect in milliseconds.
+     */
+    applyStatusEffect(effectType: string, duration: number): void {
+        super.applyStatusEffect(effectType, duration);
+    }
+
     onEnemyHealthChanged(data: { damageDealt: number }) {
         // Calculate life steal based on actual damage dealt
         const lifeStealAvailable = Math.ceil(data.damageDealt * this.percentLifeSteal / 100);
@@ -124,9 +113,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     onPlayerHealthChanged(healthChange: number) {
-        // Determine the text to display based on health change
-        const text = healthChange > 0 ? `+${healthChange}` : `${healthChange}`;
-
         this.scene.showDamageText(this.x, this.y, healthChange, healthChange > 0 ? '#00ff00' : '#ff0000', true);
     }
 
@@ -139,10 +125,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             if (forceX !== 0 || forceY !== 0) {
                 this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, this.x + forceX, this.y + forceY); // Update facing angle
 
-                moveObject(this, this.facingAngle, this.speed, delta);
+                moveObject(this, this.facingAngle, this.moveSpeed, delta);
             }
         } else {
-            // 키보드 입력 사용
+            // Keyboard input
             let velocityX = 0;
             let velocityY = 0;
 
@@ -160,7 +146,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
             if (velocityX !== 0 || velocityY !== 0) {
                 const moveAngle = Phaser.Math.Angle.Between(this.x, this.y, this.x + velocityX, this.y + velocityY);
-                moveObject(this, moveAngle, this.speed, delta);
+                moveObject(this, moveAngle, this.moveSpeed, delta);
             }
         }
 
@@ -176,28 +162,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    takeDamage(amount: number) {
+    takeDamage(amount: number): number {
         // Calculate actual damage after applying defense
         const actualDamage = Math.max(amount - this.defense, 0); // Ensure damage doesn't go below zero
 
-        this.health -= actualDamage;
-        this.scene.events.emit('playerHealthChanged', -actualDamage);
+        const damageDealt = super.takeDamage(actualDamage);
 
-        // Flash the player sprite to indicate damage
-        this.scene.tweens.add({
-            targets: this,
-            alpha: 0.5,
-            duration: 20,
-            yoyo: true,
-            repeat: 0,
-            onComplete: () => {
-                this.alpha = 1; // Ensure alpha is reset to 1
-            }
-        });
+        if (damageDealt > 0) {
+            this.scene.events.emit('playerHealthChanged', -damageDealt);
+        }
 
         if (this.health <= 0) {
             this.scene.events.emit('playerDead');
         }
+
+        return damageDealt;
     }
 
     // Method to find the nearest enemy
@@ -240,12 +219,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         while (this.experience >= this.experienceThreshold) {
             this.level += 1;
             this.previousExperienceThreshold = this.experienceThreshold;
-            this.experienceThreshold = Math.floor(this.experienceThreshold * 1.5); // 다음 레벨업 임계값 증가
+            this.experienceThreshold = Math.floor(this.experienceThreshold * 1.5); // Increase experience threshold for next level
             this.scene.events.emit('playerLevelUp', this.level);
         }
     }
 
-    destroy() {
+    destroy(): void {
         // Clean up all attacks
         this.attacks.forEach(attack => attack.destroy());
         super.destroy();

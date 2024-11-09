@@ -1,16 +1,17 @@
 import Phaser from 'phaser';
-import Player from './Player';
-import Enemy from './enemies/Enemy';
 import { createProjectileTexture } from '../utils/TextureGenerator';
 import { moveObject } from '../utils/MovementUtils';
 import GameScene from '../scenes/GameScene';
+import Character from './Character';
+import Player from './Player';
+import Enemy from './enemies/Enemy';
 
 export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     scene: GameScene;
     facingAngle: number;
     speed: number;
     attackPower: number;
-    owner: Player | Enemy;
+    owner: Character;
     piercingCount: number = 0;
     hitTargets: Set<Phaser.GameObjects.GameObject> = new Set();
 
@@ -24,13 +25,13 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.facingAngle = 0;
         this.speed = 0;
         this.attackPower = 0;
-        this.owner = {} as Player | Enemy;
+        this.owner = {} as Character;
         this.scene = scene;
         this.hitTargets = new Set();
     }
 
     fire(
-        owner: Player | Enemy,
+        owner: Character,
         angle: number,
         speed: number,
         attackPower: number,
@@ -78,7 +79,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         target: Phaser.Types.Physics.Arcade.GameObjectWithBody
     ): void {
         const projectileSprite = projectile as Projectile;
-        const targetEntity = target as Player | Enemy;
+        const targetEntity = target as Character;
 
         if (projectileSprite.active && projectileSprite.visible) {
             if (

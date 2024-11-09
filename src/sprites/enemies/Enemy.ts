@@ -1,22 +1,15 @@
 import Phaser from 'phaser';
 import { createEnemyTexture } from '../../utils/TextureGenerator';
 import { moveObject } from '../../utils/MovementUtils';
-import Player from '../Player';
 import GameScene from '../../scenes/GameScene';
-import Attack from '../../attacks/Attack';
+import Character from '../Character';
+import Player from '../Player';
 
-export default class Enemy extends Phaser.Physics.Arcade.Sprite {
-    scene: GameScene;
-    color: number;
-    moveSpeed: number;
-    health: number;
+export default class Enemy extends Character {
     attackSpeed: number;
     attackPower: number;
     attackRange: number;
     experiencePoint: number;
-    canMove: boolean;
-    facingAngle: number;
-    attackTool: Attack | undefined;
 
     constructor(
         scene: GameScene,
@@ -41,53 +34,51 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             x = Phaser.Math.Between(-margin, Number(scene.game.config.width) + margin);
             y = Phaser.Math.Between(-margin, Number(scene.game.config.height) + margin);
         } while (Phaser.Math.Distance.Between(x, y, scene.player!.x, scene.player!.y) < minDistanceFromPlayer);
+        super(scene, x, y, textureKey, color, moveSpeed, health);
 
-        super(scene, x, y, textureKey);
-        scene.add.existing(this);
-        scene.physics.add.existing(this);
-        this.setCollideWorldBounds(true);
-        this.setBounce(1);
-
-        this.scene = scene;
-        this.color = color;
-        this.moveSpeed = moveSpeed;
-        this.health = health;
         this.attackSpeed = attackSpeed;
         this.attackPower = attackPower;
         this.attackRange = attackRange;
         this.experiencePoint = experiencePoint;
-        this.canMove = true;
         this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, scene.player!.x, scene.player!.y);
     }
 
     update(player: Player, delta: number): void {
+        if (!player) return;
+
         // Update attack bar position
         this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
-        this.attackTool?.updateAttackBar();
+        this.attacks.forEach(attack => {
+            attack.updateAttackBar();
+        });
 
         const distance = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
         if (distance <= this.attackRange) {
-            this.attackTool?.performAttack();
-        } else if (this.canMove && !this.attackTool?.isAttacking) {
+            this.attacks.forEach(attack => {
+                attack.performAttack();
+            });
+        } else if (this.canMove) {
             moveObject(this, this.facingAngle, this.moveSpeed, delta);
         }
     }
 
-    calculateCriticalHit(percentCritChance: number): boolean {
-        return Phaser.Math.FloatBetween(0, 1) < percentCritChance / 100;
+    /**
+     * Applies a status effect to the enemy.
+     * @param effectType - The type of status effect (e.g., 'burn', 'freeze').
+     * @param duration - Duration of the effect in milliseconds.
+     */
+    applyStatusEffect(effectType: string, duration: number): void {
+        super.applyStatusEffect(effectType, duration);
     }
 
-    takeDamage(amount: number): void {
+    takeDamage(amount: number): number {
         const isCriticalHit = this.calculateCriticalHit(this.scene.player!.percentCritChance);
         const damage = isCriticalHit ? amount * 2 : amount;
+
+        const damageDealt = super.takeDamage(damage);
         
         // Display damage text
         this.displayDamageText(damage, isCriticalHit);
-
-        const initialHealth = this.health;
-        this.health = Math.max(this.health - damage, 0); // Ensure health doesn't go below zero
-
-        const damageDealt = initialHealth - this.health; // Calculate the actual damage dealt
 
         if (damageDealt > 0) {
             // Emit an event with the actual damage dealt
@@ -98,20 +89,17 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
             });
         }
 
-        this.scene.tweens.add({
-            targets: this,
-            alpha: 0.5,
-            duration: 20,
-            yoyo: true,
-            repeat: 0,
-            onComplete: () => {
-                this.alpha = 1; // Ensure alpha is reset to 1
-            }
-        });
-
         if (this.health <= 0) {
             this.dropExperience();
             this.destroy();
+        }
+
+        return damageDealt;
+    }
+
+    protected dropExperience(): void {
+        if (this.scene.experiencePointPool) {
+            this.scene.experiencePointPool.spawnExperience(this.x, this.y, this.experiencePoint);
         }
     }
 
@@ -120,13 +108,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.scene.showDamageText(this.x, this.y, damage, color);
     }
 
-    /**
-     * Drops experience points upon enemy death.
-     */
-    protected dropExperience(): void {
-        if (this.scene.experiencePointPool) {
-            this.scene.experiencePointPool.spawnExperience(this.x, this.y, this.experiencePoint);
-        }
+    calculateCriticalHit(percentCritChance: number): boolean {
+        return Phaser.Math.FloatBetween(0, 1) < percentCritChance / 100;
     }
 
     destroy(fromScene?: boolean): void {
