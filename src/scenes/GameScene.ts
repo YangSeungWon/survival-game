@@ -9,6 +9,7 @@ import Heart from '../sprites/Heart';
 import PowerUpManager from '../utils/PowerUpManager';
 import ExperiencePoint from '../sprites/ExperiencePoint';
 import FireballWizard from '../sprites/enemies/FireballWizard';
+import EliteEnemy from '../sprites/enemies/EliteEnemy';
 
 export default class GameScene extends Phaser.Scene {
     score: number;
@@ -213,24 +214,17 @@ export default class GameScene extends Phaser.Scene {
     }
 
     createEnemies() {
-        if (this.isPaused || document.hidden) return; // Check if the game is paused or if the window is not visible
+        if (this.isPaused || document.hidden) return;
 
-        const enemyTypes = ['FastEnemy', 'StrongEnemy', 'GunEnemy', 'FireballWizard'];
-        
-        const enemyType = Phaser.Math.RND.weightedPick(enemyTypes);
-        var enemy;
-        if (enemyType === 'FastEnemy') {
-            enemy = new FastEnemy(this);
-        } else if (enemyType === 'StrongEnemy') {
-            enemy = new StrongEnemy(this);
-        } else if (enemyType === 'GunEnemy') {
-            enemy = new GunEnemy(this);
-        } else if (enemyType === 'FireballWizard') {
-            enemy = new FireballWizard(this);
-        } else {
-            console.error("Unknown enemy type: " + enemyType);
-            return;
-        }
+        const level = this.player!.level;
+        const enemyClasses = [FastEnemy, StrongEnemy, GunEnemy, FireballWizard, EliteEnemy];
+
+        const availableEnemies = enemyClasses.filter(enemyClass => {
+            return level >= enemyClass.FROM_LEVEL && level <= enemyClass.TO_LEVEL;
+        });
+
+        const EnemyClass = Phaser.Math.RND.weightedPick(availableEnemies);
+        const enemy = new EnemyClass(this);
         this.enemies!.add(enemy);
     }
 

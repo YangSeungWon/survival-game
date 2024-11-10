@@ -1,28 +1,24 @@
 import Phaser from 'phaser';
 import Enemy from './Enemy';
-import MeleeAttack from '../../attacks/MeleeAttack';
+import MeleeAttack, { MeleeAttackConfig } from '../../attacks/MeleeAttack';
 import GameScene from '../../scenes/GameScene';
+import { AttackConfig } from '../../attacks/Attack';
 
 export default class MeleeEnemy extends Enemy {
+    static readonly TYPE: string;
+    static readonly FROM_LEVEL: number;
+    static readonly TO_LEVEL: number;
+
     constructor(
         scene: GameScene,
         color: number,
         size: number,
         moveSpeed: number,
         health: number,
-        attackSpeed: number,
-        attackPower: number,
-        attackRange: number,
-        experiencePoint: number,
-        attackAngle: number,
+        config: AttackConfig & MeleeAttackConfig,
+        experiencePoint: number
     ) {
-        super(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, experiencePoint);
-        this.attacks.push(new MeleeAttack(scene, this, {
-            attackSpeed: attackSpeed,
-            attackPower: attackPower,
-            attackRange: attackRange,
-            attackAngle: attackAngle,
-            attackColor: color
-        }));
+        super(scene, color, size, moveSpeed, health, config, experiencePoint);
+        this.attacks.push(new MeleeAttack(scene, this, config));
     }
 }

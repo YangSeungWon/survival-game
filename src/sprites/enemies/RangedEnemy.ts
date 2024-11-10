@@ -1,8 +1,13 @@
 import Enemy from './Enemy';
-import ProjectileAttack from '../../attacks/ProjectileAttack';
+import ProjectileAttack, { ProjectileAttackConfig } from '../../attacks/ProjectileAttack';
 import GameScene from '../../scenes/GameScene';
+import { AttackConfig } from '../../attacks/Attack';
 
 export default class RangedEnemy extends Enemy {
+    static readonly TYPE: string;
+    static readonly FROM_LEVEL: number;
+    static readonly TO_LEVEL: number;
+
     protected projectileSpeed: number;
     protected projectileSize: number;
     protected projectilePool: any;
@@ -13,26 +18,14 @@ export default class RangedEnemy extends Enemy {
         size: number,
         moveSpeed: number,
         health: number,
-        attackSpeed: number,
-        attackPower: number,
-        attackRange: number,
-        experiencePoint: number,
-        projectileSpeed: number,
-        projectileSize: number,
+        config: AttackConfig & ProjectileAttackConfig,
+        experiencePoint: number
     ) {
-        super(scene, color, size, moveSpeed, health, attackSpeed, attackPower, attackRange, experiencePoint);
-        this.projectileSpeed = projectileSpeed;
-        this.projectileSize = projectileSize;
+        super(scene, color, size, moveSpeed, health, config, experiencePoint);
+        this.projectileSpeed = config.projectileSpeed;
+        this.projectileSize = config.projectileSize;
 
         // Initialize ProjectileAttack instance
-        this.attacks.push(new ProjectileAttack(scene, this, {
-            attackSpeed: this.attackSpeed,
-            projectileSpeed: this.projectileSpeed,
-            attackPower: this.attackPower,
-            attackColor: color,
-            projectileSize: this.projectileSize,
-            attackRange: this.attackRange,
-            piercingCount: 0
-        }));
+        this.attacks.push(new ProjectileAttack(scene, this, config));
     }
 }

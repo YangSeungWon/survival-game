@@ -1,12 +1,18 @@
 import Phaser from 'phaser';
 import RangedEnemy from './RangedEnemy';
 import GameScene from '../../scenes/GameScene';
+import { ProjectileAttackConfig } from '../../attacks/ProjectileAttack';
+import { AttackConfig } from '../../attacks/Attack';
 
 export default class FireballWizard extends RangedEnemy {
+    static readonly TYPE = 'FireballWizard';
+    static readonly FROM_LEVEL = 7;
+    static readonly TO_LEVEL = 15;
+
     constructor(scene: GameScene) {
         const color: number = 0xff5500;   // A fiery color
         const size: number = 12;          // Slightly larger size
-        const speed: number = 70;         // Slower speed
+        const speed: number = 80;         // Slower speed
         const health: number = 150;       // Moderate health
         
         // 공격 속성 정의
@@ -19,6 +25,16 @@ export default class FireballWizard extends RangedEnemy {
         const projectileSpeed: number = 150; // Slower projectile speed
         const projectileSize: number = 10;   // Larger projectile size
 
-        super(scene, color, size, speed, health, attackSpeed, attackPower, attackRange, experiencePoint, projectileSpeed, projectileSize);
+        const config: AttackConfig & ProjectileAttackConfig = {
+            attackSpeed: attackSpeed,
+            attackPower: attackPower,
+            attackRange: attackRange,
+            attackColor: color,
+            projectileSpeed: projectileSpeed,
+            projectileSize: projectileSize,
+            piercingCount: 1
+        };
+
+        super(scene, color, size, speed, health, config, experiencePoint);
     }
 }

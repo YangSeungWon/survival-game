@@ -4,12 +4,18 @@ import { moveObject } from '../../utils/MovementUtils';
 import GameScene from '../../scenes/GameScene';
 import Character from '../Character';
 import Player from '../Player';
+import { AttackConfig, StatusEffect } from '../../attacks/Attack';
 
 export default class Enemy extends Character {
     attackSpeed: number;
     attackPower: number;
     attackRange: number;
+    attackColor: number;
+    statusEffect: StatusEffect | null;
     experiencePoint: number;
+    static readonly TYPE: string;
+    static readonly FROM_LEVEL: number;
+    static readonly TO_LEVEL: number;
 
     constructor(
         scene: GameScene,
@@ -17,9 +23,7 @@ export default class Enemy extends Character {
         size: number,
         moveSpeed: number,
         health: number,
-        attackSpeed: number,
-        attackPower: number,
-        attackRange: number,
+        attackConfig: AttackConfig, 
         experiencePoint: number
     ) {
         // 적을 그래픽으로 생성
@@ -36,9 +40,11 @@ export default class Enemy extends Character {
         } while (Phaser.Math.Distance.Between(x, y, scene.player!.x, scene.player!.y) < minDistanceFromPlayer);
         super(scene, x, y, textureKey, color, moveSpeed, health);
 
-        this.attackSpeed = attackSpeed;
-        this.attackPower = attackPower;
-        this.attackRange = attackRange;
+        this.attackSpeed = attackConfig.attackSpeed;
+        this.attackPower = attackConfig.attackPower;
+        this.attackRange = attackConfig.attackRange;
+        this.attackColor = attackConfig.attackColor;
+        this.statusEffect = attackConfig.statusEffect || null;
         this.experiencePoint = experiencePoint;
         this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, scene.player!.x, scene.player!.y);
     }
