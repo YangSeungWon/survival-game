@@ -48,10 +48,10 @@ export default class PowerUpManager {
         title.setData('powerUp', true);
 
         const allPowerUps: PowerUp[] = [
-            { name: 'Health Boost', description: 'Increase maximum health by 500.', apply: () => { this.player.maxHealth += 500; this.player.health += 500 } },
+            { name: 'Health Boost', description: 'Increase maximum health by 2000.', apply: () => { this.player.maxHealth += 2000; this.player.health += 2000 } },
             { name: 'Move Speed', description: 'Increase movement speed by 40.', apply: () => { this.player.moveSpeed += 40 } },
             { name: 'Life Steal', description: 'Gain health equal to 5% of damage dealt.', apply: () => { this.player.percentLifeSteal += 5 } },
-            { name: 'Defense Boost', description: 'Increase defense by 1.', apply: () => { this.player.defense += 1 } },
+            { name: 'Defense Boost', description: 'Increase defense by 100.', apply: () => { this.player.defense += 100 } },
             { name: 'Critical Hit Chance', description: 'Increase critical hit chance by 10%.', apply: () => { this.player.percentCritChance += 10 } },
             { name: 'Piercing Projectile', description: 'Add a projectile attack with piercing (10).', apply: () => { this.applyProjectilePowerUp() } },
             { name: 'Melee Attack', description: 'Add a melee attack.', apply: () => { this.applyMeleePowerUp() } },
