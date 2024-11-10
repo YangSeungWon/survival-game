@@ -8,6 +8,7 @@ import Player from '../sprites/Player';
 import Heart from '../sprites/Heart';
 import PowerUpManager from '../utils/PowerUpManager';
 import ExperiencePoint from '../sprites/ExperiencePoint';
+import FireballWizard from '../sprites/enemies/FireballWizard';
 
 export default class GameScene extends Phaser.Scene {
     score: number;
@@ -154,7 +155,9 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player);
 
         // Call createEnemies to spawn enemies initially
-        this.createEnemies();
+        for (let i = 0; i < 10; i++) {
+            this.createEnemies();
+        }
 
         // Overlap settings instead of collider
         this.physics.add.overlap(this.player, this.experiencePointPool.getPoints(), (player, experience) => {
@@ -212,7 +215,9 @@ export default class GameScene extends Phaser.Scene {
     createEnemies() {
         if (this.isPaused || document.hidden) return; // Check if the game is paused or if the window is not visible
 
-        const enemyType = Phaser.Math.RND.pick(['FastEnemy', 'FastEnemy', 'StrongEnemy', 'GunEnemy', 'GunEnemy']);
+        const enemyTypes = ['FastEnemy', 'StrongEnemy', 'GunEnemy', 'FireballWizard'];
+        
+        const enemyType = Phaser.Math.RND.weightedPick(enemyTypes);
         var enemy;
         if (enemyType === 'FastEnemy') {
             enemy = new FastEnemy(this);
@@ -220,6 +225,8 @@ export default class GameScene extends Phaser.Scene {
             enemy = new StrongEnemy(this);
         } else if (enemyType === 'GunEnemy') {
             enemy = new GunEnemy(this);
+        } else if (enemyType === 'FireballWizard') {
+            enemy = new FireballWizard(this);
         } else {
             console.error("Unknown enemy type: " + enemyType);
             return;

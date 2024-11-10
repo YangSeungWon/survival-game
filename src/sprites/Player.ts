@@ -19,7 +19,7 @@ export default class Player extends Character {
         const graphics = scene.add.graphics();
         const color = 0xffffff;
         graphics.fillStyle(color, 1);
-        graphics.fillRect(0, 0, 20, 20);
+        graphics.fillCircle(10, 10, 10);
         graphics.generateTexture('playerTexture', 20, 20);
         graphics.destroy();
 
