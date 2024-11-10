@@ -170,7 +170,7 @@ export default class Player extends Character {
     }
 
     // Method to find the nearest enemy
-    private getNearestEnemy(): Enemy | null {
+    getNearestEnemy(): Enemy | null {
         let nearestEnemy: Enemy | null = null;
         let minDistance = Infinity;
 

@@ -10,6 +10,7 @@ import PowerUpManager from '../utils/PowerUpManager';
 import ExperiencePoint from '../sprites/ExperiencePoint';
 import FireballWizard from '../sprites/enemies/FireballWizard';
 import EliteEnemy from '../sprites/enemies/EliteEnemy';
+import PoisonWizard from '../sprites/enemies/PoisonWizard';
 
 export default class GameScene extends Phaser.Scene {
     score: number;
@@ -217,7 +218,7 @@ export default class GameScene extends Phaser.Scene {
         if (this.isPaused || document.hidden) return;
 
         const level = this.player!.level;
-        const enemyClasses = [FastEnemy, StrongEnemy, GunEnemy, FireballWizard, EliteEnemy];
+        const enemyClasses = [FastEnemy, StrongEnemy, GunEnemy, FireballWizard, PoisonWizard, EliteEnemy];
 
         const availableEnemies = enemyClasses.filter(enemyClass => {
             return level >= enemyClass.FROM_LEVEL && level <= enemyClass.TO_LEVEL;

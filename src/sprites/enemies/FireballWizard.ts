@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import RangedEnemy from './RangedEnemy';
 import GameScene from '../../scenes/GameScene';
 import { ProjectileAttackConfig } from '../../attacks/ProjectileAttack';
-import { AttackConfig } from '../../attacks/Attack';
+import { AttackConfig, StatusEffectType } from '../../attacks/Attack';
 
 export default class FireballWizard extends RangedEnemy {
     static readonly TYPE = 'FireballWizard';
@@ -25,6 +25,8 @@ export default class FireballWizard extends RangedEnemy {
         const projectileSpeed: number = 150; // Slower projectile speed
         const projectileSize: number = 10;   // Larger projectile size
 
+        const burnDuration: number = 1000; // Duration of burn effect in milliseconds
+
         const config: AttackConfig & ProjectileAttackConfig = {
             attackSpeed: attackSpeed,
             attackPower: attackPower,
@@ -32,7 +34,11 @@ export default class FireballWizard extends RangedEnemy {
             attackColor: color,
             projectileSpeed: projectileSpeed,
             projectileSize: projectileSize,
-            piercingCount: 1
+            piercingCount: 1,
+            statusEffect: {
+                type: StatusEffectType.BURN,
+                duration: burnDuration
+            }
         };
 
         super(scene, color, size, speed, health, config, experiencePoint);

@@ -6,7 +6,7 @@ import { createAttackBarTexture } from '../utils/TextureGenerator';
 import Character from '../sprites/Character';
 import Player from '../sprites/Player';
 
-export interface MeleeAttackConfig {
+export interface MeleeAttackConfig extends AttackConfig {
     attackAngle: number;
 }
 
@@ -15,7 +15,7 @@ export default class MeleeAttack extends Attack {
     private attackAngle: number;
     private initialFacingAngle: number | null = null;
 
-    constructor(scene: GameScene, owner: Character, config: AttackConfig & MeleeAttackConfig) {
+    constructor(scene: GameScene, owner: Character, config: MeleeAttackConfig) {
         super(scene, owner, config);
         this.scene = scene;
         this.attackAngle = Phaser.Math.DegToRad(config.attackAngle);

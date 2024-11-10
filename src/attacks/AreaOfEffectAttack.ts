@@ -4,22 +4,25 @@ import GameScene from '../scenes/GameScene';
 import Character from '../sprites/Character';
 import Player from '../sprites/Player';
 
-export interface AreaOfEffectAttackConfig {
+export interface AreaOfEffectAttackConfig extends AttackConfig {
+    effectRange: number;
 }
 
 export default class AreaOfEffectAttack extends Attack {
     scene: GameScene;
     attackCircle!: Phaser.GameObjects.Ellipse;
-
-    constructor(scene: GameScene, owner: Character, config: AttackConfig & AreaOfEffectAttackConfig) {
+    effectRange: number;
+    
+    constructor(scene: GameScene, owner: Character, config: AreaOfEffectAttackConfig) {
         super(scene, owner, config);
         this.scene = scene;
+        this.effectRange = config.effectRange;
         this.initAttackBar(scene);
     }
 
     initAttackBar(scene: GameScene): void {
         this.attackBar = null;
-        this.attackCircle = this.scene.add.ellipse(this.owner.x, this.owner.y, this.attackRange * 2, this.attackRange * 2, this.attackColor, 0.5);
+        this.attackCircle = this.scene.add.ellipse(this.owner.x, this.owner.y, this.effectRange * 2, this.effectRange * 2, this.attackColor, 0.5);
         this.attackCircle.setDepth(1);
         this.attackCircle.setAlpha(0.3);
     }

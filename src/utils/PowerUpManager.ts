@@ -169,10 +169,11 @@ export default class PowerUpManager {
     }
 
     private applyAreaOfEffectBurningPowerUp(): void {
-        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig & AttackConfig = {
+        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig = {
             attackSpeed: 100,
             attackPower: 0,
             attackRange: 100,
+            effectRange: 100,
             statusEffect: {
                 type: 'burn' as StatusEffectType,
                 duration: 1000,
@@ -185,10 +186,11 @@ export default class PowerUpManager {
     }
 
     private applyAreaOfEffectFreezingPowerUp(): void {
-        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig & AttackConfig = {
+        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig = {
             attackSpeed: 100,
             attackPower: 0,
             attackRange: 200,
+            effectRange: 200,
             statusEffect: {
                 type: 'freeze' as StatusEffectType,
                 duration: 500,
@@ -200,10 +202,11 @@ export default class PowerUpManager {
     }
 
     private applyAreaOfEffectPoisoningPowerUp(): void {
-        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig & AttackConfig = {
+        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig = {
             attackSpeed: 100,
             attackPower: 0,
             attackRange: 100,
+            effectRange: 100,
             statusEffect: {
                 type: 'poison' as StatusEffectType,
                 duration: 1000,
@@ -216,7 +219,7 @@ export default class PowerUpManager {
     }
 
     private applyProjectileStunPowerUp(): void {
-        const projectileAttackConfig: ProjectileAttackConfig & AttackConfig = {
+        const projectileAttackConfig: ProjectileAttackConfig = {
             attackSpeed: 200,
             projectileSpeed: 700,
             attackPower: 10,
