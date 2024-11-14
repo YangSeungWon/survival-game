@@ -425,6 +425,9 @@ export default class GameScene extends Phaser.Scene {
         if (this.enemySpawnEvent) this.enemySpawnEvent.paused = false;
         if (this.heartSpawnEvent) this.heartSpawnEvent.paused = false;
         this.attackEvents.forEach(event => event.paused = false);
+
+        // Reset lastUpdateTime to prevent large deltaTime on resume
+        this.lastUpdateTime = this.time.now;
     }
 
     showDamageText(enemyX: number, enemyY: number, damage: number, color: string, isPlayer: boolean = false) {
