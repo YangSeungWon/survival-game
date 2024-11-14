@@ -30,7 +30,8 @@ export default class PowerUpManager {
         const centerX = this.scene.cameras.main.worldView.x + this.scene.cameras.main.width / 2;
         const centerY = this.scene.cameras.main.worldView.y + this.scene.cameras.main.height / 2;
         this.powerUpBackground = this.scene.add.rectangle(centerX, centerY, 400, 350, 0x000000, 0.7)
-            .setVisible(false);
+            .setVisible(false)
+            .setDepth(1000);
     }
 
     showPowerUpSelection(level: number): void {
@@ -44,7 +45,8 @@ export default class PowerUpManager {
             centerY - 160, 
             `Level ${level}! Choose a Power-Up:`, 
             { fontSize: '24px', color: '#ffffff' }
-        ).setOrigin(0.5);
+        ).setOrigin(0.5)
+          .setDepth(1001);
         title.setData('powerUp', true);
 
         const allPowerUps: PowerUp[] = [
@@ -73,7 +75,8 @@ export default class PowerUpManager {
                 200, 
                 50, 
                 0x555555
-            ).setInteractive();
+            ).setInteractive()
+              .setDepth(1001);
             button.setData('powerUp', true);
 
             const buttonText = this.scene.add.text(
@@ -81,7 +84,8 @@ export default class PowerUpManager {
                 buttonY, 
                 `${index + 1}: ${powerUp.name}`, 
                 { fontSize: '20px', color: '#ffffff' }
-            ).setOrigin(0.5);
+            ).setOrigin(0.5)
+              .setDepth(1002);
             buttonText.setData('powerUp', true);
 
             button.on('pointerdown', () => {
@@ -108,7 +112,8 @@ export default class PowerUpManager {
             100, 
             40, 
             0xff4444
-        ).setInteractive();
+        ).setInteractive()
+          .setDepth(1001);
         cancelButton.setData('powerUp', true);
 
         const cancelText = this.scene.add.text(
@@ -116,7 +121,8 @@ export default class PowerUpManager {
             cancelY, 
             'Cancel', 
             { fontSize: '18px', color: '#ffffff' }
-        ).setOrigin(0.5);
+        ).setOrigin(0.5)
+          .setDepth(1002);
         cancelText.setData('powerUp', true);
 
         cancelButton.on('pointerdown', () => {
