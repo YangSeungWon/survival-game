@@ -267,8 +267,10 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
     }
 
     takeDamage(amount: number): number {
+        const ceiledAmount = Math.ceil(amount);
+
         const initialHealth = this.health;
-        this.health = Math.max(this.health - amount, 0); // Ensure health doesn't go below zero
+        this.health = Math.max(this.health - ceiledAmount, 0); // Ensure health doesn't go below zero
 
         const damageDealt = initialHealth - this.health; // Calculate the actual damage dealt
 
