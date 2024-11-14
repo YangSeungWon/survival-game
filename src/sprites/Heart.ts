@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import DepthManager, { DepthLayer } from '../utils/DepthManager';
 
 export default class Heart extends Phaser.Physics.Arcade.Sprite {
     constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -15,6 +16,7 @@ export default class Heart extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.setCollideWorldBounds(true);
+        this.setDepth(DepthManager.getInstance().getDepth(DepthLayer.EFFECT));
     }
 
     collect(): void {

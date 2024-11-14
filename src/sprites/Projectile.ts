@@ -6,6 +6,7 @@ import Character from './Character';
 import Player from './Player';
 import Enemy from './enemies/Enemy';
 import { StatusEffect } from '../attacks/Attack';
+import DepthManager, { DepthLayer } from '../utils/DepthManager';
 
 export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     scene: GameScene;
@@ -30,6 +31,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.owner = {} as Character;
         this.scene = scene;
         this.hitTargets = new Set();
+        this.setDepth(DepthManager.getInstance().getDepth(DepthLayer.PROJECTILE));  
     }
 
     fire(

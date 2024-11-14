@@ -11,6 +11,7 @@ import ExperiencePoint from '../sprites/ExperiencePoint';
 import FireballWizard from '../sprites/enemies/FireballWizard';
 import EliteEnemy from '../sprites/enemies/EliteEnemy';
 import PoisonWizard from '../sprites/enemies/PoisonWizard';
+import DepthManager, { DepthLayer } from '../utils/DepthManager';
 
 export default class GameScene extends Phaser.Scene {
     score: number;
@@ -44,7 +45,8 @@ export default class GameScene extends Phaser.Scene {
     healthBar: Phaser.GameObjects.Graphics | null;
     experienceBarBackground: Phaser.GameObjects.Graphics | null;
     experienceBar: Phaser.GameObjects.Graphics | null;
-
+    depthManager: DepthManager;
+    
     private defaultTextStyle: Phaser.Types.GameObjects.Text.TextStyle = {
         fontFamily: '"Noto Sans", sans-serif',
         fontSize: '32px',
@@ -83,6 +85,7 @@ export default class GameScene extends Phaser.Scene {
         this.healthBar = null;
         this.experienceBarBackground = null;
         this.experienceBar = null;
+        this.depthManager = DepthManager.getInstance();
     }
 
     preload(): void {
@@ -95,6 +98,7 @@ export default class GameScene extends Phaser.Scene {
 
     create(): void {
         this.player = new Player(this);
+        this.player.setDepth(this.depthManager.getDepth(DepthLayer.PLAYER));
         this.projectilePool = new ProjectilePool(this);
         this.experiencePointPool = new ExperiencePointPool(this);
         this.enemies = this.physics.add.group();
@@ -115,29 +119,41 @@ export default class GameScene extends Phaser.Scene {
 
         this.cursors = this.input.keyboard!.createCursorKeys() ? this.input.keyboard!.createCursorKeys() : null;
 
-        this.scoreText = this.add.text(16, 16, 'Score: 0', this.defaultTextStyle).setScrollFactor(0).setDepth(1);
-        this.healthText = this.add.text(16, 50, `Health: ${this.player.health}/${this.player.maxHealth}`, { ...this.defaultTextStyle, color: '#f00' }).setScrollFactor(0).setDepth(1);
-        this.playerStatsText = this.add.text(16, this.cameras.main.height - 200, '', { ...this.defaultTextStyle, fontSize: '16px' }).setScrollFactor(0).setDepth(1);
-        this.timeText = this.add.text(16, 84, 'Time: 0:00', this.defaultTextStyle).setScrollFactor(0).setDepth(1);
-        this.experienceText = this.add.text(16, 118, 'XP: 0', { ...this.defaultTextStyle, color: '#00ff00' }).setScrollFactor(0).setDepth(1);
-        this.fpsText = this.add.text(this.cameras.main.width / 2, 8, 'FPS: 0', { ...this.defaultTextStyle, fontSize: '16px' }).setScrollFactor(0).setDepth(1);
+        this.scoreText = this.add.text(16, 16, 'Score: 0', this.defaultTextStyle)
+            .setScrollFactor(0)
+            .setDepth(this.depthManager.getDepth(DepthLayer.UI));
+        this.healthText = this.add.text(16, 50, `Health: ${this.player.health}/${this.player.maxHealth}`, { ...this.defaultTextStyle, color: '#f00' })
+            .setScrollFactor(0)
+            .setDepth(this.depthManager.getDepth(DepthLayer.UI));
+        this.playerStatsText = this.add.text(16, this.cameras.main.height - 200, '', { ...this.defaultTextStyle, fontSize: '16px' })
+            .setScrollFactor(0)
+            .setDepth(this.depthManager.getDepth(DepthLayer.UI));
+        this.timeText = this.add.text(16, 84, 'Time: 0:00', this.defaultTextStyle)
+            .setScrollFactor(0)
+            .setDepth(this.depthManager.getDepth(DepthLayer.UI));
+        this.experienceText = this.add.text(16, 118, 'XP: 0', { ...this.defaultTextStyle, color: '#00ff00' })
+            .setScrollFactor(0)
+            .setDepth(this.depthManager.getDepth(DepthLayer.UI));
+        this.fpsText = this.add.text(this.cameras.main.width / 2, 8, 'FPS: 0', { ...this.defaultTextStyle, fontSize: '16px' })
+            .setScrollFactor(0)
+            .setDepth(this.depthManager.getDepth(DepthLayer.UI));
 
         this.powerUpManager = new PowerUpManager(this, this.player);
 
         this.healthBarBackground = this.add.graphics();
         this.healthBarBackground.fillStyle(0x555555, 1); // Grey color for background
-        this.healthBarBackground.fillRect(this.cameras.main.width - 216, 16, 200, 20).setScrollFactor(0).setDepth(1); // Full size of the health bar
+        this.healthBarBackground.fillRect(this.cameras.main.width - 216, 16, 200, 20).setScrollFactor(0).setDepth(this.depthManager.getDepth(DepthLayer.UI)); // Full size of the health bar
 
         this.healthBar = this.add.graphics();
-        this.healthBar.setDepth(2); // Set depth for health bar
+        this.healthBar.setDepth(this.depthManager.getDepth(DepthLayer.UI)); // Set depth for health bar
         this.updateHealthRelatedUI();
 
         this.experienceBarBackground = this.add.graphics();
         this.experienceBarBackground.fillStyle(0x555555, 1); // Grey color for background
-        this.experienceBarBackground.fillRect(this.cameras.main.width - 216, 40, 200, 20).setScrollFactor(0).setDepth(1); // Full size of the experience bar
+        this.experienceBarBackground.fillRect(this.cameras.main.width - 216, 40, 200, 20).setScrollFactor(0).setDepth(this.depthManager.getDepth(DepthLayer.UI)); // Full size of the experience bar
 
         this.experienceBar = this.add.graphics();
-        this.experienceBar.setDepth(2); // Set depth for experience bar
+        this.experienceBar.setDepth(this.depthManager.getDepth(DepthLayer.UI)); // Set depth for experience bar
         this.updateExperienceRelatedUI();
 
         this.physics.world.setBounds(0, 0, this.mapSize, this.mapSize);
@@ -147,6 +163,7 @@ export default class GameScene extends Phaser.Scene {
         const borderGraphics = this.add.graphics();
         borderGraphics.lineStyle(4, 0xffffff, 1); // White border with 4px thickness
         borderGraphics.strokeRect(0, 0, this.mapSize, this.mapSize);
+        borderGraphics.setDepth(this.depthManager.getDepth(DepthLayer.UI));
 
         // Create player
         this.add.existing(this.player);
@@ -194,6 +211,7 @@ export default class GameScene extends Phaser.Scene {
                 dir: '8dir', // Allow 8-directional movement
                 fixed: true // Fix joystick to camera
             });
+            this.joystick.setDepth(this.depthManager.getDepth(DepthLayer.UI));
 
             // Create cursor keys from joystick
             this.joystickCursors = this.joystick.createCursorKeys();
@@ -211,21 +229,21 @@ export default class GameScene extends Phaser.Scene {
                 }
             }
         });
-
     }
 
     createEnemies() {
-        if (this.isPaused || document.hidden) return;
+        if (this.isPaused || this.isPausedInGame || document.hidden) return;
 
         const level = this.player!.level;
         const enemyClasses = [FastEnemy, StrongEnemy, GunEnemy, FireballWizard, PoisonWizard, EliteEnemy];
-
+        
         const availableEnemies = enemyClasses.filter(enemyClass => {
             return level >= enemyClass.FROM_LEVEL && level <= enemyClass.TO_LEVEL;
         });
 
         const EnemyClass = Phaser.Math.RND.weightedPick(availableEnemies);
         const enemy = new EnemyClass(this);
+        enemy.setDepth(this.depthManager.getDepth(DepthLayer.ENEMY));
         this.enemies!.add(enemy);
     }
 

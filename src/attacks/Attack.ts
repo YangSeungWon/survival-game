@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import GameScene from '../scenes/GameScene';
 import Character from '../sprites/Character';
+import DepthManager, { DepthLayer } from '../utils/DepthManager';
 
 export interface AttackConfig {
     attackRange: number;
@@ -51,6 +52,7 @@ export default abstract class Attack {
         this.attackBar.setOrigin(0, 1);
         this.attackBar.setDepth(this.owner.depth + 1);
         this.attackBar.setVisible(true);
+        this.attackBar.setDepth(DepthManager.getInstance().getDepth(DepthLayer.ENEMY));
     }
 
     updateAttackBar(): void {

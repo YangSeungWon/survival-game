@@ -8,7 +8,7 @@ import AreaOfEffectAttack from '../attacks/AreaOfEffectAttack';
 import { ProjectileAttackConfig } from '../attacks/ProjectileAttack';
 import { MeleeAttackConfig } from '../attacks/MeleeAttack';
 import { AreaOfEffectAttackConfig } from '../attacks/AreaOfEffectAttack';
-
+import DepthManager, { DepthLayer } from './DepthManager';
 
 interface PowerUp {
     name: string;
@@ -21,17 +21,19 @@ export default class PowerUpManager {
     private player: Player;
     private keyboardListeners: ((event: KeyboardEvent) => void)[];
     private powerUpBackground: Phaser.GameObjects.Rectangle;
+    private depthManager: DepthManager;
 
     constructor(scene: GameScene, player: Player) {
         this.scene = scene;
         this.player = player;
         this.keyboardListeners = [];
+        this.depthManager = DepthManager.getInstance();
 
         const centerX = this.scene.cameras.main.worldView.x + this.scene.cameras.main.width / 2;
         const centerY = this.scene.cameras.main.worldView.y + this.scene.cameras.main.height / 2;
         this.powerUpBackground = this.scene.add.rectangle(centerX, centerY, 400, 350, 0x000000, 0.7)
             .setVisible(false)
-            .setDepth(1000);
+            .setDepth(this.depthManager.getDepth(DepthLayer.UI));
     }
 
     showPowerUpSelection(level: number): void {
@@ -46,7 +48,7 @@ export default class PowerUpManager {
             `Level ${level}! Choose a Power-Up:`, 
             { fontSize: '24px', color: '#ffffff' }
         ).setOrigin(0.5)
-          .setDepth(1001);
+          .setDepth(this.depthManager.getDepth(DepthLayer.UI));
         title.setData('powerUp', true);
 
         const allPowerUps: PowerUp[] = [
@@ -76,7 +78,7 @@ export default class PowerUpManager {
                 50, 
                 0x555555
             ).setInteractive()
-              .setDepth(1001);
+              .setDepth(this.depthManager.getDepth(DepthLayer.UI));
             button.setData('powerUp', true);
 
             const buttonText = this.scene.add.text(
@@ -85,7 +87,7 @@ export default class PowerUpManager {
                 `${index + 1}: ${powerUp.name}`, 
                 { fontSize: '20px', color: '#ffffff' }
             ).setOrigin(0.5)
-              .setDepth(1002);
+              .setDepth(this.depthManager.getDepth(DepthLayer.UI) + 1);
             buttonText.setData('powerUp', true);
 
             button.on('pointerdown', () => {
@@ -113,7 +115,7 @@ export default class PowerUpManager {
             40, 
             0xff4444
         ).setInteractive()
-          .setDepth(1001);
+          .setDepth(this.depthManager.getDepth(DepthLayer.UI));
         cancelButton.setData('powerUp', true);
 
         const cancelText = this.scene.add.text(
@@ -122,7 +124,7 @@ export default class PowerUpManager {
             'Cancel', 
             { fontSize: '18px', color: '#ffffff' }
         ).setOrigin(0.5)
-          .setDepth(1002);
+          .setDepth(this.depthManager.getDepth(DepthLayer.UI) + 1);
         cancelText.setData('powerUp', true);
 
         cancelButton.on('pointerdown', () => {
@@ -146,6 +148,7 @@ export default class PowerUpManager {
         }
 
         (this.scene as GameScene).resumeGame();
+        (this.scene as GameScene).isPausedInGame = false;
     }
 
     private applyProjectilePowerUp(): void {

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import ExperiencePoint from '../sprites/ExperiencePoint';
+import DepthManager, { DepthLayer } from './DepthManager';
 
 export default class ExperiencePointPool {
     private scene: Phaser.Scene;
@@ -36,6 +37,7 @@ export default class ExperiencePointPool {
         let experience = this.points.getFirstDead(false) as ExperiencePoint;
         if (!experience) {
             experience = new ExperiencePoint(this.scene);
+            experience.setDepth(DepthManager.getInstance().getDepth(DepthLayer.EFFECT));
         }
         experience.initialize(x, y, experienceAmount);
         this.points.add(experience);
