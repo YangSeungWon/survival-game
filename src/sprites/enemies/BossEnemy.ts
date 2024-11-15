@@ -33,7 +33,7 @@ export default class BossEnemy extends Enemy {
         const config: EnemyConfig = {
             color: 0xff0000,
             size: 100,
-            moveSpeed: 10,
+            moveSpeed: 15,
             experiencePoint: 1000,
             health: 10000,
             attackConfig: {
@@ -73,16 +73,15 @@ export default class BossEnemy extends Enemy {
      */
     private phaseOneAttack(): void {
         const missileTexture = 'simpleMissileTexture';
-        const numberOfMissiles = 7;
-        const spreadAngle = Phaser.Math.DegToRad(10); // 10 degrees spread
+        const numberOfMissiles = 12;
+        const spreadAngle = Phaser.Math.DegToRad(30); // 10 degrees spread
 
         const target = this.scene.player;
         if (!target) {
             return;
         }
 
-        // Calculate the angle from the boss to the player
-        const angleToPlayer = Phaser.Math.Angle.Between(this.x, this.y, target.x, target.y);
+        const angleToPlayer = 0;
 
         // Calculate the starting angle for the spread
         const startAngle = angleToPlayer - spreadAngle * (numberOfMissiles - 1) / 2;
@@ -158,6 +157,7 @@ export default class BossEnemy extends Enemy {
      * Updates all switching missiles to handle homing behavior.
      */
     private updateSwitchingMissiles(): void {
+        if (!this.scene) return;
         const target = this.scene.player;
         if (!target) return;
 
@@ -241,13 +241,14 @@ export default class BossEnemy extends Enemy {
      * Checks and handles phase transitions based on current health.
      */
     private checkPhaseTransition(): void {
+        if (!this.scene) return;
         const healthPercentage = this.health / this.maxHealth;
 
-        if (healthPercentage <= 0.9 && this.currentPhase < 3) {
+        if (healthPercentage <= 0.3 && this.currentPhase < 3) {
             this.currentPhase = 3;
             this.scene.cameras.main.shake(500, 0.015);
             this.switchAttackPhase(this.phaseThreeAttack.bind(this));
-        } else if (healthPercentage <= 0.999 && this.currentPhase < 2) {
+        } else if (healthPercentage <= 0.6 && this.currentPhase < 2) {
             this.currentPhase = 2;
             this.scene.cameras.main.shake(500, 0.015);
             this.switchAttackPhase(this.phaseTwoAttack.bind(this));
@@ -277,5 +278,22 @@ export default class BossEnemy extends Enemy {
 
         // Trigger an immediate attack
         attackMethod();
+    }
+
+    handleHealthChanged(amount: number): void {    
+        // Display damage text
+        if (amount < 0) {
+            this.scene.events.emit('enemyHealthChanged', {
+                enemy: this,
+                newHealth: this.health,
+                damageDealt: -amount
+            });
+        }
+
+        if (this.health <= 0) {
+            this.dropExperience();
+            this.scene.gameSuccess();
+            this.destroy();
+        }
     }
 } 
