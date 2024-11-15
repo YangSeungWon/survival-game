@@ -12,9 +12,9 @@ import FireballWizard from '../sprites/enemies/FireballWizard';
 import EliteEnemy from '../sprites/enemies/EliteEnemy';
 import PoisonWizard from '../sprites/enemies/PoisonWizard';
 import DepthManager, { DepthLayer } from '../utils/DepthManager';
+import BossEnemy from '../sprites/enemies/BossEnemy';
 
 export default class GameScene extends Phaser.Scene {
-    score: number;
     elapsedTimeMillis: number;
     mapSize: number;
     enemySpawnInterval: number;
@@ -30,7 +30,6 @@ export default class GameScene extends Phaser.Scene {
     heartSpawnEvent: Phaser.Time.TimerEvent | null;
     attackEvents: Phaser.Time.TimerEvent[];
     cursors: Phaser.Types.Input.Keyboard.CursorKeys | null;
-    scoreText: Phaser.GameObjects.Text | null;
     healthText: Phaser.GameObjects.Text | null;
     playerStatsText: Phaser.GameObjects.Text | null;
     timeText: Phaser.GameObjects.Text | null;
@@ -46,6 +45,7 @@ export default class GameScene extends Phaser.Scene {
     experienceBarBackground: Phaser.GameObjects.Graphics | null;
     experienceBar: Phaser.GameObjects.Graphics | null;
     depthManager: DepthManager;
+    boss: BossEnemy | null = null;
     
     private defaultTextStyle: Phaser.Types.GameObjects.Text.TextStyle = {
         fontFamily: '"Noto Sans", sans-serif',
@@ -55,7 +55,6 @@ export default class GameScene extends Phaser.Scene {
 
     constructor() {
         super({ key: 'GameScene' });
-        this.score = 0;
         this.elapsedTimeMillis = 0;
         this.mapSize = 1000;
         this.enemySpawnInterval = 500; // 0.5초 간격
@@ -74,7 +73,6 @@ export default class GameScene extends Phaser.Scene {
         this.enemySpawnEvent = null;
         this.heartSpawnEvent = null;
         this.cursors = null;
-        this.scoreText = null;
         this.healthText = null;
         this.playerStatsText = null;
         this.timeText = null;
@@ -119,9 +117,6 @@ export default class GameScene extends Phaser.Scene {
 
         this.cursors = this.input.keyboard!.createCursorKeys() ? this.input.keyboard!.createCursorKeys() : null;
 
-        this.scoreText = this.add.text(16, 16, 'Score: 0', this.defaultTextStyle)
-            .setScrollFactor(0)
-            .setDepth(this.depthManager.getDepth(DepthLayer.UI));
         this.healthText = this.add.text(16, 50, `Health: ${this.player.health}/${this.player.maxHealth}`, { ...this.defaultTextStyle, color: '#f00' })
             .setScrollFactor(0)
             .setDepth(this.depthManager.getDepth(DepthLayer.UI));
@@ -215,30 +210,28 @@ export default class GameScene extends Phaser.Scene {
             // Create cursor keys from joystick
             this.joystickCursors = this.joystick.createCursorKeys();
         }
-
-        // Add event listener for visibility change
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                console.log('Window is not visible, pausing game.');
-                this.pauseGame();
-            } else {
-                console.log('Window is visible, resuming game.');
-                if (!this.isPausedInGame) {
-                    this.resumeGame();
-                }
-            }
-        });
     }
 
     createEnemies() {
         if (this.isPaused || this.isPausedInGame || document.hidden) return;
 
         const level = this.player!.level;
+
+        if (level >= 15 && !this.boss) {
+            // 보스 스폰
+            this.boss = new BossEnemy(this, this.mapSize / 2, this.mapSize / 2);
+            this.enemies!.add(this.boss);
+            return;
+        }
+
+        // 일반 적 스폰 로직
         const enemyClasses = [FastEnemy, StrongEnemy, GunEnemy, FireballWizard, PoisonWizard, EliteEnemy];
         
         const availableEnemies = enemyClasses.filter(enemyClass => {
             return level >= enemyClass.FROM_LEVEL && level <= enemyClass.TO_LEVEL;
         });
+
+        if (availableEnemies.length === 0) return;
 
         const EnemyClass = Phaser.Math.RND.weightedPick(availableEnemies);
         const enemy = new EnemyClass(this);
@@ -291,6 +284,10 @@ export default class GameScene extends Phaser.Scene {
         this.enemies!.getChildren().forEach(enemy => {
             enemy.update(this.player, deltaTime);
         });
+
+        if (this.boss) {
+            this.boss.update(this.player!, deltaTime);
+        }
 
         // Update player stats text
         var statsText = '';
@@ -360,9 +357,27 @@ export default class GameScene extends Phaser.Scene {
         this.experienceBar!.fillRect(this.cameras.main.width - 216, 40, experienceBarWidth, 20).setScrollFactor(0);
     }
 
-    gameOver() {
-        document.removeEventListener('visibilitychange', () => { });
-        this.scene.start('GameOverScene', { score: this.score, time: this.elapsedTimeMillis, experience: this.player!.experience });
+    gameOver(isSuccess: boolean = false) {
+        // Capture the screenshot
+        this.game.renderer.snapshot((image) => {
+            const screenshot = (image as HTMLImageElement).src;
+            
+            // Start the GameResultScene with the screenshot
+            this.scene.start('GameResultScene', { 
+                resultData: {
+                    level: this.player!.level, 
+                    time: this.elapsedTimeMillis, 
+                    experience: this.player!.experience, 
+                    isSuccess: isSuccess,
+                    powerUps: this.powerUpManager!.selectedPowerUps,
+                    screenshot: screenshot // Pass the screenshot
+                }
+            });
+        });
+    }
+
+    gameSuccess() {
+        this.gameOver(true);
     }
 
     /**

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import PreloadScene from './scenes/PreloadScene';
 import GameScene from './scenes/GameScene';
-import GameOverScene from './scenes/GameOverScene';
+import GameOverScene from './scenes/GameResultScene';
 import { Types } from 'phaser';
 
 const config: Types.Core.GameConfig = {
