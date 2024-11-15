@@ -183,8 +183,8 @@ export default class PowerUpManager {
         const areaOfEffectAttackConfig: AreaOfEffectAttackConfig = {
             attackSpeed: 100,
             attackPower: 0,
-            attackRange: 100,
-            effectRange: 100,
+            attackRange: 120,
+            effectRange: 120,
             statusEffect: {
                 type: 'burn' as StatusEffectType,
                 id: 'burningAoE' + Date.now(),
@@ -218,8 +218,8 @@ export default class PowerUpManager {
         const areaOfEffectAttackConfig: AreaOfEffectAttackConfig = {
             attackSpeed: 100,
             attackPower: 0,
-            attackRange: 100,
-            effectRange: 100,
+            attackRange: 120,
+            effectRange: 120,
             statusEffect: {
                 type: 'poison' as StatusEffectType,
                 duration: 1000,

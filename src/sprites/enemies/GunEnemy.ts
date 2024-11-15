@@ -10,7 +10,7 @@ export default class GunEnemy extends RangedEnemy {
     static readonly TO_LEVEL = 8;
 
     constructor(scene: GameScene) {
-        const color: number = 0x5555ff;   
+        const color: number = 0xaaaaff;   
         const size: number = 10;
         const speed: number = 120;
         const health: number = 200;
