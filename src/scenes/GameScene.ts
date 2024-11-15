@@ -324,6 +324,9 @@ export default class GameScene extends Phaser.Scene {
         // Update player stats text
         var statsText = '';
         statsText += `Level: ${this.player!.level}\n`;
+        if (this.boss) {
+            statsText += `Boss Health: ${this.boss!.health}/${this.boss!.maxHealth}\n`;
+        }
         statsText += `XP Threshold: ${this.player!.experienceThreshold}\n`;
         statsText += `Enemy Spawn Interval: ${this.enemySpawnInterval}\n`;
         statsText += `Move Speed: ${this.player!.moveSpeed}\n`;
@@ -420,6 +423,8 @@ export default class GameScene extends Phaser.Scene {
             this.scene.start('GameResultScene', { 
                 resultData: {
                     level: this.player!.level, 
+                    bossHealth: this.boss?.health,
+                    bossMaxHealth: this.boss?.maxHealth,
                     time: this.elapsedTimeMillis, 
                     experience: this.player!.experience, 
                     isSuccess: isSuccess,

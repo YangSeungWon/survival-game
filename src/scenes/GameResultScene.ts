@@ -4,6 +4,8 @@ import share from '../utils/share';
 
 interface GameResultData {
     level: number;
+    bossHealth?: number;
+    bossMaxHealth?: number;
     time: number;
     experience: number;
     isSuccess: boolean;
@@ -48,6 +50,9 @@ export default class GameResultScene extends Phaser.Scene {
         this.add.text(50, 200, `Level: ${this.resultData.level}`, { fontSize: '24px', color: '#ffffff' });
         this.add.text(50, 230, `Time: ${this.formatTime(this.resultData.time)}`, { fontSize: '24px', color: '#ffffff' });
         this.add.text(50, 260, `Experience: ${this.resultData.experience}`, { fontSize: '24px', color: '#ffffff' });
+        if (this.resultData.bossHealth) {
+            this.add.text(50, 290, `Boss Health: ${this.resultData.bossHealth}/${this.resultData.bossMaxHealth}`, { fontSize: '24px', color: '#ffffff' });
+        }
 
         // 파워업 표시
         this.add.text(50, 290, 'Power-Ups:', { fontSize: '20px', color: '#ffffff' });

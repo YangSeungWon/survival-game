@@ -52,7 +52,7 @@ export default class PowerUpManager {
 
         const allPowerUps: PowerUp[] = [
             { name: 'Health Boost', color: 0xff6136, description: 'Increase health restoration by 500.', apply: () => { this.player.heartRestore += 500 } },
-            { name: 'Move Speed', color: 0x91ffe4, description: 'Increase movement speed by 40.', apply: () => { this.player.moveSpeed += 40 } },
+            { name: 'Move Speed', color: 0x91ffe4, description: 'Increase movement speed by 50.', apply: () => { this.player.moveSpeed += 50 } },
             { name: 'Life Steal', color: 0xcc569f, description: 'Gain 5% of damage dealt as health.', apply: () => { this.player.percentLifeSteal += 5 } },
             { name: 'Defense Boost', color: 0xb1fa75, description: 'Increase defense by 100.', apply: () => { this.player.defense += 100 } },
             { name: 'Critical Hit Chance', color: 0xbea6ff, description: 'Increase critical hit chance by 20%.', apply: () => { this.player.percentCritChance += 20 } },

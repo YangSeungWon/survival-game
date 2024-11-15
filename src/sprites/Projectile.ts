@@ -22,6 +22,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     private startY: number = 0; // Starting Y position
 
     constructor(scene: GameScene, x: number, y: number) {
+        console.log('Projectile constructor');
         super(scene, x, y, 'projectileTexture');
         scene.add.existing(this);
         scene.physics.add.existing(this);

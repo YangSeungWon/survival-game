@@ -18,7 +18,7 @@ export default class FastEnemy extends MeleeEnemy {
         // 공격 속성 정의
         const config: AttackConfig & MeleeAttackConfig = {
             attackSpeed: 600,
-            attackPower: 500,
+            attackPower: 300,
             attackRange: 20,
             attackAngle: 20,
             attackColor: color
