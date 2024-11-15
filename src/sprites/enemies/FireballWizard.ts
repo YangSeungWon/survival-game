@@ -37,6 +37,7 @@ export default class FireballWizard extends RangedEnemy {
             piercingCount: 1,
             statusEffect: {
                 type: StatusEffectType.BURN,
+                id: 'fireballWizardBurn' + Date.now(),
                 duration: burnDuration
             }
         };

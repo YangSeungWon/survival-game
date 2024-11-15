@@ -14,6 +14,7 @@ export interface AttackConfig {
 export interface StatusEffect {
     type: StatusEffectType;
     duration: number;
+    id: string;
     tickRate?: number;
     lastTick?: number;
 }

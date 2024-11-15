@@ -24,9 +24,21 @@ export default class AreaOfEffectAttack extends Attack {
     initAttackBar(scene: GameScene): void {
         this.attackBar = null;
         this.attackCircle = this.scene.add.ellipse(this.owner.x, this.owner.y, this.effectRange * 2, this.effectRange * 2, this.attackColor, 0.5);
-        this.attackCircle.setDepth(1);
-        this.attackCircle.setAlpha(0.3);
+        this.attackCircle.setAlpha(0.4);
         this.attackCircle.setDepth(DepthManager.getInstance().getDepth(DepthLayer.ENEMY));  
+
+        // Trigger AoE effect
+        // Create a flash animation
+        this.scene.tweens.add({
+            targets: this.attackCircle,
+            alpha: { from: 1, to: 0 },
+            duration: 200,
+            yoyo: true,
+            loop: 5,
+            onComplete: () => {
+                this.attackCircle.setAlpha(0.4);
+            }
+        });
     }
 
     updateAttackBar(): void {
@@ -40,18 +52,6 @@ export default class AreaOfEffectAttack extends Attack {
         this.isAttacking = true;
 
         this.applyAreaOfEffect();
-
-        // Trigger AoE effect
-        // Create a flash animation
-        this.scene.tweens.add({
-            targets: this.attackCircle,
-            alpha: { from: 0.3, to: 1 },
-            duration: 30,
-            yoyo: false,
-            onComplete: () => {
-                this.attackCircle.setAlpha(0.3);
-            }
-        });
 
         this.scene.time.delayedCall(this.attackSpeed, () => {
             this.isAttacking = false;

@@ -33,6 +33,7 @@ export default class PoisonWizard extends AreaOfEffectEnemy {
             effectRange: effectRange,
             statusEffect: {
                 type: StatusEffectType.POISON,
+                id: 'poisonWizardPoison' + Date.now(),
                 duration: poisonDuration,
                 tickRate: 300
             }

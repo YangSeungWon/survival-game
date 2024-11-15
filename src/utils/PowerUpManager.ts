@@ -187,6 +187,7 @@ export default class PowerUpManager {
             effectRange: 100,
             statusEffect: {
                 type: 'burn' as StatusEffectType,
+                id: 'burningAoE' + Date.now(),
                 duration: 1000,
                 tickRate: 300
             },
@@ -205,6 +206,7 @@ export default class PowerUpManager {
             statusEffect: {
                 type: 'freeze' as StatusEffectType,
                 duration: 500,
+                id: 'freezingAoE' + Date.now(),
             },
             attackColor: 0x0000ff
         }
@@ -221,7 +223,8 @@ export default class PowerUpManager {
             statusEffect: {
                 type: 'poison' as StatusEffectType,
                 duration: 1000,
-                tickRate: 300
+                tickRate: 300,
+                id: 'poisoningAoE' + Date.now(),
             },
             attackColor: 0x00ff00
         }
@@ -241,6 +244,7 @@ export default class PowerUpManager {
             statusEffect: {
                 type: 'stun' as StatusEffectType,
                 duration: 1000,
+                id: 'stunProjectile' + Date.now(),
             }
         }   
         const newProjectileAttack = new ProjectileAttack(this.scene, this.player, projectileAttackConfig);

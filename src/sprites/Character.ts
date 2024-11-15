@@ -13,7 +13,7 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
     canAttack: boolean;
     facingAngle: number;
     attacks: Attack[];
-    statusEffects: StatusEffect[] = [];
+    statusEffects: Map<string, StatusEffect> = new Map();
     paused: boolean = false;
 
     // Particle emitters for status effects
@@ -51,29 +51,30 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
 
     /**
      * Applies a status effect to the character.
-     * @param effectType - The type of status effect (e.g., 'burn', 'freeze').
-     * @param duration - Duration of the effect in milliseconds.
+     * Updates the duration only if the status effect IDs match exactly.
+     * @param id - Unique identifier for the status effect.
+     * @param effect - The status effect to apply.
      */
     applyStatusEffect(effect: StatusEffect): void {
         if (!this.scene) return;
 
-        if (this.statusEffects.some(e => e.type === effect.type)) {
-            //update the duration
-            const existingEffect = this.statusEffects.find(e => e.type === effect.type);
-            if (existingEffect) {
-                existingEffect.duration = effect.duration;
-            }
+        const existingEffect = this.statusEffects.get(effect.id);
+
+        if (existingEffect) {
+            // Update duration if the IDs match exactly
+            existingEffect.duration = effect.duration;
+            // Optionally, reset other properties if needed
+            existingEffect.tickRate = effect.tickRate;
+            // You can update other properties as required
             return;
         }
 
         this.enterStatusEffect(effect);
         const copiedEffect = {
-            type: effect.type,
-            duration: effect.duration,
-            tickRate: effect.tickRate,
+            ...effect,
             lastTick: 0,
-        }
-        this.statusEffects.push(copiedEffect);
+        };
+        this.statusEffects.set(effect.id, copiedEffect);
     }
 
     enterStatusEffect(effect: StatusEffect): void {
@@ -83,7 +84,7 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
                 this.setTintFill(0xff0000);
                 break;
             case 'freeze':
-                this.moveSpeed *= 0.5;
+                this.moveSpeed *= 0.7;
                 this.setTintFill(0x00ffff);
                 this.addFreezeParticles();
                 break;
@@ -97,6 +98,8 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
                 this.canAttack = false;
                 this.setTintFill(0xffff00);
                 break;
+            default:
+                console.warn(`Unknown status effect type: ${effect.type}`);
         }
     }
 
@@ -111,7 +114,7 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
                 this.removeBurnParticles();
                 break;
             case 'freeze':
-                this.moveSpeed /= 0.5;
+                this.moveSpeed /= 0.7;
                 this.removeFreezeParticles();
                 break;
             case 'poison':
@@ -128,8 +131,6 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
         this.clearTint();
     }
 
-    
-
     /**
      * Updates active status effects.
      * Should be called in the update loop of the subclass.
@@ -138,20 +139,20 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
     updateStatusEffects(delta: number): void {
         if (this.paused) return;
 
-        this.statusEffects.forEach(effect => {
+        this.statusEffects.forEach((effect, id) => {
             effect.duration -= delta;
             if (!effect.lastTick) effect.lastTick = 0;
             effect.lastTick += delta; // Update the last tick time
 
-            // Apply effect logic only if 200ms have passed
+            // Apply effect logic only if tickRate is defined and enough time has passed
             if (effect.tickRate && effect.lastTick >= effect.tickRate) {
-                this.applyEffectLogic(effect.type, effect.lastTick);
+                this.applyEffectLogic(effect.type, effect.tickRate);
                 effect.lastTick = 0; // Reset the last tick
             }
 
             if (effect.duration <= 0) {
                 this.handleStatusEffectEnd(effect.type);
-                this.statusEffects = this.statusEffects.filter(e => e !== effect);
+                this.statusEffects.delete(id);
             }
         });
     }
@@ -161,12 +162,12 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
     /**
      * Defines the logic for each status effect.
      * @param effectType - The type of status effect.
-     * @param delta - Time elapsed since the last frame in milliseconds.
+     * @param delta - Time elapsed since the last tick in milliseconds.
      */
     protected applyEffectLogic(effectType: string, delta: number): void {
         switch (effectType) {
             case 'burn':
-                const burnDamage = (this.maxHealth * 0.05);
+                const burnDamage = (this.maxHealth * 0.04);
                 this.takeDamage(burnDamage);
                 break;
 
@@ -174,7 +175,7 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
                 break;
 
             case 'poison':
-                const poisonDamage = (this.health * 0.1);
+                const poisonDamage = (this.health * 0.08);
                 this.takeDamage(poisonDamage);
                 break;
 
