@@ -32,10 +32,10 @@ export default class BossEnemy extends Enemy {
     constructor(scene: GameScene) {
         const config: EnemyConfig = {
             color: 0xff0000,
-            size: 100,
-            moveSpeed: 25,
+            size: 50,
+            moveSpeed: 30,
             experiencePoint: 1000,
-            health: 30000,
+            health: 20000,
             attackConfig: {
                 attackSpeed: 1000,
                 attackPower: 100,
@@ -295,5 +295,10 @@ export default class BossEnemy extends Enemy {
             this.scene.gameSuccess();
             this.destroy();
         }
+    }
+
+    takeDamage(amount: number): number {
+        const cappedDamage = Math.min(amount, this.health / 500);
+        return super.takeDamage(cappedDamage);
     }
 } 
