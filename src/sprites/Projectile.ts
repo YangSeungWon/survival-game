@@ -17,6 +17,9 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     piercingCount: number = 0;
     hitTargets: Set<Phaser.GameObjects.GameObject> = new Set();
     statusEffect: StatusEffect | null = null;
+    attackRange: number = 0; // New property for maximum attack range
+    private startX: number = 0; // Starting X position
+    private startY: number = 0; // Starting Y position
 
     constructor(scene: GameScene, x: number, y: number) {
         super(scene, x, y, 'projectileTexture');
@@ -45,7 +48,8 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         color: number,
         projectileSize: number,
         piercingCount: number,
-        statusEffect: StatusEffect | null
+        statusEffect: StatusEffect | null,
+        attackRange: number // New parameter for attack range
     ): void {
         const textureKey = this.getTextureKey(projectileSize, color);
         if (!this.scene.textures.exists(textureKey)) {
@@ -54,12 +58,15 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setTexture(textureKey);
 
         this.setPosition(owner.x, owner.y);
+        this.startX = owner.x; // Store starting X
+        this.startY = owner.y; // Store starting Y
         this.setActive(true);
         this.setVisible(true);
 
         this.facingAngle = angle;
         this.speed = speed;
         this.attackPower = attackPower;
+        this.attackRange = attackRange; // Set attack range
 
         this.owner = owner;
 
@@ -118,6 +125,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     move(deltaMultiplier: number): void {
         moveObject(this, this.facingAngle, this.speed, deltaMultiplier);
         this.checkBounds();
+        this.checkAttackRange(); // Check if attack range exceeded
     }
 
     private checkBounds(): void {
@@ -128,6 +136,17 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
             this.setVisible(false);
             if (this.body) {
                 this.body.stop(); // Stop movement
+            }
+        }
+    }
+
+    private checkAttackRange(): void {
+        const distance = Phaser.Math.Distance.Between(this.startX, this.startY, this.x, this.y);
+        if (distance > this.attackRange) {
+            this.setActive(false);
+            this.setVisible(false);
+            if (this.body) {
+                this.body.stop();
             }
         }
     }

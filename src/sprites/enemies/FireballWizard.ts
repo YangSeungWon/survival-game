@@ -7,20 +7,20 @@ import { AttackConfig, StatusEffectType } from '../../attacks/Attack';
 export default class FireballWizard extends RangedEnemy {
     static readonly TYPE = 'FireballWizard';
     static readonly FROM_LEVEL = 7;
-    static readonly TO_LEVEL = 14;
+    static readonly TO_LEVEL = 11;
 
     constructor(scene: GameScene) {
         const color: number = 0xff5500;   // A fiery color
         const size: number = 12;          // Slightly larger size
-        const speed: number = 80;         // Slower speed
+        const speed: number = 90;         // Slower speed
         const health: number = 150;       // Moderate health
         
         // 공격 속성 정의
         const attackSpeed: number = 2000;  // Slower attack speed
-        const attackPower: number = 1500;  // Higher attack power
-        const attackRange: number = 200;  // Longer attack range
+        const attackPower: number = 500;  // Higher attack power
+        const attackRange: number = 400;  // Longer attack range
 
-        const experiencePoint: number = 20; // More experience points
+        const experiencePoint: number = 40; // More experience points
 
         const projectileSpeed: number = 150; // Slower projectile speed
         const projectileSize: number = 10;   // Larger projectile size

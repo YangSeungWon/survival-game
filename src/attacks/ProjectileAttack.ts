@@ -59,7 +59,8 @@ export default class ProjectileAttack extends Attack {
             this.attackColor,
             this.projectileSize,
             this.piercingCount,
-            this.statusEffect
+            this.statusEffect,
+            this.attackRange
         );
 
         // Reset attack state after attackSpeed delay

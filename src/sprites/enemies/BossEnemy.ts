@@ -35,7 +35,7 @@ export default class BossEnemy extends Enemy {
             size: 50,
             moveSpeed: 30,
             experiencePoint: 1000,
-            health: 20000,
+            health: 30000,
             attackConfig: {
                 attackSpeed: 1000,
                 attackPower: 100,
@@ -73,8 +73,8 @@ export default class BossEnemy extends Enemy {
      */
     private phaseOneAttack(): void {
         const missileTexture = 'simpleMissileTexture';
-        const numberOfMissiles = 8;
-        const spreadAngle = Phaser.Math.DegToRad(45); // 10 degrees spread
+        const numberOfMissiles = 18;
+        const spreadAngle = Phaser.Math.DegToRad(20); // 10 degrees spread
 
         const target = this.scene.player;
         if (!target) {
@@ -99,7 +99,7 @@ export default class BossEnemy extends Enemy {
 
             // Handle collision with player
             this.scene.physics.add.overlap(missile, this.scene.player!, (missileObj, playerObj) => {
-                const damage = 150;
+                const damage = 500;
                 (playerObj as Player).takeDamage(damage);
                 missileObj.destroy();
             });
@@ -138,7 +138,7 @@ export default class BossEnemy extends Enemy {
 
             // Handle collision with player
             this.scene.physics.add.overlap(missile, this.scene.player!, (missileObj, playerObj) => {
-                const damage = 150;
+                const damage = 500;
                 (playerObj as Player).takeDamage(damage);
                 missileObj.destroy();
             });
@@ -214,7 +214,7 @@ export default class BossEnemy extends Enemy {
 
                 // **Collision Handling**
                 this.scene.physics.add.overlap(missile, this.scene.player!, (missileObj, playerObj) => {
-                    const damage = 200;
+                    const damage = 700;
                     (playerObj as Player).takeDamage(damage);
                     missileObj.destroy();
                 });
@@ -298,7 +298,7 @@ export default class BossEnemy extends Enemy {
     }
 
     takeDamage(amount: number): number {
-        const cappedDamage = Math.min(amount, this.health / 500);
+        const cappedDamage = Math.min(amount, this.maxHealth / 500);
         return super.takeDamage(cappedDamage);
     }
 } 

@@ -23,7 +23,7 @@ export default class FastEnemy extends MeleeEnemy {
             attackAngle: 20,
             attackColor: color
         };
-        const experiencePoint = 10;
+        const experiencePoint = 5;
 
         super(scene, color, size, speed, health, config, experiencePoint);
     }

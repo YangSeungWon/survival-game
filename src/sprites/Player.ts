@@ -14,6 +14,7 @@ export default class Player extends Character {
     level: number;
     previousExperienceThreshold: number;
     experienceThreshold: number;
+    heartRestore: number;
 
     constructor(scene: Phaser.Scene) {
         const graphics = scene.add.graphics();
@@ -26,7 +27,7 @@ export default class Player extends Character {
         const x = Number(scene.game.config.width) / 2;
         const y = Number(scene.game.config.height) / 2;
 
-        super(scene as GameScene, x, y, 'playerTexture', color, 200, 10000); // moveSpeed: 200, health: 10000
+        super(scene as GameScene, x, y, 'playerTexture', color, 200, 5000); // moveSpeed: 200, health: 10000
 
         console.log('Player initialized with scene:', this.scene);
 
@@ -44,7 +45,7 @@ export default class Player extends Character {
         this.experience = 0; // Initialize experience
         this.level = 1; // Initial level
         this.previousExperienceThreshold = 0;
-        this.experienceThreshold = 50; // Experience required for next level
+        this.experienceThreshold = 100; // Experience required for next level
 
         // Listen for enemy health change events
         this.scene.events.on('enemyHealthChanged', this.onEnemyHealthChanged, this);
@@ -57,6 +58,7 @@ export default class Player extends Character {
 
         this.canAttack = true;
         this.canMove = true;
+        this.heartRestore = 500;
     }
 
     handleHealthChanged(amount: number): void {
@@ -70,9 +72,9 @@ export default class Player extends Character {
     initDefaultAttacks() {
         // Example: Initialize a default projectile attack
         const projectileAttackConfig = {
-            attackSpeed: 500,
+            attackSpeed: 200,
             projectileSpeed: 400,
-            attackPower: 100,
+            attackPower: 50,
             attackColor: 0xffffff,
             projectileSize: 4,
             attackRange: 500,
@@ -153,10 +155,15 @@ export default class Player extends Character {
         if (nearestEnemy) {
             this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, nearestEnemy.x, nearestEnemy.y);
 
+            let attackTypes: string[] = [];
             // Update all attacks
             this.attacks.forEach(attack => {
                 attack.updateAttackBar();
-                attack.performAttack();
+                if (attack.isAttacking) return;
+                if (!attackTypes.includes(attack.constructor.name)) {
+                    attack.performAttack();
+                    attackTypes.push(attack.constructor.name);
+                }
             });
         }
     }
@@ -209,7 +216,7 @@ export default class Player extends Character {
         while (this.experience >= this.experienceThreshold) {
             this.level += 1;
             const tmpExperienceThreshold = this.experienceThreshold;
-            this.experienceThreshold = Math.floor((tmpExperienceThreshold - this.previousExperienceThreshold) * 1.5) + tmpExperienceThreshold; // Increase experience threshold for next level
+            this.experienceThreshold = Math.floor((tmpExperienceThreshold - this.previousExperienceThreshold) * 1.35) + tmpExperienceThreshold; // Increase experience threshold for next level
             this.previousExperienceThreshold = tmpExperienceThreshold;
             this.scene.events.emit('playerLevelUp', this.level);
         }

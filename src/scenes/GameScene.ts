@@ -14,6 +14,7 @@ import PoisonWizard from '../sprites/enemies/PoisonWizard';
 import DepthManager, { DepthLayer } from '../utils/DepthManager';
 import BossEnemy from '../sprites/enemies/BossEnemy';
 import { createEnemyTexture, createMissileTexture, createTrackingMissileTexture } from '../utils/TextureGenerator';
+import BeamShooterEnemy from '../sprites/enemies/BeamShooterEnemy';
 
 export default class GameScene extends Phaser.Scene {
     elapsedTimeMillis: number;
@@ -59,7 +60,7 @@ export default class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
         this.elapsedTimeMillis = 0;
-        this.mapSize = 1000;
+        this.mapSize = 800;
         this.enemySpawnInterval = 500; // 0.5초 간격
         this.heartSpawnInterval = 10000; // 10초 간격
         this.lastUpdateTime = 0;
@@ -231,7 +232,7 @@ export default class GameScene extends Phaser.Scene {
 
         if (level >= 15 && !this.boss) {
             this.bossHealthBarBackground = this.add.graphics();
-            this.bossHealthBarBackground.fillStyle(0x555555, 1); // Grey color for background
+            this.bossHealthBarBackground.fillStyle(0x888888, 1); // Grey color for background
             this.bossHealthBarBackground.fillRect(this.cameras.main.width - 216, 74, 200, 20).setScrollFactor(0).setDepth(this.depthManager.getDepth(DepthLayer.UI)); // Full size of the health bar
 
             this.bossHealthBar = this.add.graphics();
@@ -246,7 +247,7 @@ export default class GameScene extends Phaser.Scene {
         }
 
         // 일반 적 스폰 로직
-        const enemyClasses = [FastEnemy, StrongEnemy, GunEnemy, FireballWizard, PoisonWizard, EliteEnemy];
+        const enemyClasses = [FastEnemy, StrongEnemy, GunEnemy, EliteEnemy, FireballWizard, PoisonWizard, BeamShooterEnemy];
         
         const availableEnemies = enemyClasses.filter(enemyClass => {
             return level >= enemyClass.FROM_LEVEL && level <= enemyClass.TO_LEVEL;
@@ -304,6 +305,10 @@ export default class GameScene extends Phaser.Scene {
         // Update each enemy
         this.enemies!.getChildren().forEach(enemy => {
             enemy.update(this.player, deltaTime);
+        });
+
+        this.hearts!.getChildren().forEach(heart => {
+            heart.update(this.player, deltaTime);
         });
 
         if (this.boss) {
@@ -434,7 +439,7 @@ export default class GameScene extends Phaser.Scene {
         this.powerUpManager!.showPowerUpSelection(newLevel);
 
         // Adjust enemy spawn interval based on player level
-        this.enemySpawnInterval = Math.max(50, 500 - newLevel * 10); // Decrease interval with level, minimum 50ms
+        this.enemySpawnInterval = Math.max(50, 450 - newLevel * 18); // Decrease interval with level, minimum 50ms
 
         // Reset the enemy spawn event with the new interval
         if (this.enemySpawnEvent) {
@@ -451,14 +456,15 @@ export default class GameScene extends Phaser.Scene {
     spawnHeart() {
         const x = Phaser.Math.Between(0, this.mapSize);
         const y = Phaser.Math.Between(0, this.mapSize);
-        const heart = new Heart(this, x, y);
+        const heart = new Heart(this);
+        heart.setPosition(x, y);
         this.hearts!.add(heart);
     }
 
     collectHeart(player: Player, heart: Heart) {
         heart.collect();
-        player.health = Math.min(player.maxHealth, player.health + 200); // Restore 200 health
-        this.events.emit('playerHealthChanged', 200);
+        player.health = Math.min(player.maxHealth, player.health + player.heartRestore); // Restore 1000 health
+        this.events.emit('playerHealthChanged', player.heartRestore);
     }
 
     pauseGame() {
@@ -490,8 +496,8 @@ export default class GameScene extends Phaser.Scene {
 
     showDamageText(enemyX: number, enemyY: number, damage: number, color: string, isPlayer: boolean = false) {
         const fontSize = isPlayer ? '24px' : '18px';
-        const deltaY = isPlayer ? -10 : -5;
-        const duration = isPlayer ? 1000 : 500;
+        const deltaY = isPlayer ? -15 : -10;
+        const duration = isPlayer ? 800 : 400;
         const damageText = this.add.text(enemyX, enemyY, (isPlayer && damage > 0 ? '+' : '') + damage.toString(), { fontSize: fontSize, color: color, fontStyle: isPlayer ? 'bold' : '' })
             .setScrollFactor(1) // Make the text move with the camera
             .setDepth(1);
@@ -500,7 +506,7 @@ export default class GameScene extends Phaser.Scene {
         this.tweens.add({
             targets: damageText,
             y: enemyY + deltaY,
-            alpha: 0.7,
+            alpha: 0.8,
             duration: duration,
             onComplete: () => {
                 damageText.destroy();

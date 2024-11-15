@@ -13,12 +13,12 @@ export default class GunEnemy extends RangedEnemy {
         const color: number = 0xaaaaff;   
         const size: number = 10;
         const speed: number = 120;
-        const health: number = 200;
+        const health: number = 100;
         
         // 공격 속성 정의
         const attackSpeed: number = 500; 
-        const attackPower: number = 100;
-        const attackRange: number = 100;
+        const attackPower: number = 200;
+        const attackRange: number = 200;
 
         const experiencePoint: number = 10;
 

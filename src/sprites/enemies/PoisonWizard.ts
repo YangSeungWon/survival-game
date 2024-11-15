@@ -12,18 +12,18 @@ export default class PoisonWizard extends AreaOfEffectEnemy {
     constructor(scene: GameScene) {
         const color: number = 0x00ff20;   // A poison-like color
         const size: number = 10;          // Standard size
-        const speed: number = 130;         // Moderate speed
+        const speed: number = 110;         // Moderate speed
         const health: number = 100;       // Moderate health
         
         // 공격 속성 정의
-        const attackSpeed: number = 1500;  // Moderate attack speed
+        const attackSpeed: number = 3000;  // Moderate attack speed
         const attackPower: number = 100;  // Moderate attack power
         const attackRange: number = 200;   // Moderate attack range
 
-        const experiencePoint: number = 15; // Moderate experience points
+        const experiencePoint: number = 40; // Moderate experience points
 
         const poisonDuration: number = 1500; // Duration of poison effect in milliseconds
-        const effectRange: number = 50; // Effect range
+        const effectRange: number = 60; // Effect range
 
         const config: TargetedAreaOfEffectAttackConfig = {
             attackSpeed: attackSpeed,

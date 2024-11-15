@@ -34,7 +34,8 @@ export default class ProjectilePool {
         color: number,
         projectileSize: number,
         piercingCount: number,
-        statusEffect: StatusEffect | null
+        statusEffect: StatusEffect | null,
+        attackRange: number
     ): void {
         let projectile = this.projectiles.getFirstDead() as Projectile;
         // if failed to get projectile, create new one
@@ -42,7 +43,7 @@ export default class ProjectilePool {
             projectile = new Projectile(this.scene, owner.x, owner.y);
             this.projectiles.add(projectile);
         }
-        projectile.fire(owner, angle, speed, attackPower, color, projectileSize, piercingCount, statusEffect);
+        projectile.fire(owner, angle, speed, attackPower, color, projectileSize, piercingCount, statusEffect, attackRange);
     }
 
     preUpdate(): void {

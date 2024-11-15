@@ -11,15 +11,15 @@ export default class EliteEnemy extends MeleeEnemy {
     constructor(scene: GameScene) {
         const color: number = 0xff2200; // Changed color to red for visual distinction
         const size: number = 15; // Further increased size for more visual impact
-        const speed: number = 160; // Slightly increased speed
+        const speed: number = 150; // Slightly increased speed
         const health: number = 1000; // Increased health for more durability
         
         // 공격 속성 정의
         const attackSpeed: number = 1500; // Faster attack speed
-        const attackPower: number = 1500; // Increased attack power
-        const attackRange: number = 50; // Increased attack range
+        const attackPower: number = 500; // Increased attack power
+        const attackRange: number = 40; // Increased attack range
         const attackAngle: number = 45; // Slightly wider attack angle
-        const experiencePoint: number = 30; // More experience points
+        const experiencePoint: number = 50; // More experience points
 
         const config: AttackConfig & MeleeAttackConfig = {
             attackSpeed: attackSpeed,

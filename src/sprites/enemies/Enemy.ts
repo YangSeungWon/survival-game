@@ -33,8 +33,8 @@ export default class Enemy extends Character {
         const textureKey = `enemyTexture_${config.color}_${config.size}`;
         createEnemyTexture(scene, textureKey, config.color, config.size);
 
-        const margin = 500; // Adjust this value as needed
-        const minDistanceFromPlayer = 500; // Minimum distance from the player
+        const margin = 0; // Adjust this value as needed
+        const minDistanceFromPlayer = 200; // Minimum distance from the player
 
         let x: number, y: number;
         if (config.x && config.y) {
@@ -42,8 +42,8 @@ export default class Enemy extends Character {
             y = config.y;
         } else {
             do {
-                x = Phaser.Math.Between(-margin, Number(scene.game.config.width) + margin);
-                y = Phaser.Math.Between(-margin, Number(scene.game.config.height) + margin);
+                x = Phaser.Math.Between(-margin, Number(scene.mapSize) + margin);
+                y = Phaser.Math.Between(-margin, Number(scene.mapSize) + margin);
             } while (Phaser.Math.Distance.Between(x, y, scene.player!.x, scene.player!.y) < minDistanceFromPlayer);
         }
 
@@ -70,12 +70,16 @@ export default class Enemy extends Character {
 
         if (this.health <= 0) {
             this.dropExperience();
-            this.destroy();
+            this.visible = false;
+            this.active = false;
         }
     }
 
     update(player: Player, delta: number): void {
         if (!player) return;
+        if (!this.visible) {
+            this.destroy();
+        }
 
         this.updateStatusEffects(delta);
 
