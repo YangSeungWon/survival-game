@@ -13,6 +13,7 @@ import EliteEnemy from '../sprites/enemies/EliteEnemy';
 import PoisonWizard from '../sprites/enemies/PoisonWizard';
 import DepthManager, { DepthLayer } from '../utils/DepthManager';
 import BossEnemy from '../sprites/enemies/BossEnemy';
+import { createEnemyTexture, createMissileTexture, createTrackingMissileTexture } from '../utils/TextureGenerator';
 
 export default class GameScene extends Phaser.Scene {
     elapsedTimeMillis: number;
@@ -92,6 +93,13 @@ export default class GameScene extends Phaser.Scene {
             this.plugins.install('rexvirtualjoystick', (window as any).rexvirtualjoystickplugin, true);
             console.log('Plugin after install:', this.plugins.get('rexvirtualjoystick'));
         });
+
+        // Create Boss Texture
+        createEnemyTexture(this, 'bossTexture', 0xff0000, 100);
+
+        // Create Missile Textures
+        createMissileTexture(this, 'missileTexture', 0x0000ff, 10, 20);
+        createTrackingMissileTexture(this, 'trackingMissileTexture', 0xffa500, 15, 30);
     }
 
     create(): void {
@@ -219,7 +227,7 @@ export default class GameScene extends Phaser.Scene {
 
         if (level >= 15 && !this.boss) {
             // 보스 스폰
-            this.boss = new BossEnemy(this, this.mapSize / 2, this.mapSize / 2);
+            this.boss = new BossEnemy(this);
             this.enemies!.add(this.boss);
             return;
         }

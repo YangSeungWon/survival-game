@@ -1,8 +1,7 @@
 import Phaser from 'phaser';
-import Enemy from './Enemy';
+import Enemy, { EnemyConfig } from './Enemy';
 import GameScene from '../../scenes/GameScene';
 import TargetedAreaOfEffectAttack, { TargetedAreaOfEffectAttackConfig } from '../../attacks/TargetedAreaOfEffectAttack';
-import { AttackConfig } from '../../attacks/Attack';
 
 export default class AreaOfEffectEnemy extends Enemy {
     static readonly TYPE: string;
@@ -15,12 +14,26 @@ export default class AreaOfEffectEnemy extends Enemy {
         size: number,
         moveSpeed: number,
         health: number,
-        config: AttackConfig & TargetedAreaOfEffectAttackConfig,
+        attackConfig: TargetedAreaOfEffectAttackConfig,
         experiencePoint: number
     ) {
-        super(scene, color, size, moveSpeed, health, config, experiencePoint);
+        const config: EnemyConfig = {
+            color: color,
+            size: size,
+            moveSpeed: moveSpeed,
+            health: health,
+            attackConfig: attackConfig,
+            experiencePoint: experiencePoint
+        };
+        super(scene, config);
 
         // Initialize ProjectileAttack instance
-        this.attacks.push(new TargetedAreaOfEffectAttack(scene, this, config));
+        this.attacks.push(
+            new TargetedAreaOfEffectAttack(
+                scene,
+                this,
+                config.attackConfig as TargetedAreaOfEffectAttackConfig
+            )
+        );
     }
 }

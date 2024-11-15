@@ -6,6 +6,17 @@ import Character from '../Character';
 import Player from '../Player';
 import { AttackConfig, StatusEffect } from '../../attacks/Attack';
 
+export interface EnemyConfig {
+    color: number;
+    size: number;
+    moveSpeed: number;
+    health: number;
+    attackConfig: AttackConfig;
+    experiencePoint: number;
+    x?: number;
+    y?: number;
+}
+
 export default class Enemy extends Character {
     attackSpeed: number;
     attackPower: number;
@@ -17,35 +28,33 @@ export default class Enemy extends Character {
     static readonly FROM_LEVEL: number;
     static readonly TO_LEVEL: number;
 
-    constructor(
-        scene: GameScene,
-        color: number,
-        size: number,
-        moveSpeed: number,
-        health: number,
-        attackConfig: AttackConfig, 
-        experiencePoint: number
-    ) {
+    constructor(scene: GameScene, config: EnemyConfig) {
         // 적을 그래픽으로 생성
-        const textureKey = `enemyTexture_${color}_${size}`;
-        createEnemyTexture(scene, textureKey, color, size);
+        const textureKey = `enemyTexture_${config.color}_${config.size}`;
+        createEnemyTexture(scene, textureKey, config.color, config.size);
 
         const margin = 500; // Adjust this value as needed
         const minDistanceFromPlayer = 500; // Minimum distance from the player
 
         let x: number, y: number;
-        do {
-            x = Phaser.Math.Between(-margin, Number(scene.game.config.width) + margin);
-            y = Phaser.Math.Between(-margin, Number(scene.game.config.height) + margin);
-        } while (Phaser.Math.Distance.Between(x, y, scene.player!.x, scene.player!.y) < minDistanceFromPlayer);
-        super(scene, x, y, textureKey, color, moveSpeed, health);
+        if (config.x && config.y) {
+            x = config.x;
+            y = config.y;
+        } else {
+            do {
+                x = Phaser.Math.Between(-margin, Number(scene.game.config.width) + margin);
+                y = Phaser.Math.Between(-margin, Number(scene.game.config.height) + margin);
+            } while (Phaser.Math.Distance.Between(x, y, scene.player!.x, scene.player!.y) < minDistanceFromPlayer);
+        }
 
-        this.attackSpeed = attackConfig.attackSpeed;
-        this.attackPower = attackConfig.attackPower;
-        this.attackRange = attackConfig.attackRange;
-        this.attackColor = attackConfig.attackColor;
-        this.statusEffect = attackConfig.statusEffect || null;
-        this.experiencePoint = experiencePoint;
+        super(scene, x, y, textureKey, config.color, config.moveSpeed, config.health);
+
+        this.attackSpeed = config.attackConfig.attackSpeed;
+        this.attackPower = config.attackConfig.attackPower;
+        this.attackRange = config.attackConfig.attackRange;
+        this.attackColor = config.attackConfig.attackColor;
+        this.statusEffect = config.attackConfig.statusEffect || null;
+        this.experiencePoint = config.experiencePoint;
         this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, scene.player!.x, scene.player!.y);
     }
 

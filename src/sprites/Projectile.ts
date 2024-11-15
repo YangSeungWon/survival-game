@@ -31,7 +31,10 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.owner = {} as Character;
         this.scene = scene;
         this.hitTargets = new Set();
-        this.setDepth(DepthManager.getInstance().getDepth(DepthLayer.PROJECTILE));  
+        this.setDepth(DepthManager.getInstance().getDepth(DepthLayer.PROJECTILE));
+
+        this.setCollideWorldBounds(true);
+        scene.physics.world.on('worldbounds', this.handleWorldBounds, this);
     }
 
     fire(
@@ -114,5 +117,28 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
 
     move(deltaMultiplier: number): void {
         moveObject(this, this.facingAngle, this.speed, deltaMultiplier);
+        this.checkBounds();
+    }
+
+    private checkBounds(): void {
+        const { x, y } = this;
+
+        if (x < 0 || x > this.scene.mapSize || y < 0 || y > this.scene.mapSize) {
+            this.setActive(false);
+            this.setVisible(false);
+            if (this.body) {
+                this.body.stop(); // Stop movement
+            }
+        }
+    }
+
+    private handleWorldBounds(body: Phaser.Physics.Arcade.Body, up: boolean, down: boolean, left: boolean, right: boolean): void {
+        if (body.gameObject === this) {
+            this.setActive(false);
+            this.setVisible(false);
+            if (this.body) {
+                this.body.stop();
+            }
+        }
     }
 }

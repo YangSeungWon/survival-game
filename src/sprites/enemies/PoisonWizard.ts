@@ -7,7 +7,7 @@ import { TargetedAreaOfEffectAttackConfig } from '../../attacks/TargetedAreaOfEf
 export default class PoisonWizard extends AreaOfEffectEnemy {
     static readonly TYPE = 'PoisonWizard';
     static readonly FROM_LEVEL = 9;
-    static readonly TO_LEVEL = 15;
+    static readonly TO_LEVEL = 14;
 
     constructor(scene: GameScene) {
         const color: number = 0x00ff20;   // A poison-like color

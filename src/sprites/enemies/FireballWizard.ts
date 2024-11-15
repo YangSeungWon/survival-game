@@ -7,7 +7,7 @@ import { AttackConfig, StatusEffectType } from '../../attacks/Attack';
 export default class FireballWizard extends RangedEnemy {
     static readonly TYPE = 'FireballWizard';
     static readonly FROM_LEVEL = 7;
-    static readonly TO_LEVEL = 15;
+    static readonly TO_LEVEL = 14;
 
     constructor(scene: GameScene) {
         const color: number = 0xff5500;   // A fiery color

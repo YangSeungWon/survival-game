@@ -42,7 +42,7 @@ export default class Player extends Character {
         this.initDefaultAttacks();
 
         this.experience = 0; // Initialize experience
-        this.level = 1; // Initial level
+        this.level = 15; // Initial level
         this.previousExperienceThreshold = 0;
         this.experienceThreshold = 50; // Experience required for next level
 

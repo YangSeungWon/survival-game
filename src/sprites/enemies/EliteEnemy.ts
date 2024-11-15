@@ -6,7 +6,7 @@ import { MeleeAttackConfig } from '../../attacks/MeleeAttack';
 export default class EliteEnemy extends MeleeEnemy {
     static readonly TYPE = 'EliteEnemy';
     static readonly FROM_LEVEL = 10;
-    static readonly TO_LEVEL = 15;
+    static readonly TO_LEVEL = 14;
 
     constructor(scene: GameScene) {
         const color: number = 0xff2200; // Changed color to red for visual distinction

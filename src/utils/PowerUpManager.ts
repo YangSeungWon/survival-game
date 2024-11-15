@@ -22,13 +22,13 @@ export default class PowerUpManager {
     private keyboardListeners: ((event: KeyboardEvent) => void)[];
     private powerUpBackground: Phaser.GameObjects.Rectangle;
     private depthManager: DepthManager;
-
+    selectedPowerUps: string[];
     constructor(scene: GameScene, player: Player) {
         this.scene = scene;
         this.player = player;
         this.keyboardListeners = [];
         this.depthManager = DepthManager.getInstance();
-
+        this.selectedPowerUps = [];
         const centerX = this.scene.cameras.main.worldView.x + this.scene.cameras.main.width / 2;
         const centerY = this.scene.cameras.main.worldView.y + this.scene.cameras.main.height / 2;
         this.powerUpBackground = this.scene.add.rectangle(centerX, centerY, 400, 350, 0x000000, 0.7)
@@ -92,12 +92,14 @@ export default class PowerUpManager {
 
             button.on('pointerdown', () => {
                 powerUp.apply();
+                this.selectedPowerUps.push(powerUp.name);
                 this.closePowerUpSelection();
             });
 
             const listener = (event: KeyboardEvent) => {
                 if (event.key === `${index + 1}`) {
                     powerUp.apply();
+                    this.selectedPowerUps.push(powerUp.name);
                     this.closePowerUpSelection();
                 }
             };
