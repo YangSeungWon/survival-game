@@ -113,7 +113,7 @@ export default class GameResultScene extends Phaser.Scene {
         const shareData = {
             title: '[Survival Game]',
             text: this.getShareText(),
-            url: 'https://survival.game.ysw.kr',
+            url: this.getShareText(),
             files: [file],
         };
 

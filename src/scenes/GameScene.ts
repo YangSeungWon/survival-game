@@ -48,6 +48,7 @@ export default class GameScene extends Phaser.Scene {
     experienceBar: Phaser.GameObjects.Graphics | null;
     bossHealthBarBackground: Phaser.GameObjects.Graphics | null;
     bossHealthBar: Phaser.GameObjects.Graphics | null;
+    powerUpText: Phaser.GameObjects.Text | null;
     depthManager: DepthManager;
     boss: BossEnemy | null = null;
     
@@ -89,6 +90,7 @@ export default class GameScene extends Phaser.Scene {
         this.experienceBar = null;
         this.bossHealthBarBackground = null;
         this.bossHealthBar = null;
+        this.powerUpText = null;
         this.depthManager = DepthManager.getInstance();
     }
 
@@ -130,19 +132,19 @@ export default class GameScene extends Phaser.Scene {
 
         this.cursors = this.input.keyboard!.createCursorKeys() ? this.input.keyboard!.createCursorKeys() : null;
 
-        this.healthText = this.add.text(16, 50, `Health: ${this.player.health}/${this.player.maxHealth}`, { ...this.defaultTextStyle, color: '#f00' })
+        this.healthText = this.add.text(16, 10, `Health: ${this.player.health}/${this.player.maxHealth}`, { ...this.defaultTextStyle, color: '#f00' })
             .setScrollFactor(0)
             .setDepth(this.depthManager.getDepth(DepthLayer.UI));
-        this.playerStatsText = this.add.text(16, this.cameras.main.height - 200, '', { ...this.defaultTextStyle, fontSize: '16px' })
+        this.playerStatsText = this.add.text(16, this.cameras.main.height - 200, '', { ...this.defaultTextStyle, fontSize: '12px' })
             .setScrollFactor(0)
             .setDepth(this.depthManager.getDepth(DepthLayer.UI));
-        this.timeText = this.add.text(16, 84, 'Time: 0:00', this.defaultTextStyle)
+        this.timeText = this.add.text(16, 44, 'Time: 0:00', this.defaultTextStyle)
             .setScrollFactor(0)
             .setDepth(this.depthManager.getDepth(DepthLayer.UI));
-        this.experienceText = this.add.text(16, 118, 'XP: 0', { ...this.defaultTextStyle, color: '#00ff00' })
+        this.experienceText = this.add.text(16, 78, 'XP: 0', { ...this.defaultTextStyle, color: '#00ff00' })
             .setScrollFactor(0)
             .setDepth(this.depthManager.getDepth(DepthLayer.UI));
-        this.fpsText = this.add.text(this.cameras.main.width / 2, 8, 'FPS: 0', { ...this.defaultTextStyle, fontSize: '16px' })
+        this.fpsText = this.add.text(this.cameras.main.width / 2, 8, 'FPS: 0', { ...this.defaultTextStyle, fontSize: '12px' })
             .setScrollFactor(0)
             .setDepth(this.depthManager.getDepth(DepthLayer.UI));
 
@@ -163,6 +165,10 @@ export default class GameScene extends Phaser.Scene {
         this.experienceBar = this.add.graphics();
         this.experienceBar.setDepth(this.depthManager.getDepth(DepthLayer.UI)); // Set depth for experience bar
         this.updateExperienceRelatedUI();
+
+        this.powerUpText = this.add.text(100, 220, 'Power-Ups:', { fontSize: '16px', color: '#ffffff' });
+        this.powerUpText.setDepth(this.depthManager.getDepth(DepthLayer.UI));
+        this.powerUpText.setVisible(false);
 
         this.physics.world.setBounds(0, 0, this.mapSize, this.mapSize);
         this.add.rectangle(this.mapSize / 2, this.mapSize / 2, this.mapSize * 2, this.mapSize * 2, 0x222222);
@@ -318,7 +324,6 @@ export default class GameScene extends Phaser.Scene {
         // Update player stats text
         var statsText = '';
         statsText += `Level: ${this.player!.level}\n`;
-        statsText += `XP: ${this.player!.experience}\n`;
         statsText += `XP Threshold: ${this.player!.experienceThreshold}\n`;
         statsText += `Enemy Spawn Interval: ${this.enemySpawnInterval}\n`;
         statsText += `Move Speed: ${this.player!.moveSpeed}\n`;
@@ -327,7 +332,7 @@ export default class GameScene extends Phaser.Scene {
         statsText += `Critical Hit Chance (%): ${this.player!.percentCritChance}\n`;
         statsText += `Attacks: ${this.player!.attacks.length}`;
         for (const attack of this.player!.attacks) {
-            statsText += `\n\t- P${attack.attackPower} S${attack.attackSpeed} R${attack.attackRange}`;
+            statsText += `\n\t- ${attack.constructor.name} P${attack.attackPower} S${attack.attackSpeed} R${attack.attackRange}`;
         }
         this.playerStatsText!.setText(statsText);
 
@@ -476,10 +481,36 @@ export default class GameScene extends Phaser.Scene {
         this.physics.pause();
         this.isPaused = true;
 
+        // Show power-ups when the game is paused
+        this.showPowerUps();
+
         // Pause the timed events
         if (this.enemySpawnEvent) this.enemySpawnEvent.paused = true;
         if (this.heartSpawnEvent) this.heartSpawnEvent.paused = true;
         this.attackEvents.forEach(event => event.paused = true);
+    }
+
+    showPowerUps() {
+        let text = 'Power-Ups:\n';
+        this.powerUpManager!.selectedPowerUps.forEach((powerUp, index) => {
+            text += `• ${powerUp}\n`;
+        });
+        this.powerUpText!.setText(text);
+
+
+        this.powerUpText!.setVisible(true);
+        this.powerUpText!.setDepth(this.depthManager.getDepth(DepthLayer.UI));
+        this.powerUpText!.x = 100;
+        this.powerUpText!.y = 220;
+        this.powerUpText!.setScrollFactor(0);
+        console.log('showPowerUps');
+        console.log(this.powerUpText);
+    }
+
+    hidePowerUps() {
+        if (this.powerUpText) {
+            this.powerUpText.setVisible(false);
+        }
     }
 
     resumeGame() {
@@ -487,6 +518,8 @@ export default class GameScene extends Phaser.Scene {
         // Resume the game physics
         this.physics.resume();
         this.isPaused = false;
+
+        this.hidePowerUps();
 
         // Resume the timed events
         if (this.enemySpawnEvent) this.enemySpawnEvent.paused = false;

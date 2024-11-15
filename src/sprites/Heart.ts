@@ -13,7 +13,7 @@ export default class Heart extends Phaser.Physics.Arcade.Sprite {
         const textureKey = 'heartTexture';
         if (!scene.textures.exists(textureKey)) {
             const graphics = scene.add.graphics();
-            graphics.fillStyle(0x00ff00, 1); // Green color for the heart
+            graphics.fillStyle(0x95db58, 1); // Green color for the heart
             graphics.fillCircle(10, 10, 10); // Draw a circle with radius 10
             graphics.generateTexture(textureKey, 20, 20); // Generate texture with size 20x20
             graphics.destroy();

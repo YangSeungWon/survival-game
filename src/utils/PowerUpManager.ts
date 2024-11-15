@@ -176,7 +176,7 @@ export default class PowerUpManager {
             projectileSpeed: 300,
             attackPower: 10,
             attackRange: 2000,
-            attackColor: 0x00ff00,
+            attackColor: 0xa6ffbc,
             projectileSize: 10,
             piercingCount: 30
         };
