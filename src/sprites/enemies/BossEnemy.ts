@@ -14,12 +14,20 @@ interface SpreadMissile extends Phaser.Physics.Arcade.Sprite {
     shouldSpread: boolean;
 }
 
+// New Interface for Switching Missiles
+interface SwitchingMissile extends Phaser.Physics.Arcade.Sprite {
+    hasStartedHoming: boolean;
+    hasApproachedPlayer: boolean;
+    initialDistance: number;
+}
+
 export default class BossEnemy extends Enemy {
     private attackCooldown: number;
     private missileSpeed: number;
     private depthManager: DepthManager;
     private currentPhase: number; // Tracks the current phase
-    maxHealth: number;    // Maximum health of the boss
+    maxHealth: number; // Maximum health of the boss
+    private switchingMissiles: SwitchingMissile[] = []; // Track switching missiles
 
     constructor(scene: GameScene) {
         const config: EnemyConfig = {
@@ -38,40 +46,59 @@ export default class BossEnemy extends Enemy {
             y: 200
         }
         super(scene, config);
-        this.attackCooldown = 2000; // Time between attacks in milliseconds
-        this.missileSpeed = 300;     // Speed of the homing missile
+        this.attackCooldown = 1500; // Time between attacks in milliseconds
+        this.missileSpeed = 400;     // Speed of the missiles
         this.depthManager = DepthManager.getInstance();
         this.currentPhase = 1;       // Initialize to Phase 1
         this.maxHealth = config.health; // Assuming EnemyConfig has a health property
 
         // Generate missile textures
-        createMissileTexture(this.scene, 'simpleMissileTexture', 0xff0000, 16, 16);
-        createMissileTexture(this.scene, 'homingMissileTexture', 0x00ff00, 16, 16);
-        createMissileTexture(this.scene, 'spreadMissileTexture', 0x0000ff, 16, 16);
+        createMissileTexture(this.scene, 'simpleMissileTexture', 0xff0000, 10, 10);
+        createMissileTexture(this.scene, 'homingMissileTexture', 0x00ff00, 10, 10);
+        createMissileTexture(this.scene, 'switchingMissileTexture', 0x00ff00, 10, 10);
+        createMissileTexture(this.scene, 'spreadMissileTexture', 0x0000ff, 10, 10);
 
         // Initial shake effect when the boss appears
         this.scene.cameras.main.shake(500, 0.01);
 
         // Setup initial attack pattern
         this.setupAttackPattern(this.phaseOneAttack.bind(this));
+
+        // Listen to worldstep for updating switching missiles
+        this.scene.physics.world.on('worldstep', this.updateSwitchingMissiles, this);
     }
 
     /**
-     * Phase One Attack: Fires simple missiles towards the player.
+     * Phase One Attack: Fires simple missiles towards the player's current position in four directions.
      */
     private phaseOneAttack(): void {
+        const missileTexture = 'simpleMissileTexture';
+        const numberOfMissiles = 7;
+        const spreadAngle = Phaser.Math.DegToRad(10); // 10 degrees spread
+
         const target = this.scene.player;
-        if (target) {
-            const missile = this.scene.physics.add.sprite(this.x, this.y, 'simpleMissileTexture');
+        if (!target) {
+            return;
+        }
+
+        // Calculate the angle from the boss to the player
+        const angleToPlayer = Phaser.Math.Angle.Between(this.x, this.y, target.x, target.y);
+
+        // Calculate the starting angle for the spread
+        const startAngle = angleToPlayer - spreadAngle * (numberOfMissiles - 1) / 2;
+
+        for (let i = 0; i < numberOfMissiles; i++) {
+            const angle = startAngle + spreadAngle * i;
+
+            const missile = this.scene.physics.add.sprite(this.x, this.y, missileTexture);
             missile.setDepth(this.depthManager.getDepth(DepthLayer.ENEMY));
 
-            const angle = Phaser.Math.Angle.Between(this.x, this.y, target.x, target.y);
             missile.setRotation(angle);
             this.scene.physics.velocityFromRotation(angle, this.missileSpeed, missile.body!.velocity);
             missile.setCollideWorldBounds(true);
             missile.body!.onWorldBounds = true;
 
-            // Give damage to player
+            // Handle collision with player
             this.scene.physics.add.overlap(missile, this.scene.player!, (missileObj, playerObj) => {
                 const damage = 150;
                 (playerObj as Player).takeDamage(damage);
@@ -88,45 +115,83 @@ export default class BossEnemy extends Enemy {
     }
 
     /**
-     * Phase Two Attack: Fires homing missiles towards the player.
+     * Phase Two Attack: Fires 11 missiles in a circular pattern that start homing after reaching a certain distance.
      */
     private phaseTwoAttack(): void {
-        const target = this.scene.player;
-        if (target) {
-            const missile = this.scene.physics.add.sprite(this.x, this.y, 'homingMissileTexture') as HomingMissile;
+        const missileTexture = 'switchingMissileTexture';
+        const numberOfMissiles = 7;
+        const angleIncrement = Phaser.Math.DegToRad(360 / numberOfMissiles);
+
+        for (let i = 0; i < numberOfMissiles; i++) {
+            const angle = i * angleIncrement;
+
+            const missile = this.scene.physics.add.sprite(this.x, this.y, missileTexture) as SwitchingMissile;
             missile.setDepth(this.depthManager.getDepth(DepthLayer.ENEMY));
-            missile.shouldHoming = true;
+            missile.hasStartedHoming = false;
+            missile.initialDistance = 0;
 
-            // **Homing Behavior**
-            this.scene.physics.moveToObject(missile, target, this.missileSpeed);
+            // Set initial velocity straight outward
+            this.scene.physics.velocityFromRotation(angle, this.missileSpeed * 0.8, missile.body!.velocity);
+            missile.setRotation(angle);
 
-            // Update missile direction each frame to home in on the player
-            this.scene.physics.world.on('worldstep', () => {
-                if (missile.active && target.active && missile.shouldHoming) {
-                    const distance = Phaser.Math.Distance.Between(missile.x, missile.y, target.x, target.y);
-                    if (distance < 150) {
-                        missile.shouldHoming = false;
-                    }
-                    const angle = Phaser.Math.Angle.Between(missile.x, missile.y, target.x, target.y);
-                    missile.setRotation(angle);
-                    this.scene.physics.moveToObject(missile, target, this.missileSpeed);
-                }
-            });
+            // Add to tracking array
+            this.switchingMissiles.push(missile);
 
-            // **Collision Handling**
+            // Handle collision with player
             this.scene.physics.add.overlap(missile, this.scene.player!, (missileObj, playerObj) => {
                 const damage = 150;
                 (playerObj as Player).takeDamage(damage);
                 missileObj.destroy();
             });
 
-            // **Destroy missile if it goes out of bounds**
-            missile.setCollideWorldBounds(true);
+            // Destroy missile if it goes out of bounds
             this.scene.physics.world.on('worldbounds', (body: Phaser.Physics.Arcade.Body) => {
                 if (body.gameObject === missile) {
+                    this.removeSwitchingMissile(missile);
                     missile.destroy();
                 }
             });
+        }
+    }
+
+    /**
+     * Updates all switching missiles to handle homing behavior.
+     */
+    private updateSwitchingMissiles(): void {
+        const target = this.scene.player;
+        if (!target) return;
+
+        this.switchingMissiles.forEach((missile) => {
+            if (!missile.active) return;
+
+            // Calculate distance from boss
+            const distance = Phaser.Math.Distance.Between(missile.x, missile.y, this.x, this.y);
+            if (!missile.hasStartedHoming && distance > 200) { // homingThreshold
+                missile.hasStartedHoming = true;
+            } else if (missile.hasStartedHoming && target.active && !missile.hasApproachedPlayer) {
+                const distance = Phaser.Math.Distance.Between(missile.x, missile.y, target.x, target.y);
+                const angle = Phaser.Math.Angle.Between(missile.x, missile.y, target.x, target.y);
+
+                // Continuously adjust velocity towards player
+                this.scene.physics.velocityFromRotation(angle, this.missileSpeed * 0.4, missile.body!.velocity);
+                missile.setRotation(angle);
+
+                if (distance < 300) {
+                    missile.hasApproachedPlayer = true;
+                    this.scene.physics.moveToObject(missile, target, this.missileSpeed);
+                }
+            }
+        });
+    }
+
+    /**
+     * Removes a missile from the tracking array.
+     * @param missile The missile to remove.
+     */
+    private removeSwitchingMissile(missile: SwitchingMissile): void {
+        const index = this.switchingMissiles.indexOf(missile);
+        if (index > -1) {
+            this.switchingMissiles.splice(index, 1);
         }
     }
 
@@ -155,7 +220,6 @@ export default class BossEnemy extends Enemy {
                 });
 
                 // **Destroy missile if it goes out of bounds**
-                missile.setCollideWorldBounds(true);
                 this.scene.physics.world.on('worldbounds', (body: Phaser.Physics.Arcade.Body) => {
                     if (body.gameObject === missile) {
                         missile.destroy();
@@ -179,11 +243,11 @@ export default class BossEnemy extends Enemy {
     private checkPhaseTransition(): void {
         const healthPercentage = this.health / this.maxHealth;
 
-        if (healthPercentage <= 0.3 && this.currentPhase < 3) {
+        if (healthPercentage <= 0.9 && this.currentPhase < 3) {
             this.currentPhase = 3;
             this.scene.cameras.main.shake(500, 0.015);
             this.switchAttackPhase(this.phaseThreeAttack.bind(this));
-        } else if (healthPercentage <= 0.6 && this.currentPhase < 2) {
+        } else if (healthPercentage <= 0.999 && this.currentPhase < 2) {
             this.currentPhase = 2;
             this.scene.cameras.main.shake(500, 0.015);
             this.switchAttackPhase(this.phaseTwoAttack.bind(this));
@@ -195,9 +259,6 @@ export default class BossEnemy extends Enemy {
      * @param newPhaseAttack The attack method for the new phase.
      */
     private switchAttackPhase(newPhaseAttack: () => void): void {
-        // Remove all existing timed events to prevent overlapping attacks
-        this.scene.time.removeAllEvents();
-
         // Setup the new attack pattern
         this.setupAttackPattern(newPhaseAttack);
     }
@@ -217,9 +278,4 @@ export default class BossEnemy extends Enemy {
         // Trigger an immediate attack
         attackMethod();
     }
-
-    /**
-     * Override update method if additional behaviors are needed.
-     */
-    // Note: The update method is already overridden above.
 } 
