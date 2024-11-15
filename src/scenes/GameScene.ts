@@ -211,7 +211,6 @@ export default class GameScene extends Phaser.Scene {
                 dir: '8dir', // Allow 8-directional movement
                 fixed: true // Fix joystick to camera
             });
-            this.joystick.setDepth(this.depthManager.getDepth(DepthLayer.UI));
 
             // Create cursor keys from joystick
             this.joystickCursors = this.joystick.createCursorKeys();
