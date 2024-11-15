@@ -64,6 +64,7 @@ export default class ProjectilePool {
         this.projectiles.getChildren().forEach(gameObject => {
             const projectile = gameObject as Projectile;
             projectile.move(deltaMultiplier);
+            projectile.updateStatusEffects(deltaMultiplier);
         });
     }
 

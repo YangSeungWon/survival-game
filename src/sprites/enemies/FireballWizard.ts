@@ -34,12 +34,7 @@ export default class FireballWizard extends RangedEnemy {
             attackColor: color,
             projectileSpeed: projectileSpeed,
             projectileSize: projectileSize,
-            piercingCount: 1,
-            statusEffect: {
-                type: StatusEffectType.BURN,
-                id: 'fireballWizardBurn' + Date.now(),
-                duration: burnDuration
-            }
+            piercingCount: 0
         };
 
         super(scene, color, size, speed, health, config, experiencePoint);

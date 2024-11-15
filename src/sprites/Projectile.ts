@@ -12,17 +12,18 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     scene: GameScene;
     facingAngle: number;
     speed: number;
+    speedModifier: number = 1;
     attackPower: number;
     owner: Character;
     piercingCount: number = 0;
     hitTargets: Set<Phaser.GameObjects.GameObject> = new Set();
     statusEffect: StatusEffect | null = null;
     attackRange: number = 0; // New property for maximum attack range
+    statusEffects: Map<string, StatusEffect> = new Map();
     private startX: number = 0; // Starting X position
     private startY: number = 0; // Starting Y position
 
     constructor(scene: GameScene, x: number, y: number) {
-        console.log('Projectile constructor');
         super(scene, x, y, 'projectileTexture');
         scene.add.existing(this);
         scene.physics.add.existing(this);
@@ -31,6 +32,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setVisible(false);
         this.facingAngle = 0;
         this.speed = 0;
+        this.speedModifier = 1;
         this.attackPower = 0;
         this.owner = {} as Character;
         this.scene = scene;
@@ -39,6 +41,9 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
 
         this.setCollideWorldBounds(true);
         scene.physics.world.on('worldbounds', this.handleWorldBounds, this);
+
+        this.visible = false;
+        this.active = false;
     }
 
     fire(
@@ -66,10 +71,12 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
 
         this.facingAngle = angle;
         this.speed = speed;
+        this.speedModifier = 1;
         this.attackPower = attackPower;
         this.attackRange = attackRange; // Set attack range
 
         this.owner = owner;
+        this.statusEffects.clear();
 
         this.setTint(color);
 
@@ -86,6 +93,9 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         } else {
             alert('Projectile: Invalid target');
         }
+
+        this.visible = true;
+        this.active = true;
     }
 
     getTextureKey(projectileSize: number, color: number): string {
@@ -124,7 +134,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     }
 
     move(deltaMultiplier: number): void {
-        moveObject(this, this.facingAngle, this.speed, deltaMultiplier);
+        moveObject(this, this.facingAngle, this.speed * this.speedModifier, deltaMultiplier);
         this.checkBounds();
         this.checkAttackRange(); // Check if attack range exceeded
     }
@@ -161,4 +171,67 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
             }
         }
     }
+
+    applyStatusEffect(effect: StatusEffect): void {
+        if (!this.scene) return;
+
+        const existingEffect = this.statusEffects.get(effect.id);
+
+        if (existingEffect) {
+            // Update duration if the IDs match exactly
+            existingEffect.duration = effect.duration;
+            // Optionally, reset other properties if needed
+            existingEffect.tickRate = effect.tickRate;
+            // You can update other properties as required
+            return;
+        }
+
+        this.enterStatusEffect(effect);
+        const copiedEffect = {
+            ...effect,
+            lastTick: 0,
+        };
+        this.statusEffects.set(effect.id, copiedEffect);
+    }
+
+
+    enterStatusEffect(effect: StatusEffect): void {
+        switch (effect.type) {
+            case 'freeze':
+                this.speedModifier *= 0.7;
+                break;
+        }
+    }
+
+    applyEffectLogic(effect: StatusEffect, tickRate: number): void {
+        return;
+    }
+
+    exitStatusEffect(effect: StatusEffect): void {
+        switch (effect.type) {
+            case 'freeze':
+                this.speedModifier /= 0.7;
+                break;
+        }
+    }
+
+    updateStatusEffects(delta: number): void {
+        this.statusEffects.forEach((effect, id) => {
+            effect.duration -= delta;
+            if (!effect.lastTick) effect.lastTick = 0;
+            effect.lastTick += delta; // Update the last tick time
+
+            // Apply effect logic only if tickRate is defined and enough time has passed
+            if (effect.tickRate && effect.lastTick >= effect.tickRate) {
+                this.applyEffectLogic(effect, effect.tickRate);
+                effect.lastTick = 0; // Reset the last tick
+            }
+
+            if (effect.duration <= 0) {
+                this.exitStatusEffect(effect);
+                this.statusEffects.delete(id);
+            }
+        });
+    }
+
 }

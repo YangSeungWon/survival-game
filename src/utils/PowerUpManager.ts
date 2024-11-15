@@ -222,7 +222,7 @@ export default class PowerUpManager {
             effectRange: 200,
             statusEffect: {
                 type: 'freeze' as StatusEffectType,
-                duration: 500,
+                duration: 100,
                 id: 'freezingAoE' + Date.now(),
             },
             attackColor: 0x0000ff
@@ -271,7 +271,7 @@ export default class PowerUpManager {
     private applyOneShotProjectilePowerUp(): void {
         const projectileAttackConfig: ProjectileAttackConfig & AttackConfig = {
             attackSpeed: 500,
-            projectileSpeed: 200,
+            projectileSpeed: 300,
             attackPower: 1000,
             attackRange: 150,
             attackColor: 0xa9b5c9,
@@ -284,9 +284,9 @@ export default class PowerUpManager {
 
     private applyBeamPowerUp(): void {
         const beamAttackConfig: BeamAttackConfig = {
-            attackRange: 500,
+            attackRange: 400,
             attackSpeed: 2000,
-            attackPower: 50,
+            attackPower: 20,
             attackColor: 0x00ffff,
             beamDuration: 500,
             beamWidth: 7

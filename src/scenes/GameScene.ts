@@ -307,6 +307,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Update each projectile
         this.projectilePool!.moveAll(deltaTime);
+        console.log('projectile count:', this.projectilePool!.getProjectiles().getChildren().length);
 
         // Update each enemy
         this.enemies!.getChildren().forEach(enemy => {
@@ -538,7 +539,7 @@ export default class GameScene extends Phaser.Scene {
     showDamageText(enemyX: number, enemyY: number, damage: number, color: string, isPlayer: boolean = false) {
         const fontSize = isPlayer ? '24px' : '18px';
         const deltaY = isPlayer ? -15 : -10;
-        const duration = isPlayer ? 800 : 400;
+        const duration = isPlayer ? 500 : 300;
         const damageText = this.add.text(enemyX, enemyY, (isPlayer && damage > 0 ? '+' : '') + damage.toString(), { fontSize: fontSize, color: color, fontStyle: isPlayer ? 'bold' : '' })
             .setScrollFactor(1) // Make the text move with the camera
             .setDepth(1);

@@ -4,6 +4,7 @@ import GameScene from '../scenes/GameScene';
 import Character from '../sprites/Character';
 import Player from '../sprites/Player';
 import DepthManager, { DepthLayer } from '../utils/DepthManager';
+import Projectile from '../sprites/Projectile';
 
 export interface AreaOfEffectAttackConfig extends AttackConfig {
     effectRange: number;
@@ -74,6 +75,16 @@ export default class AreaOfEffectAttack extends Attack {
                 if (this.statusEffect) {
                     target.applyStatusEffect(this.statusEffect);
                 }
+            }
+        });
+
+        const projectiles = this.scene.projectilePool?.getProjectiles().getChildren();
+        projectiles?.forEach((projectile: Object) => {
+            const projectileSprite = projectile as Projectile;
+            const distance = Phaser.Math.Distance.Between(this.owner.x, this.owner.y, projectileSprite.x, projectileSprite.y);
+            if (projectileSprite.owner !== this.owner && this.statusEffect && distance <= this.attackRange) {
+                console.log('Applying status effect to projectile');
+                projectileSprite.applyStatusEffect(this.statusEffect);
             }
         });
     }
