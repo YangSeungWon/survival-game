@@ -438,12 +438,15 @@ export default class GameScene extends Phaser.Scene {
         this.isPausedInGame = true;
         this.powerUpManager!.showPowerUpSelection(newLevel);
 
-        // Adjust enemy spawn interval based on player level
-        this.enemySpawnInterval = Math.max(50, 450 - newLevel * 18); // Decrease interval with level, minimum 50ms
+        // 맵에 있는 모든 경험치 오브젝트 제거
+        this.experiencePointPool!.clear();
+        
+        // 플레이어 레벨에 따라 적 스폰 간격 조정
+        this.enemySpawnInterval = Math.max(50, 450 - newLevel * 18); // 레벨이 증가할수록 스폰 간격 감소, 최소 50ms
 
-        // Reset the enemy spawn event with the new interval
+        // 새로운 스폰 간격으로 적 스폰 이벤트 재설정
         if (this.enemySpawnEvent) {
-            this.enemySpawnEvent.remove(false); // Remove the old event without destroying it
+            this.enemySpawnEvent.remove(false); // 기존 이벤트 제거 (파괴하지 않음)
         }
         this.enemySpawnEvent = this.time.addEvent({
             delay: this.enemySpawnInterval,

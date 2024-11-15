@@ -55,4 +55,12 @@ export default class ExperiencePointPool {
     public getPoints(): Phaser.Physics.Arcade.Group {
         return this.points;
     }
+
+    public clear(): void {
+        while (this.points.getChildren().length > 0) {
+            const experience = this.points.getChildren()[0] as ExperiencePoint;
+            experience.remove();
+            this.points.remove(experience);
+        }
+    }
 }

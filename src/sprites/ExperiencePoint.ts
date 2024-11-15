@@ -115,6 +115,14 @@ export default class ExperiencePoint extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    remove(): void {
+        this.isCollected = true;
+        this.setActive(false);
+        this.setVisible(false);
+        this.glow.setVisible(false);
+        this.destroy();
+    }
+
     /**
      * Ensures the glow graphic is destroyed when the experience point is removed.
      */
