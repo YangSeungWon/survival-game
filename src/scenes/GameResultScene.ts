@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import GameScene from './GameScene';
+import share from '../utils/share';
 
 interface GameResultData {
     level: number;
@@ -16,7 +17,6 @@ export default class GameResultScene extends Phaser.Scene {
     private resultText!: Phaser.GameObjects.Text;
     private retryButton!: Phaser.GameObjects.Text;
     private shareButton!: Phaser.GameObjects.Text;
-    private shareToTwitterButton!: Phaser.GameObjects.Text;
 
     constructor() {
         super({ key: 'GameResultScene' });
@@ -58,29 +58,18 @@ export default class GameResultScene extends Phaser.Scene {
         // 리트라이 버튼 추가
         this.retryButton = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 100, 'Retry', {
             fontSize: '32px',
-            color: '#ff0000',
-            backgroundColor: '#ffffff',
+            color: '#ffffff',
+            backgroundColor: '#0000ef',
             padding: { x: 20, y: 10 },
         })
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => this.retryGame());
 
-        // 트위터 공유 버튼 추가
-        this.shareToTwitterButton = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 220, 'Share to Twitter', {
-            fontSize: '32px',
-            color: '#0000ff',
-            backgroundColor: '#ffffff',
-            padding: { x: 20, y: 10 },
-        })
-            .setOrigin(0.5)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => this.shareToTwitter());
-
         // 일반 공유 버튼 추가
         this.shareButton = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 160, 'Share', {
             fontSize: '32px',
-            color: '#0000ff',
+            color: '#0000ef',
             backgroundColor: '#ffffff',
             padding: { x: 20, y: 10 },
         })
@@ -89,9 +78,9 @@ export default class GameResultScene extends Phaser.Scene {
             .on('pointerdown', () => this.shareResult());
 
         // 스크린샷 다운로드 버튼 추가
-        const downloadScreenshotButton = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 280, 'Download Screenshot', {
+        const downloadScreenshotButton = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 220, 'Download Screenshot', {
             fontSize: '32px',
-            color: '#0000ff',
+            color: '#000000',
             backgroundColor: '#ffffff',
             padding: { x: 20, y: 10 },
         })
@@ -102,8 +91,7 @@ export default class GameResultScene extends Phaser.Scene {
         // 버튼 위치 조정
         this.retryButton.setY(this.cameras.main.height - 100);
         this.shareButton.setY(this.cameras.main.height - 160);
-        this.shareToTwitterButton.setY(this.cameras.main.height - 220);
-        downloadScreenshotButton.setY(this.cameras.main.height - 280);
+        downloadScreenshotButton.setY(this.cameras.main.height - 220);
     }
 
     update(time: number, delta: number) {
@@ -114,51 +102,26 @@ export default class GameResultScene extends Phaser.Scene {
         window.location.reload();
     }
 
-    private shareResult() {
+    private async shareResult() {
+        // Fetch the screenshot as a Blob
+        const response = await fetch(this.resultData.screenshot);
+        const blob = await response.blob();
+
+        // Create a File from the Blob
+        const file = new File([blob], 'screenshot.jpg', { type: blob.type });
+
         const shareData = {
             title: '[Survival Game]',
             text: this.getShareText(),
             url: 'https://survival.game.ysw.kr',
+            files: [file],
         };
 
-        if (navigator.share) {
-            navigator.share(shareData)
-                .then(() => {
-                    console.log('Game result shared successfully.');
-                })
-                .catch((error) => {
-                    console.error('Error sharing:', error);
-                });
+        const isShared = await share(shareData);
+        if (isShared === 'shared' || isShared === 'copiedToClipboard') {
+            this.showCopySuccessMessage('Share text copied to clipboard!');
         } else {
-            const shareText = `${shareData.text}\nPLAY NOW: ${shareData.url}`;
-            navigator.clipboard.writeText(shareText)
-                .then(() => {
-                    this.showCopySuccessMessage('Share text copied to clipboard!');
-                })
-                .catch((error) => {
-                    console.error('Failed to copy text:', error);
-                });
-        }
-    }
-
-    /**
-     * 트위터에 게임 결과를 공유하는 메소드
-     */
-    private async shareToTwitter() {
-        try {
-            const shareText = encodeURIComponent(this.getShareText());
-            const shareURL = encodeURIComponent('https://survival.game.ysw.kr');
-            const twitterURL = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareURL}`;
-
-            // 파일 공유는 삭제되었습니다. 기존 공유 로직만 유지
-            window.open(twitterURL, '_blank');
-        } catch (error) {
-            console.error('Error sharing to Twitter:', error);
-            // 오류 발생 시 일반 트위터 공유 URL 열기
-            const shareText = encodeURIComponent(this.getShareText());
-            const shareURL = encodeURIComponent('https://survival.game.ysw.kr');
-            const twitterURL = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareURL}`;
-            window.open(twitterURL, '_blank');
+            this.showCopySuccessMessage('Failed to copy share text.', true);
         }
     }
 
