@@ -60,8 +60,8 @@ export function createEnemyTexture(
 ): void {
     const graphics = scene.make.graphics({ x: 0, y: 0 });
     graphics.fillStyle(color, 1);
-    graphics.fillCircle(size / 2, size / 2, size / 2);
-    graphics.generateTexture(key, size, size);
+    graphics.fillRect(0, 0, size * 2, size * 2);
+    graphics.generateTexture(key, size * 2, size * 2);
     graphics.destroy();
 }
 

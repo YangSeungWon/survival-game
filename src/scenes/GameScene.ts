@@ -45,6 +45,8 @@ export default class GameScene extends Phaser.Scene {
     healthBar: Phaser.GameObjects.Graphics | null;
     experienceBarBackground: Phaser.GameObjects.Graphics | null;
     experienceBar: Phaser.GameObjects.Graphics | null;
+    bossHealthBarBackground: Phaser.GameObjects.Graphics | null;
+    bossHealthBar: Phaser.GameObjects.Graphics | null;
     depthManager: DepthManager;
     boss: BossEnemy | null = null;
     
@@ -84,6 +86,8 @@ export default class GameScene extends Phaser.Scene {
         this.healthBar = null;
         this.experienceBarBackground = null;
         this.experienceBar = null;
+        this.bossHealthBarBackground = null;
+        this.bossHealthBar = null;
         this.depthManager = DepthManager.getInstance();
     }
 
@@ -226,9 +230,18 @@ export default class GameScene extends Phaser.Scene {
         const level = this.player!.level;
 
         if (level >= 15 && !this.boss) {
+            this.bossHealthBarBackground = this.add.graphics();
+            this.bossHealthBarBackground.fillStyle(0x555555, 1); // Grey color for background
+            this.bossHealthBarBackground.fillRect(this.cameras.main.width - 216, 74, 200, 20).setScrollFactor(0).setDepth(this.depthManager.getDepth(DepthLayer.UI)); // Full size of the health bar
+
+            this.bossHealthBar = this.add.graphics();
+            this.bossHealthBar.setDepth(this.depthManager.getDepth(DepthLayer.UI)); // Set depth for health bar
+            this.updateBossHealthRelatedUI();
+
             // 보스 스폰
             this.boss = new BossEnemy(this);
             this.enemies!.add(this.boss);
+            this.updateBossHealthRelatedUI();
             return;
         }
 
@@ -323,6 +336,10 @@ export default class GameScene extends Phaser.Scene {
 
         // Update time text
         this.timeText!.setText(`Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
+
+        if (this.boss) {
+            this.updateBossHealthRelatedUI();
+        }
     }
 
     updateHealthRelatedUI() {
@@ -333,6 +350,10 @@ export default class GameScene extends Phaser.Scene {
     updateExperienceRelatedUI() {
         this.updateExperienceText();
         this.updateExperienceBar();
+    }
+
+    updateBossHealthRelatedUI() {
+        this.updateBossHealthBar();
     }
 
     updateHealthText() {
@@ -365,7 +386,22 @@ export default class GameScene extends Phaser.Scene {
         this.experienceBar!.fillRect(this.cameras.main.width - 216, 40, experienceBarWidth, 20).setScrollFactor(0);
     }
 
+    updateBossHealthBar() {
+        if (!this.boss) return;
+        this.bossHealthBar!.clear();
+        this.bossHealthBar!.fillStyle(0xff0000, 1); // Red color for current health
+        const healthPercentage = this.boss!.health / this.boss!.maxHealth;
+        const healthBarWidth = 200 * healthPercentage; // Calculate width
+        this.bossHealthBar!.fillRect(this.cameras.main.width - 216, 74, healthBarWidth, 20).setScrollFactor(0);
+    }
+
     gameOver(isSuccess: boolean = false) {
+        if (this.bossHealthBar) {
+            this.bossHealthBar.destroy();
+        }
+        if (this.bossHealthBarBackground) {
+            this.bossHealthBarBackground.destroy();
+        }
         // Capture the screenshot
         this.game.renderer.snapshot((image) => {
             const screenshot = (image as HTMLImageElement).src;

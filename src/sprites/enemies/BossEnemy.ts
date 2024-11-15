@@ -33,7 +33,7 @@ export default class BossEnemy extends Enemy {
         const config: EnemyConfig = {
             color: 0xff0000,
             size: 100,
-            moveSpeed: 15,
+            moveSpeed: 25,
             experiencePoint: 1000,
             health: 10000,
             attackConfig: {
@@ -42,12 +42,12 @@ export default class BossEnemy extends Enemy {
                 attackRange: 100,
                 attackColor: 0xff0000,
             },
-            x: 200,
-            y: 200
+            x: 0,
+            y: 0
         }
         super(scene, config);
-        this.attackCooldown = 1500; // Time between attacks in milliseconds
-        this.missileSpeed = 400;     // Speed of the missiles
+        this.attackCooldown = 1000; // Time between attacks in milliseconds
+        this.missileSpeed = 300;     // Speed of the missiles
         this.depthManager = DepthManager.getInstance();
         this.currentPhase = 1;       // Initialize to Phase 1
         this.maxHealth = config.health; // Assuming EnemyConfig has a health property
@@ -73,18 +73,18 @@ export default class BossEnemy extends Enemy {
      */
     private phaseOneAttack(): void {
         const missileTexture = 'simpleMissileTexture';
-        const numberOfMissiles = 12;
-        const spreadAngle = Phaser.Math.DegToRad(30); // 10 degrees spread
+        const numberOfMissiles = 8;
+        const spreadAngle = Phaser.Math.DegToRad(45); // 10 degrees spread
 
         const target = this.scene.player;
         if (!target) {
             return;
         }
 
-        const angleToPlayer = 0;
+        const angleToPlayer = Phaser.Math.Angle.Between(this.x, this.y, target.x, target.y);
 
         // Calculate the starting angle for the spread
-        const startAngle = angleToPlayer - spreadAngle * (numberOfMissiles - 1) / 2;
+        const startAngle = angleToPlayer + spreadAngle * (numberOfMissiles - 1) / 2 + Phaser.Math.DegToRad(22.5);
 
         for (let i = 0; i < numberOfMissiles; i++) {
             const angle = startAngle + spreadAngle * i;
@@ -118,7 +118,7 @@ export default class BossEnemy extends Enemy {
      */
     private phaseTwoAttack(): void {
         const missileTexture = 'switchingMissileTexture';
-        const numberOfMissiles = 7;
+        const numberOfMissiles = 4;
         const angleIncrement = Phaser.Math.DegToRad(360 / numberOfMissiles);
 
         for (let i = 0; i < numberOfMissiles; i++) {
