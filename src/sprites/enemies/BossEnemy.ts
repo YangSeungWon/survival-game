@@ -35,7 +35,7 @@ export default class BossEnemy extends Enemy {
             size: 100,
             moveSpeed: 25,
             experiencePoint: 1000,
-            health: 10000,
+            health: 30000,
             attackConfig: {
                 attackSpeed: 1000,
                 attackPower: 100,

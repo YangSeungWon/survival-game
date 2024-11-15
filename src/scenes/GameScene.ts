@@ -417,7 +417,7 @@ export default class GameScene extends Phaser.Scene {
                     screenshot: screenshot // Pass the screenshot
                 }
             });
-        });
+        }, 'image/jpeg', 0.8);
     }
 
     gameSuccess() {
