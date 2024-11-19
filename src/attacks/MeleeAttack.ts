@@ -49,7 +49,9 @@ export default class MeleeAttack extends Attack {
     }
 
     private showAttackMotion(): void {
-        this.attackBar!.setPosition(this.owner.x, this.owner.y);
+        if (this.owner instanceof Player) {
+            this.scene.shootSound?.play();
+        }
 
         const facingAngle = this.initialFacingAngle!;
         const halfArc = this.attackAngle / 2;

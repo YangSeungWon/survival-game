@@ -3,6 +3,7 @@ import Attack, { AttackConfig } from './Attack';
 import GameScene from '../scenes/GameScene';
 import { createAttackBarTexture } from '../utils/TextureGenerator';
 import Character from '../sprites/Character';
+import Player from '../sprites/Player';
 
 export interface ProjectileAttackConfig extends AttackConfig {
     projectileSpeed: number;
@@ -35,6 +36,10 @@ export default class ProjectileAttack extends Attack {
     
     performAttack(): void {
         if (this.isAttacking) return;
+
+        if (this.owner instanceof Player) {
+            this.scene.shootSound?.play();
+        }   
 
         this.isAttacking = true;
 

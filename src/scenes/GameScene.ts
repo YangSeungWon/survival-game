@@ -51,6 +51,13 @@ export default class GameScene extends Phaser.Scene {
     powerUpText: Phaser.GameObjects.Text | null;
     depthManager: DepthManager;
     boss: BossEnemy | null = null;
+
+    hitSound: Phaser.Sound.BaseSound | null;
+    hurtSound: Phaser.Sound.BaseSound | null;
+    shootSound: Phaser.Sound.BaseSound | null;
+    powerUpSound: Phaser.Sound.BaseSound | null;
+    coinSound: Phaser.Sound.BaseSound | null;
+    pickupSound: Phaser.Sound.BaseSound | null; 
     
     private defaultTextStyle: Phaser.Types.GameObjects.Text.TextStyle = {
         fontFamily: '"Noto Sans", sans-serif',
@@ -92,9 +99,24 @@ export default class GameScene extends Phaser.Scene {
         this.bossHealthBar = null;
         this.powerUpText = null;
         this.depthManager = DepthManager.getInstance();
+
+        this.hitSound = null;
+        this.hurtSound = null;
+        this.shootSound = null;
+        this.powerUpSound = null;
+        this.coinSound = null;
+        this.pickupSound = null;
     }
 
     preload(): void {
+        // load sound
+        this.load.audio('hitSound', 'assets/sounds/Hit.wav');
+        this.load.audio('hurtSound', 'assets/sounds/Hurt.wav');
+        this.load.audio('shootSound', 'assets/sounds/Shoot.wav');
+        this.load.audio('powerUpSound', 'assets/sounds/Powerup.wav');
+        this.load.audio('coinSound', 'assets/sounds/Coin.wav');
+        this.load.audio('pickupSound', 'assets/sounds/Pickup.wav');
+
         this.load.script('rexvirtualjoystick', 'https://cdn.jsdelivr.net/npm/phaser3-rex-plugins/dist/rexvirtualjoystickplugin.min.js');
         this.load.once('complete', () => {
             this.plugins.install('rexvirtualjoystick', (window as any).rexvirtualjoystickplugin, true);
@@ -107,9 +129,17 @@ export default class GameScene extends Phaser.Scene {
         // Create Missile Textures
         createMissileTexture(this, 'missileTexture', 0x0000ff, 10, 20);
         createTrackingMissileTexture(this, 'trackingMissileTexture', 0xffa500, 15, 30);
+
     }
 
     create(): void {
+        this.hitSound = this.sound.add('hitSound', { volume: 0.1 });
+        this.hurtSound = this.sound.add('hurtSound', { volume: 0.3 });
+        this.shootSound = this.sound.add('shootSound', { volume: 0.1 });
+        this.powerUpSound = this.sound.add('powerUpSound', { volume: 0.25 });
+        this.coinSound = this.sound.add('coinSound', { volume: 0.25 });
+        this.pickupSound = this.sound.add('pickupSound', { volume: 0.2 });
+
         this.player = new Player(this);
         this.player.setDepth(this.depthManager.getDepth(DepthLayer.PLAYER));
         this.projectilePool = new ProjectilePool(this);
@@ -229,6 +259,8 @@ export default class GameScene extends Phaser.Scene {
             // Create cursor keys from joystick
             this.joystickCursors = this.joystick.createCursorKeys();
         }
+        
+        
     }
 
     createEnemies() {
@@ -448,6 +480,8 @@ export default class GameScene extends Phaser.Scene {
         this.pauseGame();
         this.isPausedInGame = true;
         this.powerUpManager!.showPowerUpSelection(newLevel);
+
+        this.sound.play('powerUpSound');
 
         // 맵에 있는 모든 경험치 오브젝트 제거
         this.experiencePointPool!.clear();

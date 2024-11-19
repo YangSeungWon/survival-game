@@ -128,6 +128,7 @@ export default class Heart extends Phaser.Physics.Arcade.Sprite {
             this.setVisible(false);
             this.glow.setVisible(false);
             this.scene.events.emit('heartCollected', this.healAmount); // Emit heal amount
+            (this.scene as GameScene).pickupSound?.play();
             this.destroy();
         }
     }

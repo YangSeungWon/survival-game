@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import ExperiencePoint from '../sprites/ExperiencePoint';
 import DepthManager, { DepthLayer } from './DepthManager';
+import GameScene from '../scenes/GameScene';
 
 export default class ExperiencePointPool {
     private scene: Phaser.Scene;
@@ -48,6 +49,7 @@ export default class ExperiencePointPool {
      * @param {number} amount - Amount of experience to add.
      */
     public addPlayerExperience(amount: number): void {
+        (this.scene as GameScene).coinSound?.play();
         // Emit an event to handle experience addition elsewhere
         this.scene.events.emit('experiencePointCollected', amount);
     }

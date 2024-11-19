@@ -106,6 +106,7 @@ export default class Player extends Character {
         const lifeStealAvailable = Math.ceil(data.damageDealt * this.percentLifeSteal / 100);
         const maxLifeStealAmount = this.maxHealth - this.health;
         const lifeStealAmount = Math.min(lifeStealAvailable, maxLifeStealAmount);
+        this.scene.hitSound?.play();
 
         if (lifeStealAmount > 0) {
             this.health = Math.min(this.health + lifeStealAmount, this.maxHealth);
@@ -115,6 +116,11 @@ export default class Player extends Character {
 
     onPlayerHealthChanged(healthChange: number) {
         this.scene.showDamageText(this.x, this.y, healthChange, healthChange > 0 ? '#00ff00' : '#ff0000', true);
+        if (healthChange < 0) {
+            this.scene.hurtSound?.play();
+        } else if (healthChange > 100) {
+            this.scene.powerUpSound?.play();
+        }
     }
 
     move(cursors: Phaser.Types.Input.Keyboard.CursorKeys, delta: number, joystick?: any) {
