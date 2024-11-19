@@ -213,6 +213,8 @@ export default class GameScene extends Phaser.Scene {
         this.add.existing(this.player);
         this.physics.add.existing(this.player);
         this.player.setCollideWorldBounds(true);
+        
+        this.createEnemies();
 
         // Set camera to follow the player
         this.cameras.main.startFollow(this.player);
@@ -254,7 +256,6 @@ export default class GameScene extends Phaser.Scene {
             // Create cursor keys from joystick
             this.joystickCursors = this.joystick.createCursorKeys();
         }
-        
         
     }
 
