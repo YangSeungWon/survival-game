@@ -217,11 +217,6 @@ export default class GameScene extends Phaser.Scene {
         // Set camera to follow the player
         this.cameras.main.startFollow(this.player);
 
-        // Call createEnemies to spawn enemies initially
-        for (let i = 0; i < 10; i++) {
-            this.createEnemies();
-        }
-
         // Overlap settings instead of collider
         this.physics.add.overlap(this.player, this.experiencePointPool.getPoints(), (player, experience) => {
             this.collectExperience(player as Player, experience as ExperiencePoint);
