@@ -41,5 +41,10 @@ module.exports = {
         { from: 'assets', to: 'assets' },
       ],
     }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'version.json', to: 'version.json' },
+      ],
+    }),
   ],
 };

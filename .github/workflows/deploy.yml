@@ -24,6 +24,10 @@ jobs:
     - name: Build project
       run: npm run build  # Ensure this script builds your project into the 'dist' directory
 
+    - name: Generate version.json with commit hash
+      run: |
+        echo '{ "commitHash": "${{ github.sha }}" }' > dist/version.json
+
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:

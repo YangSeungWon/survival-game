@@ -16,6 +16,7 @@ import BossEnemy from '../sprites/enemies/BossEnemy';
 import { createEnemyTexture, createMissileTexture, createTrackingMissileTexture } from '../utils/TextureGenerator';
 import BeamShooterEnemy from '../sprites/enemies/BeamShooterEnemy';
 import EnemyPool from '../utils/EnemyPool';
+import GameResultScene from './GameResultScene';
 
 export default class GameScene extends Phaser.Scene {
     elapsedTimeMillis: number;
@@ -66,6 +67,8 @@ export default class GameScene extends Phaser.Scene {
         fontSize: '32px',
         color: '#fff'
     };
+
+    private commitHashText!: Phaser.GameObjects.Text;
 
     constructor() {
         super({ key: 'GameScene' });
@@ -132,6 +135,8 @@ export default class GameScene extends Phaser.Scene {
         // Create Missile Textures
         createMissileTexture(this, 'missileTexture', 0x0000ff, 10, 20);
         createTrackingMissileTexture(this, 'trackingMissileTexture', 0xffa500, 15, 30);
+
+        this.load.json('version', 'version.json');
     }
 
     create(): void {
@@ -260,6 +265,30 @@ export default class GameScene extends Phaser.Scene {
             this.joystickCursors = this.joystick.createCursorKeys();
         }
         
+        const versionData = this.cache.json.get('version') as { commitHash: string };
+        const commitHash = versionData?.commitHash || 'Unknown';
+
+        // Display the commit hash at the bottom right corner
+        this.commitHashText = this.add.text(
+            this.cameras.main.width - 10,
+            this.cameras.main.height - 10,
+            `Commit: ${commitHash}`,
+            {
+                fontSize: '16px',
+                color: '#ffffff',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                padding: { x: 5, y: 5 },
+            }
+        )
+        .setOrigin(1, 1) // Align text to bottom-right
+        .setScrollFactor(0); // Fix position to the camera
+
+        // Optional: Update text on resize
+        this.scale.on('resize', this.updateCommitHashPosition, this);
+    }
+
+    private updateCommitHashPosition(gameSize: Phaser.Structs.Size) {
+        this.commitHashText.setPosition(gameSize.width - 10, gameSize.height - 10);
     }
 
     createEnemies() {

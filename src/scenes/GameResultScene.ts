@@ -31,6 +31,7 @@ export default class GameResultScene extends Phaser.Scene {
     preload() {
         // Load necessary assets
         this.load.image('background', this.resultData.screenshot);
+        this.load.json('version', 'version.json');
     }
 
     create() {
@@ -47,6 +48,9 @@ export default class GameResultScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // 레벨, 시간, 경험치 표시
+        const versionData = this.cache.json.get('version') as { commitHash: string };
+        const commitHash = versionData?.commitHash || 'Unknown';
+        this.add.text(50, 170, `Commit: ${commitHash}`, { fontSize: '16px', color: '#ffffff' });
         this.add.text(50, 200, `Level: ${this.resultData.level}`, { fontSize: '24px', color: '#ffffff' });
         this.add.text(50, 230, `Time: ${this.formatTime(this.resultData.time)}`, { fontSize: '24px', color: '#ffffff' });
         this.add.text(50, 260, `Experience: ${this.resultData.experience}`, { fontSize: '24px', color: '#ffffff' });
@@ -55,9 +59,9 @@ export default class GameResultScene extends Phaser.Scene {
         }
 
         // 파워업 표시
-        this.add.text(50, 290, 'Power-Ups:', { fontSize: '20px', color: '#ffffff' });
+        this.add.text(50, 320, 'Power-Ups:', { fontSize: '20px', color: '#ffffff' });
         this.resultData.powerUps.forEach((powerUp, index) => {
-            this.add.text(100, 320 + index * 25, `• ${powerUp}`, { fontSize: '16px', color: '#ffffff' });
+            this.add.text(100, 350 + index * 25, `• ${powerUp}`, { fontSize: '16px', color: '#ffffff' });
         });
 
         // 리트라이 버튼 추가
