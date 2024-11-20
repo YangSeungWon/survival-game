@@ -65,5 +65,13 @@ export default class PreloadScene extends Phaser.Scene {
                 this.scene.start('GameScene');
             });
         });
+
+        this.input.keyboard?.once('keydown', () => {
+            this.cameras.main.fadeOut(500, 0, 0, 0);
+
+            this.cameras.main.on('camerafadeoutcomplete', () => {
+                this.scene.start('GameScene');
+            });
+        });
     }
 }

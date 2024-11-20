@@ -19,9 +19,9 @@ export default class BeamShooterEnemy extends Enemy {
         const health: number = 200;        // 체력 설정
 
         // 공격 속성 정의
-        const attackSpeed: number = 2000;  // 빔 발사 속도
-        const attackPower: number = 20;    // 빔 공격력
-        const attackRange: number = 300;    // 빔 사거리
+        const attackSpeed: number = 1000;  // 빔 발사 속도
+        const attackPower: number = 40;    // 빔 공격력
+        const attackRange: number = 400;    // 빔 사거리
 
         const experiencePoint: number = 40; // 경험치
 
@@ -57,5 +57,9 @@ export default class BeamShooterEnemy extends Enemy {
     destroy() {
         this.beamAttack.destroy();
         super.destroy();
+    }
+
+    public getType(): string {
+        return BeamShooterEnemy.TYPE;
     }
 }

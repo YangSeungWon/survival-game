@@ -29,4 +29,8 @@ export default class RangedEnemy extends Enemy {
             new ProjectileAttack(scene, this, config.attackConfig as ProjectileAttackConfig)
         );
     }
+
+    public getType(): string {
+        return RangedEnemy.TYPE;
+    }
 }

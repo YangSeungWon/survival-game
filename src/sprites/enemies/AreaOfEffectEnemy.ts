@@ -36,4 +36,8 @@ export default class AreaOfEffectEnemy extends Enemy {
             )
         );
     }
+
+    public getType(): string {
+        return AreaOfEffectEnemy.TYPE;
+    }
 }

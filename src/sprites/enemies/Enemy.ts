@@ -18,12 +18,13 @@ export interface EnemyConfig {
 }
 
 export default class Enemy extends Character {
-    attackSpeed: number;
-    attackPower: number;
-    attackRange: number;
-    attackColor: number;
-    statusEffect: StatusEffect | null;
-    experiencePoint: number;
+    config: EnemyConfig;
+    attackSpeed?: number;
+    attackPower?: number;
+    attackRange?: number;
+    attackColor?: number;
+    statusEffect?: StatusEffect | null;
+    experiencePoint?: number;
     static readonly TYPE: string;
     static readonly FROM_LEVEL: number;
     static readonly TO_LEVEL: number;
@@ -33,6 +34,13 @@ export default class Enemy extends Character {
         const textureKey = `enemyTexture_${config.color}_${config.size}`;
         createEnemyTexture(scene, textureKey, config.color, config.size);
 
+        super(scene, -1000, -1000, textureKey, config.color, config.moveSpeed, config.health);
+        this.config = config;
+        this.active = false;
+        this.visible = false;
+    }
+
+    initPosition(scene: GameScene, config: EnemyConfig): void {
         const margin = 0; // Adjust this value as needed
         const minDistanceFromPlayer = 200; // Minimum distance from the player
 
@@ -47,8 +55,10 @@ export default class Enemy extends Character {
             } while (Phaser.Math.Distance.Between(x, y, scene.player!.x, scene.player!.y) < minDistanceFromPlayer);
         }
 
-        super(scene, x, y, textureKey, config.color, config.moveSpeed, config.health);
+        this.setPosition(x, y);
+    }
 
+    initAttack(scene: GameScene, config: EnemyConfig): void {
         this.attackSpeed = config.attackConfig.attackSpeed;
         this.attackPower = config.attackConfig.attackPower;
         this.attackRange = config.attackConfig.attackRange;
@@ -90,7 +100,7 @@ export default class Enemy extends Character {
         });
 
         const distance = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
-        if (distance <= this.attackRange) {
+        if (distance <= this.attackRange!) {
             this.attacks.forEach(attack => {
                 attack.performAttack();
             });
@@ -115,7 +125,7 @@ export default class Enemy extends Character {
 
     protected dropExperience(): void {
         if (this.scene.experiencePointPool) {
-            this.scene.experiencePointPool.spawnExperience(this.x, this.y, this.experiencePoint);
+            this.scene.experiencePointPool.spawnExperience(this.x, this.y, this.experiencePoint!);
         }
     }
 
@@ -132,5 +142,22 @@ export default class Enemy extends Character {
 
     destroy(fromScene?: boolean): void {
         super.destroy(fromScene);
+    }
+
+    /**
+     * Resets the enemy to its default state before being reused.
+     */
+    public reset(): void {
+        this.health = this.maxHealth;
+        this.statusEffects.clear();
+        this.initPosition(this.scene, this.config);
+        this.initAttack(this.scene, this.config);
+        this.active = true;
+        this.visible = true;
+    }
+
+
+    public getType(): string {
+        return "Enemy";
     }
 }

@@ -41,4 +41,8 @@ export default class PoisonWizard extends AreaOfEffectEnemy {
 
         super(scene, color, size, speed, health, config, experiencePoint);
     }
+
+    public getType(): string {
+        return PoisonWizard.TYPE;
+    }
 }

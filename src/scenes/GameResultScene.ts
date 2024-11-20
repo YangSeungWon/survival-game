@@ -162,10 +162,11 @@ export default class GameResultScene extends Phaser.Scene {
     }
 
     private formatTime(milliseconds: number): string {
-        const seconds = Math.floor(milliseconds / 1000);
+        const ms = Math.floor(milliseconds);
+        const seconds = Math.floor(ms / 1000);
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
-        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}:${ms < 100 ? ms < 10 ? '00' : '0' : ''}${ms % 1000}`;
     }
 
     /**

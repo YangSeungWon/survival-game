@@ -38,4 +38,8 @@ export default class GunEnemy extends RangedEnemy {
 
         super(scene, color, size, speed, health, config, experiencePoint);
     }
+
+    public getType(): string {
+        return GunEnemy.TYPE;
+    }
 }

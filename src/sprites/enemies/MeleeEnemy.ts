@@ -31,4 +31,8 @@ export default class MeleeEnemy extends Enemy {
             new MeleeAttack(scene, this, config.attackConfig as MeleeAttackConfig)
         );
     }
+
+    public getType(): string {
+        return MeleeEnemy.TYPE;
+    }
 }

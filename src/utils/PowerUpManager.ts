@@ -174,7 +174,7 @@ export default class PowerUpManager {
         const projectileAttackConfig: ProjectileAttackConfig & AttackConfig = {
             attackSpeed: 300,
             projectileSpeed: 300,
-            attackPower: 10,
+            attackPower: 20,
             attackRange: 2000,
             attackColor: 0xa6ffbc,
             projectileSize: 10,
@@ -186,7 +186,7 @@ export default class PowerUpManager {
 
     private applyMeleePowerUp(): void {
         const meleeAttackConfig: MeleeAttackConfig & AttackConfig = {
-            attackSpeed: 1000,
+            attackSpeed: 1500,
             attackPower: 1000,
             attackRange: 100,
             attackAngle: 90,
@@ -253,7 +253,7 @@ export default class PowerUpManager {
         const projectileAttackConfig: ProjectileAttackConfig = {
             attackSpeed: 200,
             projectileSpeed: 700,
-            attackPower: 5,
+            attackPower: 10,
             attackRange: 200,
             attackColor: 0xffff00,
             projectileSize: 7,
@@ -285,7 +285,7 @@ export default class PowerUpManager {
     private applyBeamPowerUp(): void {
         const beamAttackConfig: BeamAttackConfig = {
             attackRange: 400,
-            attackSpeed: 2000,
+            attackSpeed: 1000,
             attackPower: 20,
             attackColor: 0x00ffff,
             beamDuration: 500,

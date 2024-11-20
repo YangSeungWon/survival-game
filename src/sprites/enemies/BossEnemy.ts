@@ -57,7 +57,14 @@ export default class BossEnemy extends Enemy {
         createMissileTexture(this.scene, 'homingMissileTexture', 0x00ff00, 10, 10);
         createMissileTexture(this.scene, 'switchingMissileTexture', 0x00ff00, 10, 10);
         createMissileTexture(this.scene, 'spreadMissileTexture', 0x0000ff, 10, 10);
+    }
 
+    reset(): void {
+        super.reset();
+        this.setup();
+    }
+
+    setup(): void {
         // Initial shake effect when the boss appears
         this.scene.cameras.main.shake(500, 0.01);
 
@@ -73,9 +80,10 @@ export default class BossEnemy extends Enemy {
      */
     private phaseOneAttack(): void {
         const missileTexture = 'simpleMissileTexture';
-        const numberOfMissiles = 18;
-        const spreadAngle = Phaser.Math.DegToRad(20); // 10 degrees spread
+        const numberOfMissiles = 16;
+        const spreadAngle = Phaser.Math.DegToRad(22.5); // 10 degrees spread
 
+        if (!this.scene) return;
         const target = this.scene.player;
         if (!target) {
             return;
@@ -99,7 +107,7 @@ export default class BossEnemy extends Enemy {
 
             // Handle collision with player
             this.scene.physics.add.overlap(missile, this.scene.player!, (missileObj, playerObj) => {
-                const damage = 500;
+                const damage = 600;
                 (playerObj as Player).takeDamage(damage);
                 missileObj.destroy();
             });
@@ -118,7 +126,7 @@ export default class BossEnemy extends Enemy {
      */
     private phaseTwoAttack(): void {
         const missileTexture = 'switchingMissileTexture';
-        const numberOfMissiles = 4;
+        const numberOfMissiles = 3;
         const angleIncrement = Phaser.Math.DegToRad(360 / numberOfMissiles);
 
         for (let i = 0; i < numberOfMissiles; i++) {
@@ -138,7 +146,7 @@ export default class BossEnemy extends Enemy {
 
             // Handle collision with player
             this.scene.physics.add.overlap(missile, this.scene.player!, (missileObj, playerObj) => {
-                const damage = 500;
+                const damage = 700;
                 (playerObj as Player).takeDamage(damage);
                 missileObj.destroy();
             });
@@ -214,7 +222,7 @@ export default class BossEnemy extends Enemy {
 
                 // **Collision Handling**
                 this.scene.physics.add.overlap(missile, this.scene.player!, (missileObj, playerObj) => {
-                    const damage = 700;
+                    const damage = 800;
                     (playerObj as Player).takeDamage(damage);
                     missileObj.destroy();
                 });
@@ -300,5 +308,9 @@ export default class BossEnemy extends Enemy {
     takeDamage(amount: number): number {
         const cappedDamage = Math.min(amount, this.maxHealth / 500);
         return super.takeDamage(cappedDamage);
+    }
+
+    public getType(): string {
+        return BossEnemy.TYPE;
     }
 } 

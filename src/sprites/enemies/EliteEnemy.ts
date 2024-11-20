@@ -31,4 +31,8 @@ export default class EliteEnemy extends MeleeEnemy {
 
         super(scene, color, size, speed, health, config, experiencePoint);
     }
+
+    public getType(): string {
+        return EliteEnemy.TYPE;
+    }
 }

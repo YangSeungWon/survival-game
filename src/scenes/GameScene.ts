@@ -15,6 +15,7 @@ import DepthManager, { DepthLayer } from '../utils/DepthManager';
 import BossEnemy from '../sprites/enemies/BossEnemy';
 import { createEnemyTexture, createMissileTexture, createTrackingMissileTexture } from '../utils/TextureGenerator';
 import BeamShooterEnemy from '../sprites/enemies/BeamShooterEnemy';
+import EnemyPool from '../utils/EnemyPool';
 
 export default class GameScene extends Phaser.Scene {
     elapsedTimeMillis: number;
@@ -51,6 +52,7 @@ export default class GameScene extends Phaser.Scene {
     powerUpText: Phaser.GameObjects.Text | null;
     depthManager: DepthManager;
     boss: BossEnemy | null = null;
+    enemyPool: EnemyPool | null;
 
     hitSound: Phaser.Sound.BaseSound | null;
     hurtSound: Phaser.Sound.BaseSound | null;
@@ -99,6 +101,7 @@ export default class GameScene extends Phaser.Scene {
         this.bossHealthBar = null;
         this.powerUpText = null;
         this.depthManager = DepthManager.getInstance();
+        this.enemyPool = null;
 
         this.hitSound = null;
         this.hurtSound = null;
@@ -129,7 +132,6 @@ export default class GameScene extends Phaser.Scene {
         // Create Missile Textures
         createMissileTexture(this, 'missileTexture', 0x0000ff, 10, 20);
         createTrackingMissileTexture(this, 'trackingMissileTexture', 0xffa500, 15, 30);
-
     }
 
     create(): void {
@@ -141,6 +143,7 @@ export default class GameScene extends Phaser.Scene {
         this.pickupSound = this.sound.add('pickupSound', { volume: 0.2 });
 
         this.player = new Player(this);
+        this.enemyPool = new EnemyPool(this);
         this.player.setDepth(this.depthManager.getDepth(DepthLayer.PLAYER));
         this.projectilePool = new ProjectilePool(this);
         this.experiencePointPool = new ExperiencePointPool(this);
@@ -262,6 +265,7 @@ export default class GameScene extends Phaser.Scene {
     createEnemies() {
         if (this.isPaused || this.isPausedInGame || document.hidden) return;
 
+        console.log('createEnemies ' + this.enemies!.getChildren().length);
         const level = this.player!.level;
 
         if (level >= 15 && !this.boss) {
@@ -275,6 +279,7 @@ export default class GameScene extends Phaser.Scene {
 
             // 보스 스폰
             this.boss = new BossEnemy(this);
+            this.boss.reset();
             this.enemies!.add(this.boss);
             this.updateBossHealthRelatedUI();
             return;
@@ -290,9 +295,13 @@ export default class GameScene extends Phaser.Scene {
         if (availableEnemies.length === 0) return;
 
         const EnemyClass = Phaser.Math.RND.weightedPick(availableEnemies);
-        const enemy = new EnemyClass(this);
-        enemy.setDepth(this.depthManager.getDepth(DepthLayer.ENEMY));
-        this.enemies!.add(enemy);
+        const enemy = this.enemyPool!.getEnemy(EnemyClass.TYPE);
+        if (enemy) {
+            enemy.setDepth(this.depthManager.getDepth(DepthLayer.ENEMY));
+            this.enemies!.add(enemy);
+        } else {
+            console.error(`Enemy class ${EnemyClass.TYPE} not found.`);
+        }
     }
 
     /**
@@ -375,9 +384,10 @@ export default class GameScene extends Phaser.Scene {
         // Calculate minutes and seconds
         const minutes = Math.floor(this.elapsedTimeMillis / 60000);
         const seconds = Math.floor((this.elapsedTimeMillis % 60000) / 1000);
+        const ms = Math.floor(this.elapsedTimeMillis % 1000);
 
         // Update time text
-        this.timeText!.setText(`Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
+        this.timeText!.setText(`Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}:${ms < 100 ? ms < 10 ? '00' : '0' : ''}${ms}`);
 
         if (this.boss) {
             this.updateBossHealthRelatedUI();
@@ -473,8 +483,8 @@ export default class GameScene extends Phaser.Scene {
      * @param {number} newLevel - The new level of the player.
      */
     onPlayerLevelUp(newLevel: number) {
-        this.pauseGame();
         this.isPausedInGame = true;
+        this.pauseGame();
         this.powerUpManager!.showPowerUpSelection(newLevel);
 
         this.sound.play('powerUpSound');

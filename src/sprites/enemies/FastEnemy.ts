@@ -27,4 +27,8 @@ export default class FastEnemy extends MeleeEnemy {
 
         super(scene, color, size, speed, health, config, experiencePoint);
     }
+
+    public getType(): string {
+        return FastEnemy.TYPE;
+    }
 }

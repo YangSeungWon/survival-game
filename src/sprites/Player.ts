@@ -27,7 +27,7 @@ export default class Player extends Character {
         const x = Number(scene.game.config.width) / 2;
         const y = Number(scene.game.config.height) / 2;
 
-        super(scene as GameScene, x, y, 'playerTexture', color, 200, 5000); // moveSpeed: 200, health: 10000
+        super(scene as GameScene, x, y, 'playerTexture', color, 200, 5000); // moveSpeed: 200, health: 5000
 
         console.log('Player initialized with scene:', this.scene);
 
