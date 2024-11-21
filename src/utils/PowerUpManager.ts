@@ -90,15 +90,15 @@ export default class PowerUpManager {
             apply: (scene: GameScene, player: Player) => { applyAreaOfEffectPoisoningPowerUp(scene, player); }
         },
         {
-            name: 'Stun Projectile',
+            name: 'Stunning Projectile',
             color: 0xf6fa89,
-            description: 'Add a stun projectile.',
+            description: 'Add a stunning projectile.',
             apply: (scene: GameScene, player: Player) => { applyProjectileStunPowerUp(scene, player); }
         },
         {
-            name: 'One-shot Projectile',
+            name: 'One shot Projectile',
             color: 0xa9b5c9,
-            description: 'Add a one-shot projectile.',
+            description: 'Add a one shot projectile.',
             apply: (scene: GameScene, player: Player) => { applyOneShotProjectilePowerUp(scene, player); }
         },
         {
@@ -335,7 +335,7 @@ function applyAreaOfEffectPoisoningPowerUp(scene: GameScene, player: Player): vo
 }
 
 function applyProjectileStunPowerUp(scene: GameScene, player: Player): void {
-    const attackStat = PlayerAttackStats.find(stat => stat.name === 'Stun Projectile')!;
+    const attackStat = PlayerAttackStats.find(stat => stat.name === 'Stunning Projectile')!;
     const projectileAttackConfig: ProjectileAttackConfig = {
         attackSpeed: attackStat.attackSpeed!,
         projectileSpeed: attackStat.projectileSpeed!,
@@ -346,7 +346,7 @@ function applyProjectileStunPowerUp(scene: GameScene, player: Player): void {
         piercingCount: 0,
         statusEffect: {
             type: StatusEffectType.STUN,
-            duration: 500,
+            duration: attackStat.effectDuration!,
             id: 'stunProjectile' + Date.now(),
         }
     }   
@@ -355,7 +355,7 @@ function applyProjectileStunPowerUp(scene: GameScene, player: Player): void {
 }
 
 function applyOneShotProjectilePowerUp(scene: GameScene, player: Player): void {
-    const attackStat = PlayerAttackStats.find(stat => stat.name === 'One-shot Projectile')!;
+    const attackStat = PlayerAttackStats.find(stat => stat.name === 'One Shot Projectile')!;
     const projectileAttackConfig: ProjectileAttackConfig & AttackConfig = {
         attackSpeed: attackStat.attackSpeed!,
         projectileSpeed: attackStat.projectileSpeed!,

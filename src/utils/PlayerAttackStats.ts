@@ -31,7 +31,7 @@ export const PlayerAttackStats: PlayerAttackStat[] = [
         piercingCount: 0,
     },
     {
-        name: 'Piercing Attack',
+        name: 'Piercing Projectile',
         color: 0xa6ffbc,
         attackSpeed: 300,
         attackPower: 20,
@@ -77,6 +77,7 @@ export const PlayerAttackStats: PlayerAttackStat[] = [
         attackSpeed: 100,
         attackPower: 0,
         attackRange: 200,
+        effectRange: 200,
         effectDuration: 100,
         statusEffect: StatusEffectType.FREEZE,
     },
@@ -102,7 +103,7 @@ export const PlayerAttackStats: PlayerAttackStat[] = [
         piercingCount: 0,
     },
     {
-        name: 'Beam Attack',
+        name: 'Farthest Beam Attack',
         color: 0x00ffff,
         attackSpeed: 1000,
         attackPower: 20,
