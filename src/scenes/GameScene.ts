@@ -294,8 +294,11 @@ export default class GameScene extends Phaser.Scene {
     createEnemies() {
         if (this.isPaused || this.isPausedInGame || document.hidden) return;
 
-        console.log('createEnemies ' + this.enemies!.getChildren().length);
+        const countEnemies = this.enemies!.getChildren().length;
+        console.log('createEnemies ' + countEnemies);
         const level = this.player!.level;
+
+        if (countEnemies >= 1000) return;
 
         if (level >= 15 && !this.boss) {
             this.bossHealthBarBackground = this.add.graphics();
