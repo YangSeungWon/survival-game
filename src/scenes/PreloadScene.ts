@@ -73,5 +73,33 @@ export default class PreloadScene extends Phaser.Scene {
                 this.scene.start('GameScene');
             });
         });
+
+        // Add Enemy Stats Button
+        const statsButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 200, 'Enemy Stats', {
+            fontSize: '32px',
+            color: '#ffffff',
+            backgroundColor: '#0000ef',
+            padding: { x: 20, y: 10 },
+            fontFamily: '"Noto Sans", sans-serif'
+        })
+        .setOrigin(0.5)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                this.scene.start('EnemyStatsScene');
+            });
+
+        // Add Power Up Stats Button
+        const powerUpButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 270, 'Power Up Stats', {
+            fontSize: '32px',
+            color: '#ffffff',
+            backgroundColor: '#0000ef',
+            padding: { x: 20, y: 10 },
+            fontFamily: '"Noto Sans", sans-serif'
+        })
+        .setOrigin(0.5)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                this.scene.start('PowerUpAndAttackStatsScene');
+            });
     }
 }

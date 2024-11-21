@@ -3,6 +3,7 @@ import AreaOfEffectEnemy from './AreaOfEffectEnemy';
 import GameScene from '../../scenes/GameScene';
 import { AttackConfig, StatusEffectType } from '../../attacks/Attack';
 import { TargetedAreaOfEffectAttackConfig } from '../../attacks/TargetedAreaOfEffectAttack';
+import EnemyStats, { EnemyStat } from '../../utils/EnemyStats';
 
 export default class PoisonWizard extends AreaOfEffectEnemy {
     static readonly TYPE = 'PoisonWizard';
@@ -10,20 +11,22 @@ export default class PoisonWizard extends AreaOfEffectEnemy {
     static readonly TO_LEVEL = 14;
 
     constructor(scene: GameScene) {
-        const color: number = 0x00ff20;   // A poison-like color
-        const size: number = 10;          // Standard size
-        const speed: number = 110;         // Moderate speed
-        const health: number = 100;       // Moderate health
+        const enemyStat: EnemyStat = EnemyStats.find(stat => stat.type === PoisonWizard.TYPE)!;
+
+        const color: number = enemyStat.color;   // A poison-like color
+        const size: number = enemyStat.size;          // Standard size
+        const speed: number = enemyStat.speed;         // Moderate speed
+        const health: number = enemyStat.health;       // Moderate health
         
         // 공격 속성 정의
-        const attackSpeed: number = 3000;  // Moderate attack speed
-        const attackPower: number = 100;  // Moderate attack power
-        const attackRange: number = 200;   // Moderate attack range
+        const attackSpeed: number = enemyStat.attackSpeed;  // Moderate attack speed
+        const attackPower: number = enemyStat.attackPower;  // Moderate attack power
+        const attackRange: number = enemyStat.attackRange;   // Moderate attack range
 
-        const experiencePoint: number = 40; // Moderate experience points
+        const experiencePoint: number = enemyStat.experiencePoint; // Moderate experience points
 
-        const poisonDuration: number = 1500; // Duration of poison effect in milliseconds
-        const effectRange: number = 60; // Effect range
+        const poisonDuration: number = enemyStat.effectDuration!; // Duration of poison effect in milliseconds
+        const effectRange: number = enemyStat.effectRange!; // Effect range
 
         const config: TargetedAreaOfEffectAttackConfig = {
             attackSpeed: attackSpeed,
@@ -35,7 +38,7 @@ export default class PoisonWizard extends AreaOfEffectEnemy {
                 type: StatusEffectType.POISON,
                 id: 'poisonWizardPoison' + Date.now(),
                 duration: poisonDuration,
-                tickRate: 300
+                tickRate: enemyStat.effectTickRate!
             }
         };
 

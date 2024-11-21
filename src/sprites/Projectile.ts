@@ -7,6 +7,7 @@ import Player from './Player';
 import Enemy from './enemies/Enemy';
 import { StatusEffect } from '../attacks/Attack';
 import DepthManager, { DepthLayer } from '../utils/DepthManager';
+import { StatusEffectConfig } from '../utils/StatusEffectStats';
 
 export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     scene: GameScene;
@@ -198,7 +199,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     enterStatusEffect(effect: StatusEffect): void {
         switch (effect.type) {
             case 'freeze':
-                this.speedModifier *= 0.7;
+                this.speedModifier *= StatusEffectConfig.freeze.multiplierPercent / 100;
                 break;
         }
     }
@@ -210,7 +211,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     exitStatusEffect(effect: StatusEffect): void {
         switch (effect.type) {
             case 'freeze':
-                this.speedModifier /= 0.7;
+                this.speedModifier /= StatusEffectConfig.freeze.multiplierPercent / 100;
                 break;
         }
     }

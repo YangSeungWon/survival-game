@@ -2,6 +2,7 @@ import { AttackConfig } from '../../attacks/Attack';
 import { MeleeAttackConfig } from '../../attacks/MeleeAttack';
 import GameScene from '../../scenes/GameScene';
 import MeleeEnemy from './MeleeEnemy';
+import EnemyStats, { EnemyStat } from '../../utils/EnemyStats';
 
 export default class StrongEnemy extends MeleeEnemy {
     static readonly TYPE = 'StrongEnemy';
@@ -9,17 +10,19 @@ export default class StrongEnemy extends MeleeEnemy {
     static readonly TO_LEVEL = 7;
 
     constructor(scene: GameScene) {
-        const color: number = 0x0000ff;
-        const size: number = 18;
-        const speed: number = 140;
-        const health: number = 400;
+        const enemyStat: EnemyStat = EnemyStats.find(stat => stat.type === StrongEnemy.TYPE)!;
+
+        const color: number = enemyStat.color;
+        const size: number = enemyStat.size;
+        const speed: number = enemyStat.speed;
+        const health: number = enemyStat.health;
         
         // 공격 속성 정의
-        const attackSpeed: number = 1000; 
-        const attackPower: number = 500;  
-        const attackRange: number = 30;
-        const attackAngle: number = 40;
-        const experiencePoint: number = 10;
+        const attackSpeed: number = enemyStat.attackSpeed; 
+        const attackPower: number = enemyStat.attackPower;  
+        const attackRange: number = enemyStat.attackRange;
+        const attackAngle: number = enemyStat.attackAngle!;
+        const experiencePoint: number = enemyStat.experiencePoint;
 
         const config: AttackConfig & MeleeAttackConfig = {
             attackSpeed: attackSpeed,

@@ -3,6 +3,7 @@ import RangedEnemy from './RangedEnemy';
 import GameScene from '../../scenes/GameScene';
 import { ProjectileAttackConfig } from '../../attacks/ProjectileAttack';
 import { AttackConfig, StatusEffectType } from '../../attacks/Attack';
+import EnemyStats, { EnemyStat } from '../../utils/EnemyStats';
 
 export default class FireballWizard extends RangedEnemy {
     static readonly TYPE = 'FireballWizard';
@@ -10,22 +11,24 @@ export default class FireballWizard extends RangedEnemy {
     static readonly TO_LEVEL = 11;
 
     constructor(scene: GameScene) {
-        const color: number = 0xff5500;   // A fiery color
-        const size: number = 12;          // Slightly larger size
-        const speed: number = 90;         // Slower speed
-        const health: number = 150;       // Moderate health
+        const enemyStat: EnemyStat = EnemyStats.find(stat => stat.type === FireballWizard.TYPE)!;
+
+        const color: number = enemyStat.color;   // A fiery color
+        const size: number = enemyStat.size;          // Slightly larger size
+        const speed: number = enemyStat.speed;         // Slower speed
+        const health: number = enemyStat.health;       // Moderate health
         
         // 공격 속성 정의
-        const attackSpeed: number = 2000;  // Slower attack speed
-        const attackPower: number = 500;  // Higher attack power
-        const attackRange: number = 400;  // Longer attack range
+        const attackSpeed: number = enemyStat.attackSpeed;  // Slower attack speed
+        const attackPower: number = enemyStat.attackPower;  // Higher attack power
+        const attackRange: number = enemyStat.attackRange;  // Longer attack range
 
-        const experiencePoint: number = 40; // More experience points
+        const experiencePoint: number = enemyStat.experiencePoint; // More experience points
 
-        const projectileSpeed: number = 150; // Slower projectile speed
-        const projectileSize: number = 10;   // Larger projectile size
+        const projectileSpeed: number = enemyStat.projectileSpeed!; // Slower projectile speed
+        const projectileSize: number = enemyStat.projectileSize!;   // Larger projectile size
 
-        const burnDuration: number = 1000; // Duration of burn effect in milliseconds
+        const burnDuration: number = enemyStat.effectDuration!; // Duration of burn effect in milliseconds
 
         const config: AttackConfig & ProjectileAttackConfig = {
             attackSpeed: attackSpeed,

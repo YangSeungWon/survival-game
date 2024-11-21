@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import GameScene from '../scenes/GameScene';
 import Attack from '../attacks/Attack';
 import { StatusEffect } from '../attacks/Attack';
+import { StatusEffectConfig } from '../utils/StatusEffectStats';
 
 export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
     scene: GameScene;
@@ -84,7 +85,7 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
                 this.setTintFill(0xff0000);
                 break;
             case 'freeze':
-                this.moveSpeed *= 0.7;
+                this.moveSpeed *= StatusEffectConfig.freeze.multiplierPercent / 100;
                 this.setTintFill(0x00ffff);
                 this.addFreezeParticles();
                 break;
@@ -114,7 +115,7 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
                 this.removeBurnParticles();
                 break;
             case 'freeze':
-                this.moveSpeed /= 0.7;
+                this.moveSpeed /= StatusEffectConfig.freeze.multiplierPercent / 100;
                 this.removeFreezeParticles();
                 break;
             case 'poison':
@@ -167,16 +168,30 @@ export default abstract class Character extends Phaser.Physics.Arcade.Sprite {
     protected applyEffectLogic(effectType: string, delta: number): void {
         switch (effectType) {
             case 'burn':
-                const burnDamage = (this.maxHealth * 0.04);
-                this.takeDamage(burnDamage);
+                if (StatusEffectConfig.burn.healthFrom == 'max') {
+                    const burnDamage = (this.maxHealth * StatusEffectConfig.burn.damagePercent / 100);
+                    this.takeDamage(burnDamage);
+                } else if (StatusEffectConfig.burn.healthFrom == 'current') {
+                    const burnDamage = (this.health * StatusEffectConfig.burn.damagePercent / 100);
+                    this.takeDamage(burnDamage);
+                } else {
+                    console.warn(`Unknown healthFrom value: ${StatusEffectConfig.burn.healthFrom}`);
+                }
                 break;
 
             case 'freeze':
                 break;
 
             case 'poison':
-                const poisonDamage = (this.health * 0.08);
-                this.takeDamage(poisonDamage);
+                if (StatusEffectConfig.poison.healthFrom == 'max') {
+                    const poisonDamage = (this.maxHealth * StatusEffectConfig.poison.damagePercent / 100);
+                    this.takeDamage(poisonDamage);
+                } else if (StatusEffectConfig.poison.healthFrom == 'current') {
+                    const poisonDamage = (this.health * StatusEffectConfig.poison.damagePercent / 100);
+                    this.takeDamage(poisonDamage);
+                } else {
+                    console.warn(`Unknown healthFrom value: ${StatusEffectConfig.poison.healthFrom}`);
+                }
                 break;
 
             case 'stun':

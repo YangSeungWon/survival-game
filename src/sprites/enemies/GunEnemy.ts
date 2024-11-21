@@ -3,6 +3,7 @@ import RangedEnemy from './RangedEnemy';
 import GameScene from '../../scenes/GameScene';
 import { AttackConfig } from '../../attacks/Attack';
 import { ProjectileAttackConfig } from '../../attacks/ProjectileAttack';
+import EnemyStats, { EnemyStat } from '../../utils/EnemyStats';
 
 export default class GunEnemy extends RangedEnemy {
     static readonly TYPE = 'GunEnemy';
@@ -10,20 +11,22 @@ export default class GunEnemy extends RangedEnemy {
     static readonly TO_LEVEL = 8;
 
     constructor(scene: GameScene) {
-        const color: number = 0xaaaaff;   
-        const size: number = 10;
-        const speed: number = 120;
-        const health: number = 100;
+        const enemyStat: EnemyStat = EnemyStats.find(stat => stat.type === GunEnemy.TYPE)!;
+
+        const color: number = enemyStat.color;   
+        const size: number = enemyStat.size;
+        const speed: number = enemyStat.speed;
+        const health: number = enemyStat.health;
         
         // 공격 속성 정의
-        const attackSpeed: number = 500; 
-        const attackPower: number = 200;
-        const attackRange: number = 200;
+        const attackSpeed: number = enemyStat.attackSpeed; 
+        const attackPower: number = enemyStat.attackPower;
+        const attackRange: number = enemyStat.attackRange;
 
-        const experiencePoint: number = 10;
+        const experiencePoint: number = enemyStat.experiencePoint;
 
-        const projectileSpeed: number = 300;    
-        const projectileSize: number = 5;   
+        const projectileSpeed: number = enemyStat.projectileSpeed!;    
+        const projectileSize: number = enemyStat.projectileSize!;   
         
 
         const config: AttackConfig & ProjectileAttackConfig = {

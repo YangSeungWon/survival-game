@@ -10,12 +10,13 @@ import { MeleeAttackConfig } from '../attacks/MeleeAttack';
 import { AreaOfEffectAttackConfig } from '../attacks/AreaOfEffectAttack';
 import DepthManager, { DepthLayer } from './DepthManager';
 import BeamAttack, { BeamAttackConfig } from '../attacks/BeamAttack';
+import { PlayerAttackStats } from './PlayerAttackStats';
 
-interface PowerUp {
+export interface PowerUp {
     name: string;
     color: number;
     description: string;
-    apply: () => void;
+    apply: (scene: GameScene, player: Player) => void;
 }
 
 export default class PowerUpManager {
@@ -25,12 +26,100 @@ export default class PowerUpManager {
     private powerUpBackground?: Phaser.GameObjects.Rectangle;
     private depthManager: DepthManager;
     selectedPowerUps: string[];
+
+    // Centralized list of power-ups
+    private static readonly powerUps: PowerUp[] = [
+        {
+            name: 'Health Boost',
+            color: 0xff6136,
+            description: 'Increase health restoration by 500.',
+            apply: (scene: GameScene, player: Player) => { player.heartRestore += 500; }
+        },
+        {
+            name: 'Move Speed',
+            color: 0x91ffe4,
+            description: 'Increase movement speed by 50.',
+            apply: (scene: GameScene, player: Player) => { player.moveSpeed += 50; }
+        },
+        {
+            name: 'Life Steal',
+            color: 0xcc569f,
+            description: 'Gain 5% of damage dealt as health.',
+            apply: (scene: GameScene, player: Player) => { player.percentLifeSteal += 5; }
+        },
+        {
+            name: 'Defense Boost',
+            color: 0xb1fa75,
+            description: 'Increase defense by 100.',
+            apply: (scene: GameScene, player: Player) => { player.defense += 100; }
+        },
+        {
+            name: 'Critical Hit Chance',
+            color: 0xbea6ff,
+            description: 'Increase critical hit chance by 20%.',
+            apply: (scene: GameScene, player: Player) => { player.percentCritChance += 20; }
+        },
+        {
+            name: 'Piercing Projectile',
+            color: 0xa6ffbc,
+            description: 'Add a piercing projectile.',
+            apply: (scene: GameScene, player: Player) => { applyProjectilePowerUp(scene, player); }
+        },
+        {
+            name: 'Melee Attack',
+            color: 0xff87e5,
+            description: 'Add a melee attack.',
+            apply: (scene: GameScene, player: Player) => { applyMeleePowerUp(scene, player); }
+        },
+        {
+            name: 'Burning AoE',
+            color: 0xfcb16a,
+            description: 'Add a burning circle.',
+            apply: (scene: GameScene, player: Player) => { applyAreaOfEffectBurningPowerUp(scene, player); }
+        },
+        {
+            name: 'Freezing AoE',
+            color: 0xa7f1f2,
+            description: 'Add a freezing circle.',
+            apply: (scene: GameScene, player: Player) => { applyAreaOfEffectFreezingPowerUp(scene, player); }
+        },
+        {
+            name: 'Poisoning AoE',
+            color: 0x67a865,
+            description: 'Add a poisoning circle.',
+            apply: (scene: GameScene, player: Player) => { applyAreaOfEffectPoisoningPowerUp(scene, player); }
+        },
+        {
+            name: 'Stun Projectile',
+            color: 0xf6fa89,
+            description: 'Add a stun projectile.',
+            apply: (scene: GameScene, player: Player) => { applyProjectileStunPowerUp(scene, player); }
+        },
+        {
+            name: 'One-shot Projectile',
+            color: 0xa9b5c9,
+            description: 'Add a one-shot projectile.',
+            apply: (scene: GameScene, player: Player) => { applyOneShotProjectilePowerUp(scene, player); }
+        },
+        {
+            name: 'Farthest Beam Attack',
+            color: 0x00ffff,
+            description: 'Shoot a beam at the farthest enemy within range.',
+            apply: (scene: GameScene, player: Player) => { applyBeamPowerUp(scene, player); }
+        }
+    ];
+
     constructor(scene: GameScene, player: Player) {
         this.scene = scene;
         this.player = player;
         this.keyboardListeners = [];
         this.depthManager = DepthManager.getInstance();
         this.selectedPowerUps = [];
+    }
+
+    // Getter to expose the list of power-ups
+    public static getPowerUps(): PowerUp[] {
+        return this.powerUps;
     }
 
     showPowerUpSelection(level: number): void {
@@ -50,22 +139,8 @@ export default class PowerUpManager {
           .setDepth(this.depthManager.getDepth(DepthLayer.UI));
         title.setData('powerUp', true);
 
-        const allPowerUps: PowerUp[] = [
-            { name: 'Health Boost', color: 0xff6136, description: 'Increase health restoration by 500.', apply: () => { this.player.heartRestore += 500 } },
-            { name: 'Move Speed', color: 0x91ffe4, description: 'Increase movement speed by 50.', apply: () => { this.player.moveSpeed += 50 } },
-            { name: 'Life Steal', color: 0xcc569f, description: 'Gain 5% of damage dealt as health.', apply: () => { this.player.percentLifeSteal += 5 } },
-            { name: 'Defense Boost', color: 0xb1fa75, description: 'Increase defense by 100.', apply: () => { this.player.defense += 100 } },
-            { name: 'Critical Hit Chance', color: 0xbea6ff, description: 'Increase critical hit chance by 20%.', apply: () => { this.player.percentCritChance += 20 } },
-            { name: 'Piercing Projectile', color: 0xa6ffbc, description: 'Add a piercing projectile.', apply: () => { this.applyProjectilePowerUp() } },
-            { name: 'Melee Attack', color: 0xff87e5, description: 'Add a melee attack.', apply: () => { this.applyMeleePowerUp() } },
-            { name: 'Burning AoE', color: 0xfcb16a, description: 'Add a burning circle.', apply: () => { this.applyAreaOfEffectBurningPowerUp() } },
-            { name: 'Freezing AoE', color: 0xa7f1f2, description: 'Add a freezing circle.', apply: () => { this.applyAreaOfEffectFreezingPowerUp() } },
-            { name: 'Poisoning AoE', color: 0x67a865, description: 'Add a poisoning circle.', apply: () => { this.applyAreaOfEffectPoisoningPowerUp() } },
-            { name: 'Stun Projectile', color: 0xf6fa89, description: 'Add a stun projectile.', apply: () => { this.applyProjectileStunPowerUp() } },
-            { name: 'One-shot Projectile', color: 0xa9b5c9, description: 'Add a one-shot projectile.', apply: () => { this.applyOneShotProjectilePowerUp() } },
-            { name: 'Farthest Beam Attack', color: 0x00ffff, description: 'Shoot a beam at the farthest enemy within range.', apply: () => { this.applyBeamPowerUp() } }
-        ];
-
+        const allPowerUps: PowerUp[] = [...PowerUpManager.powerUps];
+        
         Phaser.Utils.Array.Shuffle(allPowerUps);
         const selectedPowerUps = allPowerUps.slice(0, 3);
 
@@ -106,14 +181,14 @@ export default class PowerUpManager {
             descriptionText.setData('powerUp', true);
 
             button.on('pointerdown', () => {
-                powerUp.apply();
+                powerUp.apply(this.scene, this.player);
                 this.selectedPowerUps.push(powerUp.name);
                 this.closePowerUpSelection();
             });
 
             const listener = (event: KeyboardEvent) => {
                 if (event.key === `${index + 1}`) {
-                    powerUp.apply();
+                    powerUp.apply(this.scene, this.player);
                     this.selectedPowerUps.push(powerUp.name);
                     this.closePowerUpSelection();
                 }
@@ -170,128 +245,140 @@ export default class PowerUpManager {
         (this.scene as GameScene).isPausedInGame = false;
     }
 
-    private applyProjectilePowerUp(): void {
-        const projectileAttackConfig: ProjectileAttackConfig & AttackConfig = {
-            attackSpeed: 300,
-            projectileSpeed: 300,
-            attackPower: 20,
-            attackRange: 2000,
-            attackColor: 0xa6ffbc,
-            projectileSize: 10,
-            piercingCount: 30
-        };
-        const newProjectileAttack = new ProjectileAttack(this.scene, this.player, projectileAttackConfig);
-        this.player.addAttack(newProjectileAttack);
-    }
+}
 
-    private applyMeleePowerUp(): void {
-        const meleeAttackConfig: MeleeAttackConfig & AttackConfig = {
-            attackSpeed: 1500,
-            attackPower: 1000,
-            attackRange: 100,
-            attackAngle: 90,
-            attackColor: 0xff87e5
-        };
-        const newMeleeAttack = new MeleeAttack(this.scene, this.player, meleeAttackConfig);
-        this.player.addAttack(newMeleeAttack);
-    }
 
-    private applyAreaOfEffectBurningPowerUp(): void {
-        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig = {
-            attackSpeed: 100,
-            attackPower: 0,
-            attackRange: 130,
-            effectRange: 130,
-            statusEffect: {
-                type: 'burn' as StatusEffectType,
-                id: 'burningAoE' + Date.now(),
-                duration: 500,
-                tickRate: 200
-            },
-            attackColor: 0xff0000
+
+// Example implementations of apply methods
+function applyProjectilePowerUp(scene: GameScene, player: Player): void {
+    const attackStat = PlayerAttackStats.find(stat => stat.name === 'Piercing Projectile')!;
+    const projectileAttackConfig: ProjectileAttackConfig & AttackConfig = {
+        attackSpeed: attackStat.attackSpeed!,
+        projectileSpeed: attackStat.projectileSpeed!,
+        attackPower: attackStat.attackPower,
+        attackRange: attackStat.attackRange,
+        attackColor: attackStat.color,
+        projectileSize: attackStat.projectileSize!,
+        piercingCount: attackStat.piercingCount!
+    };
+    const newProjectileAttack = new ProjectileAttack(scene, player, projectileAttackConfig);
+    player.addAttack(newProjectileAttack);
+}
+
+function applyMeleePowerUp(scene: GameScene, player: Player): void {
+    const attackStat = PlayerAttackStats.find(stat => stat.name === 'Melee Attack')!;
+    const meleeAttackConfig: MeleeAttackConfig & AttackConfig = {
+        attackSpeed: attackStat.attackSpeed!,
+        attackPower: attackStat.attackPower!,
+        attackRange: attackStat.attackRange!,
+        attackAngle: attackStat.attackAngle!,
+        attackColor: attackStat.color
+    };
+    const newMeleeAttack = new MeleeAttack(scene, player, meleeAttackConfig);
+    player.addAttack(newMeleeAttack);
+}
+
+function applyAreaOfEffectBurningPowerUp(scene: GameScene, player: Player): void {
+    const attackStat = PlayerAttackStats.find(stat => stat.name === 'Burning AoE')!;
+    const areaOfEffectAttackConfig: AreaOfEffectAttackConfig = {
+        attackSpeed: attackStat.attackSpeed!,
+        attackPower: 0,
+        attackRange: attackStat.attackRange!,
+        effectRange: attackStat.effectRange!,
+        statusEffect: {
+            type: StatusEffectType.BURN,
+            id: 'burningAoE' + Date.now(),
+            duration: attackStat.effectDuration!,
+            tickRate: attackStat.effectTickRate!
+        },
+        attackColor: attackStat.color
+    }
+    const newAreaOfEffectAttack = new AreaOfEffectAttack(scene, player, areaOfEffectAttackConfig);
+    player.addAttack(newAreaOfEffectAttack);
+}
+
+function applyAreaOfEffectFreezingPowerUp(scene: GameScene, player: Player): void {
+    const attackStat = PlayerAttackStats.find(stat => stat.name === 'Freezing AoE')!;
+    const areaOfEffectAttackConfig: AreaOfEffectAttackConfig = {
+        attackSpeed: attackStat.attackSpeed!,
+        attackPower: attackStat.attackPower!,
+        attackRange: attackStat.attackRange!,
+        effectRange: attackStat.effectRange!,
+        statusEffect: {
+            type: StatusEffectType.FREEZE,
+            duration: attackStat.effectDuration!,
+            id: 'freezingAoE' + Date.now(),
+        },
+        attackColor: attackStat.color
+    }
+    const newAreaOfEffectAttack = new AreaOfEffectAttack(scene, player, areaOfEffectAttackConfig);
+    player.addAttack(newAreaOfEffectAttack);
+}
+
+function applyAreaOfEffectPoisoningPowerUp(scene: GameScene, player: Player): void {
+    const attackStat = PlayerAttackStats.find(stat => stat.name === 'Poisoning AoE')!;
+    const areaOfEffectAttackConfig: AreaOfEffectAttackConfig = {
+        attackSpeed: attackStat.attackSpeed!,
+        attackPower: attackStat.attackPower!,
+        attackRange: attackStat.attackRange!,
+        effectRange: attackStat.effectRange!,
+        statusEffect: {
+            type: StatusEffectType.POISON,
+            duration: attackStat.effectDuration!,
+            tickRate: attackStat.effectTickRate!,
+            id: 'poisoningAoE' + Date.now(),
+        },
+        attackColor: attackStat.color
+    }
+    const newAreaOfEffectAttack = new AreaOfEffectAttack(scene, player, areaOfEffectAttackConfig);
+    player.addAttack(newAreaOfEffectAttack);
+}
+
+function applyProjectileStunPowerUp(scene: GameScene, player: Player): void {
+    const attackStat = PlayerAttackStats.find(stat => stat.name === 'Stun Projectile')!;
+    const projectileAttackConfig: ProjectileAttackConfig = {
+        attackSpeed: attackStat.attackSpeed!,
+        projectileSpeed: attackStat.projectileSpeed!,
+        attackPower: attackStat.attackPower!,
+        attackRange: attackStat.attackRange!,
+        attackColor: attackStat.color,
+        projectileSize: attackStat.projectileSize!,
+        piercingCount: 0,
+        statusEffect: {
+            type: StatusEffectType.STUN,
+            duration: 500,
+            id: 'stunProjectile' + Date.now(),
         }
-        const newAreaOfEffectAttack = new AreaOfEffectAttack(this.scene, this.player, areaOfEffectAttackConfig);
-        this.player.addAttack(newAreaOfEffectAttack);
-    }
+    }   
+    const newProjectileAttack = new ProjectileAttack(scene, player, projectileAttackConfig);
+    player.addAttack(newProjectileAttack);
+}
 
-    private applyAreaOfEffectFreezingPowerUp(): void {
-        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig = {
-            attackSpeed: 100,
-            attackPower: 0,
-            attackRange: 200,
-            effectRange: 200,
-            statusEffect: {
-                type: 'freeze' as StatusEffectType,
-                duration: 100,
-                id: 'freezingAoE' + Date.now(),
-            },
-            attackColor: 0x0000ff
-        }
-        const newAreaOfEffectAttack = new AreaOfEffectAttack(this.scene, this.player, areaOfEffectAttackConfig);
-        this.player.addAttack(newAreaOfEffectAttack);
-    }
+function applyOneShotProjectilePowerUp(scene: GameScene, player: Player): void {
+    const attackStat = PlayerAttackStats.find(stat => stat.name === 'One-shot Projectile')!;
+    const projectileAttackConfig: ProjectileAttackConfig & AttackConfig = {
+        attackSpeed: attackStat.attackSpeed!,
+        projectileSpeed: attackStat.projectileSpeed!,
+        attackPower: attackStat.attackPower!,
+        attackRange: attackStat.attackRange!,
+        attackColor: attackStat.color,
+        projectileSize: attackStat.projectileSize!,
+        piercingCount: attackStat.piercingCount!,
+    };
+    const newProjectileAttack = new ProjectileAttack(scene, player, projectileAttackConfig);
+    player.addAttack(newProjectileAttack);
+}
 
-    private applyAreaOfEffectPoisoningPowerUp(): void {
-        const areaOfEffectAttackConfig: AreaOfEffectAttackConfig = {
-            attackSpeed: 100,
-            attackPower: 0,
-            attackRange: 130,
-            effectRange: 130,
-            statusEffect: {
-                type: 'poison' as StatusEffectType,
-                duration: 500,
-                tickRate: 200,
-                id: 'poisoningAoE' + Date.now(),
-            },
-            attackColor: 0x00ff00
-        }
-        const newAreaOfEffectAttack = new AreaOfEffectAttack(this.scene, this.player, areaOfEffectAttackConfig);
-        this.player.addAttack(newAreaOfEffectAttack);
-    }
-
-    private applyProjectileStunPowerUp(): void {
-        const projectileAttackConfig: ProjectileAttackConfig = {
-            attackSpeed: 200,
-            projectileSpeed: 700,
-            attackPower: 10,
-            attackRange: 200,
-            attackColor: 0xffff00,
-            projectileSize: 7,
-            piercingCount: 0,
-            statusEffect: {
-                type: 'stun' as StatusEffectType,
-                duration: 500,
-                id: 'stunProjectile' + Date.now(),
-            }
-        }   
-        const newProjectileAttack = new ProjectileAttack(this.scene, this.player, projectileAttackConfig);
-        this.player.addAttack(newProjectileAttack);
-    }
-
-    private applyOneShotProjectilePowerUp(): void {
-        const projectileAttackConfig: ProjectileAttackConfig & AttackConfig = {
-            attackSpeed: 500,
-            projectileSpeed: 300,
-            attackPower: 1000,
-            attackRange: 150,
-            attackColor: 0xa9b5c9,
-            projectileSize: 10,
-            piercingCount: 0,
-        };
-        const newProjectileAttack = new ProjectileAttack(this.scene, this.player, projectileAttackConfig);
-        this.player.addAttack(newProjectileAttack);
-    }
-
-    private applyBeamPowerUp(): void {
-        const beamAttackConfig: BeamAttackConfig = {
-            attackRange: 400,
-            attackSpeed: 1000,
-            attackPower: 20,
-            attackColor: 0x00ffff,
-            beamDuration: 500,
-            beamWidth: 7
-        };
-        const newBeamAttack = new BeamAttack(this.scene, this.player, beamAttackConfig);
-        this.player.addAttack(newBeamAttack);
-    }
+function applyBeamPowerUp(scene: GameScene, player: Player): void {
+    const attackStat = PlayerAttackStats.find(stat => stat.name === 'Farthest Beam Attack')!;
+    const beamAttackConfig: BeamAttackConfig = {
+        attackRange: attackStat.attackRange!,
+        attackSpeed: attackStat.attackSpeed!,
+        attackPower: attackStat.attackPower!,
+        attackColor: attackStat.color,
+        beamDuration: attackStat.beamDuration!,
+        beamWidth: attackStat.beamWidth!
+    };
+    const newBeamAttack = new BeamAttack(scene, player, beamAttackConfig);
+    player.addAttack(newBeamAttack);
 }

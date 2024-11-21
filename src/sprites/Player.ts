@@ -5,6 +5,7 @@ import { moveObject } from '../utils/MovementUtils';
 import GameScene from '../scenes/GameScene';
 import Enemy from './enemies/Enemy';
 import Character from './Character';
+import { PlayerAttackStats } from '../utils/PlayerAttackStats';
 
 export default class Player extends Character {
     percentLifeSteal: number;
@@ -70,15 +71,15 @@ export default class Player extends Character {
     }
 
     initDefaultAttacks() {
-        // Example: Initialize a default projectile attack
+        const attackStat = PlayerAttackStats.find(stat => stat.name === 'Default Attack')!;
         const projectileAttackConfig = {
-            attackSpeed: 200,
-            projectileSpeed: 400,
-            attackPower: 50,
-            attackColor: 0xffffff,
-            projectileSize: 4,
-            attackRange: 500,
-            piercingCount: 0,
+            attackSpeed: attackStat.attackSpeed!,
+            projectileSpeed: attackStat.projectileSpeed!,
+            attackPower: attackStat.attackPower!,
+            attackColor: attackStat.color,
+            projectileSize: attackStat.projectileSize!,
+            attackRange: attackStat.attackRange!,
+            piercingCount: attackStat.piercingCount!,
         };
         const projectileAttack = new ProjectileAttack(this.scene, this, projectileAttackConfig);
         this.addAttack(projectileAttack);

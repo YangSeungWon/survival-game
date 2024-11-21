@@ -3,6 +3,8 @@ import PreloadScene from './scenes/PreloadScene';
 import GameScene from './scenes/GameScene';
 import GameOverScene from './scenes/GameResultScene';
 import { Types } from 'phaser';
+import EnemyStatsScene from './scenes/EnemyStatsScene';
+import PowerUpAndAttackStatsScene from './scenes/PowerUpStatsScene';
 
 const config: Types.Core.GameConfig = {
     type: Phaser.AUTO,  
@@ -19,7 +21,7 @@ const config: Types.Core.GameConfig = {
             debug: window.location.hostname === 'localhost'
         }
     },
-    scene: [PreloadScene, GameScene, GameOverScene]
+    scene: [PreloadScene, GameScene, GameOverScene, EnemyStatsScene, PowerUpAndAttackStatsScene]
 };
 
 const game = new Phaser.Game(config);
