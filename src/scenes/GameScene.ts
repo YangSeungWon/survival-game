@@ -248,7 +248,7 @@ export default class GameScene extends Phaser.Scene {
         this.events.on('playerLevelUp', this.onPlayerLevelUp, this);
 
         // Check if the device is a mobile device
-        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+        const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         if (isMobile && this.plugins.get('rexvirtualjoystick')) {
             // Add Virtual Joystick for mobile devices
             this.joystick = (this.plugins.get('rexvirtualjoystick') as any).add(this, {
