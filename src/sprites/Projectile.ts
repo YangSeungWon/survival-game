@@ -23,6 +23,8 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     statusEffects: Map<string, StatusEffect> = new Map();
     private startX: number = 0; // Starting X position
     private startY: number = 0; // Starting Y position
+    private enemyOverlapCollider?: Phaser.Physics.Arcade.Collider;
+    private playerOverlapCollider?: Phaser.Physics.Arcade.Collider;
 
     constructor(scene: GameScene, x: number, y: number) {
         super(scene, x, y, 'projectileTexture');
@@ -86,11 +88,21 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
         
         this.statusEffect = statusEffect;
 
-        const handleCollision = this.handleCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback;
+        // Remove existing colliders if they exist
+        if (this.enemyOverlapCollider) {
+            this.scene.physics.world.removeCollider(this.enemyOverlapCollider);
+            this.enemyOverlapCollider = undefined;
+        }
+        if (this.playerOverlapCollider) {
+            this.scene.physics.world.removeCollider(this.playerOverlapCollider);
+            this.playerOverlapCollider = undefined;
+        }
+
+        const handleCollision = this.handleCollision.bind(this) as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback;
         if (owner instanceof Player) {
-            this.scene.physics.add.overlap(this, this.scene.enemies!, handleCollision, null as any, this);
+            this.enemyOverlapCollider = this.scene.physics.add.overlap(this, this.scene.enemies!, handleCollision, undefined, this);
         } else if (owner instanceof Enemy) {
-            this.scene.physics.add.overlap(this, this.scene.player!, handleCollision, null as any, this);
+            this.playerOverlapCollider = this.scene.physics.add.overlap(this, this.scene.player!, handleCollision, undefined, this);
         } else {
             alert('Projectile: Invalid target');
         }
@@ -126,6 +138,14 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
                     if (projectileSprite.piercingCount <= 0) {
                         projectileSprite.setActive(false);
                         projectileSprite.setVisible(false);
+                        if (this.enemyOverlapCollider) {
+                            this.scene.physics.world.removeCollider(this.enemyOverlapCollider);
+                            this.enemyOverlapCollider = undefined;
+                        }
+                        if (this.playerOverlapCollider) {
+                            this.scene.physics.world.removeCollider(this.playerOverlapCollider);
+                            this.playerOverlapCollider = undefined;
+                        }
                     }
 
                     projectileSprite.piercingCount--;

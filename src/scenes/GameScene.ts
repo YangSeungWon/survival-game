@@ -298,8 +298,6 @@ export default class GameScene extends Phaser.Scene {
         console.log('createEnemies ' + countEnemies);
         const level = this.player!.level;
 
-        if (countEnemies >= 1000) return;
-
         if (level >= 15 && !this.boss) {
             this.bossHealthBarBackground = this.add.graphics();
             this.bossHealthBarBackground.fillStyle(0x888888, 1); // Grey color for background
