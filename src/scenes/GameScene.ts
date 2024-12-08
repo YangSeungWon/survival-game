@@ -567,10 +567,10 @@ export default class GameScene extends Phaser.Scene {
         this.isPausedInGame = true;
         this.pauseGame();
         this.powerUpManager!.showPowerUpSelection(newLevel);
+        
+        this.powerUpSound?.play();
 
-        this.sound.play('powerUpSound');
-
-        // 맵에 ��는 모든 경험치 오브젝트 제거
+        // 맵에 는 모든 경험치 오브젝트 제거
         this.experiencePointPool!.clear();
         
         // 플레이어 레벨에 따라 적 스폰 간격 조정
