@@ -115,13 +115,39 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload(): void {
-        // load sound
-        this.load.audio('hitSound', 'assets/sounds/Hit.ogg');
-        this.load.audio('hurtSound', 'assets/sounds/Hurt.ogg');
-        this.load.audio('shootSound', 'assets/sounds/Shoot.ogg');
-        this.load.audio('powerUpSound', 'assets/sounds/Powerup.ogg');
-        this.load.audio('coinSound', 'assets/sounds/Coin.ogg');
-        this.load.audio('pickupSound', 'assets/sounds/Pickup.ogg');
+        const audioFiles = [
+            { key: 'hitSound', path: 'assets/sounds/Hit.ogg' },
+            { key: 'hurtSound', path: 'assets/sounds/Hurt.ogg' },
+            { key: 'shootSound', path: 'assets/sounds/Shoot.ogg' },
+            { key: 'powerUpSound', path: 'assets/sounds/Powerup.ogg' },
+            { key: 'coinSound', path: 'assets/sounds/Coin.ogg' },
+            { key: 'pickupSound', path: 'assets/sounds/Pickup.ogg' }
+        ];
+
+        // Create a valid silent audio buffer as fallback (WAV format)
+        const silentAudio = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+
+        // Load each audio file with error handling
+        audioFiles.forEach(audio => {
+            // First try to load the main audio file
+            this.load.audio(audio.key, audio.path);
+            
+            // Add specific error handler for each audio file
+            this.load.once(`filecomplete-audio-${audio.key}`, () => {
+                console.log(`Successfully loaded audio: ${audio.key}`);
+            });
+            
+            this.load.once(`loaderror-audio-${audio.key}`, () => {
+                console.warn(`Failed to load audio: ${audio.key}, loading fallback`);
+                // If main file fails, try loading the fallback
+                this.load.audio(audio.key, silentAudio);
+            });
+        });
+
+        // Global error handler as final fallback
+        this.load.on('loaderror', (fileObj: any) => {
+            console.warn(`Global loader error for: ${fileObj.key}`);
+        });
 
         this.load.script('rexvirtualjoystick', 'https://cdn.jsdelivr.net/npm/phaser3-rex-plugins/dist/rexvirtualjoystickplugin.min.js');
         this.load.once('complete', () => {
@@ -140,12 +166,37 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create(): void {
-        this.hitSound = this.sound.add('hitSound', { volume: 0.1 });
-        this.hurtSound = this.sound.add('hurtSound', { volume: 0.3 });
-        this.shootSound = this.sound.add('shootSound', { volume: 0.1 });
-        this.powerUpSound = this.sound.add('powerUpSound', { volume: 0.25 });
-        this.coinSound = this.sound.add('coinSound', { volume: 0.25 });
-        this.pickupSound = this.sound.add('pickupSound', { volume: 0.2 });
+        // Improved audio creation with better error handling
+        const createAudio = (key: string, volume: number): Phaser.Sound.BaseSound | null => {
+            try {
+                if (!this.cache.audio.exists(key)) {
+                    console.warn(`Audio key "${key}" not found in cache`);
+                    return null;
+                }
+                
+                const sound = this.sound.add(key, { 
+                    volume,
+                    loop: false
+                });
+                
+                // Add error handler for actual playback
+                sound.on('loaderror', () => {
+                    console.warn(`Error loading audio: ${key}`);
+                });
+                
+                return sound;
+            } catch (error) {
+                console.warn(`Failed to create audio for ${key}:`, error);
+                return null;
+            }
+        };
+
+        this.hitSound = createAudio('hitSound', 0.1);
+        this.hurtSound = createAudio('hurtSound', 0.3);
+        this.shootSound = createAudio('shootSound', 0.1);
+        this.powerUpSound = createAudio('powerUpSound', 0.25);
+        this.coinSound = createAudio('coinSound', 0.25);
+        this.pickupSound = createAudio('pickupSound', 0.2);
 
         this.player = new Player(this);
         this.enemyPool = new EnemyPool(this);
@@ -519,7 +570,7 @@ export default class GameScene extends Phaser.Scene {
 
         this.sound.play('powerUpSound');
 
-        // 맵에 있는 모든 경험치 오브젝트 제거
+        // 맵에 ��는 모든 경험치 오브젝트 제거
         this.experiencePointPool!.clear();
         
         // 플레이어 레벨에 따라 적 스폰 간격 조정
