@@ -116,12 +116,12 @@ export default class GameScene extends Phaser.Scene {
 
     preload(): void {
         // load sound
-        this.load.audio('hitSound', 'assets/sounds/Hit.wav');
-        this.load.audio('hurtSound', 'assets/sounds/Hurt.wav');
-        this.load.audio('shootSound', 'assets/sounds/Shoot.wav');
-        this.load.audio('powerUpSound', 'assets/sounds/Powerup.wav');
-        this.load.audio('coinSound', 'assets/sounds/Coin.wav');
-        this.load.audio('pickupSound', 'assets/sounds/Pickup.wav');
+        this.load.audio('hitSound', 'assets/sounds/Hit.ogg');
+        this.load.audio('hurtSound', 'assets/sounds/Hurt.ogg');
+        this.load.audio('shootSound', 'assets/sounds/Shoot.ogg');
+        this.load.audio('powerUpSound', 'assets/sounds/Powerup.ogg');
+        this.load.audio('coinSound', 'assets/sounds/Coin.ogg');
+        this.load.audio('pickupSound', 'assets/sounds/Pickup.ogg');
 
         this.load.script('rexvirtualjoystick', 'https://cdn.jsdelivr.net/npm/phaser3-rex-plugins/dist/rexvirtualjoystickplugin.min.js');
         this.load.once('complete', () => {
