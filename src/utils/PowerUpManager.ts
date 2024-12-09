@@ -186,25 +186,16 @@ export default class PowerUpManager {
                 this.closePowerUpSelection();
             });
 
-            const listener = (event: KeyboardEvent) => {
-                if (event.key === `${index + 1}`) {
-                    powerUp.apply(this.scene, this.player);
-                    this.selectedPowerUps.push(powerUp.name);
-                    this.closePowerUpSelection();
-                }
-            };
-            if (this.scene.input.keyboard) {
-                this.scene.input.keyboard.on('keydown', listener);
-                this.keyboardListeners.push(listener);
-            }
-        });
-        const cancelPowerUpListener = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
+            this.registerKeyboardListener(`${index + 1}`, () => {
+                powerUp.apply(this.scene, this.player);
+                this.selectedPowerUps.push(powerUp.name);
                 this.closePowerUpSelection();
-            }
-        }
-        this.scene.input.keyboard?.on('keydown', cancelPowerUpListener);
-        this.keyboardListeners.push(cancelPowerUpListener);
+            });
+        });
+
+        this.registerKeyboardListener("Escape", () => {
+            this.closePowerUpSelection();
+        })
 
         const cancelY = centerY + 200;
         const cancelButton = this.scene.add.rectangle(
@@ -229,6 +220,19 @@ export default class PowerUpManager {
         cancelButton.on('pointerdown', () => {
             this.closePowerUpSelection();
         });
+    }
+
+    private registerKeyboardListener(key: string, callback: () => void): void {
+        const listener = (event: KeyboardEvent) => {
+            if (event.key === key) {
+                callback();
+            }
+        };
+
+        if (this.scene.input.keyboard) {
+            this.scene.input.keyboard!.on('keydown', listener);
+            this.keyboardListeners.push(listener);
+        }
     }
 
     private closePowerUpSelection(): void {
