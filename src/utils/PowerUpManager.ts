@@ -198,6 +198,13 @@ export default class PowerUpManager {
                 this.keyboardListeners.push(listener);
             }
         });
+        const cancelPowerUpListener = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                this.closePowerUpSelection();
+            }
+        }
+        this.scene.input.keyboard?.on('keydown', cancelPowerUpListener);
+        this.keyboardListeners.push(cancelPowerUpListener);
 
         const cancelY = centerY + 200;
         const cancelButton = this.scene.add.rectangle(
