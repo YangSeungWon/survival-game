@@ -77,6 +77,40 @@
       "player": "ysw",
       "date": "2024-11-28",
       "note": "commit e5c7683 · played 2024-11-28 12:41"
+    },
+    {
+      "time": 2296993,
+      "level": 16,
+      "powerUps": [
+        "Move Speed",
+        "Life Steal",
+        "Critical Hit Chance",
+        "Life Steal",
+        "Life Steal",
+        "Move Speed",
+        "Defense Boost",
+        "Life Steal",
+        "Critical Hit Chance",
+        "Critical Hit Chance",
+        "Critical Hit Chance",
+        "Critical Hit Chance",
+        "Life Steal",
+        "Defense Boost",
+        "Defense Boost"
+      ],
+      "stats": {
+        "maxHealth": 5000,
+        "moveSpeed": 300,
+        "lifeSteal": 25,
+        "defense": 300,
+        "critChance": 100,
+        "attacks": [
+          "ProjectileAttack P50 S200 R500"
+        ]
+      },
+      "player": "ysw",
+      "date": "2024-11-28",
+      "note": "commit e5c7683 · played 2024-11-28 23:31 · no attack power-ups (crit-only build)"
     }
   ]
 }
