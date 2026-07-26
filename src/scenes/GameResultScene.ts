@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import GameScene from './GameScene';
 import share from '../utils/share';
+import copyToClipboard from '../utils/copyToClipboard';
+import { RecordEntry, RecordStats } from '../utils/records';
 
 interface GameResultData {
     level: number;
@@ -10,6 +12,7 @@ interface GameResultData {
     experience: number;
     isSuccess: boolean;
     powerUps: string[];
+    stats: RecordStats;
     screenshot: string;
 }
 
@@ -101,6 +104,58 @@ export default class GameResultScene extends Phaser.Scene {
         this.retryButton.setY(this.cameras.main.height - 100);
         this.shareButton.setY(this.cameras.main.height - 160);
         downloadScreenshotButton.setY(this.cameras.main.height - 220);
+
+        // 기록 보관소 버튼 (항상 표시) → 정적 HTML 리더보드 페이지로 이동
+        this.add.text(this.cameras.main.width - 20, 20, '🏆 Records', {
+            fontSize: '24px',
+            color: '#ffd700',
+            backgroundColor: '#000000',
+            padding: { x: 12, y: 6 },
+        })
+            .setOrigin(1, 0)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => { window.location.href = 'records.html'; });
+
+        // 승리한 경우에만: records.json 에 붙여넣을 기록 항목을 클립보드로 복사
+        if (this.resultData.isSuccess) {
+            this.add.text(this.cameras.main.width - 20, 70, '📋 Copy Record', {
+                fontSize: '24px',
+                color: '#00ff00',
+                backgroundColor: '#000000',
+                padding: { x: 12, y: 6 },
+            })
+                .setOrigin(1, 0)
+                .setInteractive({ useHandCursor: true })
+                .on('pointerdown', () => this.copyRecordEntry());
+        }
+    }
+
+    /**
+     * Copies the current (winning) run as a JSON entry ready to paste into the
+     * "records" array of records.json.
+     */
+    private async copyRecordEntry() {
+        const versionData = this.cache.json.get('version') as { commitHash: string } | undefined;
+        const entry: RecordEntry = {
+            time: Math.floor(this.resultData.time),
+            level: this.resultData.level,
+            powerUps: this.resultData.powerUps,
+            stats: this.resultData.stats,
+            commit: versionData?.commitHash || '',
+            player: '',
+            date: new Date().toISOString().slice(0, 10),
+            note: '',
+        };
+        const json = JSON.stringify(entry, null, 2);
+        const copied = await copyToClipboard(json);
+        this.showCopySuccessMessage(
+            copied ? 'Record JSON copied — paste into records.json' : 'Failed to copy record.',
+            !copied
+        );
+    }
+
+    private truncate(text: string, max: number): string {
+        return text.length > max ? text.slice(0, max - 1) + '…' : text;
     }
 
     update(time: number, delta: number) {

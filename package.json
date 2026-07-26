@@ -10,6 +10,9 @@
     "webpack-dev-server": "^5.1.0"
   },
   "scripts": {
+    "build:pages": "node scripts/build-records.js && node scripts/build-howto.js",
+    "prebuild": "npm run build:pages",
+    "prestart": "npm run build:pages",
     "build": "webpack --config webpack.config.js && node createCNAME.js",
     "start": "webpack serve --open",
     "watch": "webpack --watch"
