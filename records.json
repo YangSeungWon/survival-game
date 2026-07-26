@@ -38,6 +38,45 @@
       "player": "ysw",
       "date": "2024-11-26",
       "note": "commit e5c7683 · played 2024-11-26 20:46"
+    },
+    {
+      "time": 300931,
+      "level": 15,
+      "powerUps": [
+        "Piercing Projectile",
+        "Critical Hit Chance",
+        "Move Speed",
+        "One shot Projectile",
+        "Life Steal",
+        "One shot Projectile",
+        "Critical Hit Chance",
+        "Health Boost",
+        "Defense Boost",
+        "Piercing Projectile",
+        "Defense Boost",
+        "One shot Projectile",
+        "Stunning Projectile",
+        "Critical Hit Chance"
+      ],
+      "stats": {
+        "maxHealth": 5000,
+        "moveSpeed": 250,
+        "lifeSteal": 5,
+        "defense": 200,
+        "critChance": 60,
+        "attacks": [
+          "ProjectileAttack P50 S200 R500",
+          "ProjectileAttack P20 S300 R2000",
+          "ProjectileAttack P1000 S500 R150",
+          "ProjectileAttack P1000 S500 R150",
+          "ProjectileAttack P20 S300 R2000",
+          "ProjectileAttack P1000 S500 R150",
+          "ProjectileAttack P10 S200 R200"
+        ]
+      },
+      "player": "ysw",
+      "date": "2024-11-28",
+      "note": "commit e5c7683 · played 2024-11-28 12:41"
     }
   ]
 }
