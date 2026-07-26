@@ -74,8 +74,9 @@ export default class PreloadScene extends Phaser.Scene {
             });
         });
 
-        // Add Enemy Stats Button
-        const statsButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 200, 'Enemy Stats', {
+        // Add How to Play Button — static HTML guide (howto.html), which now
+        // covers the enemy and power-up/attack reference too.
+        const howToButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 200, '📖 How to Play', {
             fontSize: '32px',
             color: '#ffffff',
             backgroundColor: '#0000ef',
@@ -85,25 +86,11 @@ export default class PreloadScene extends Phaser.Scene {
         .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                this.scene.start('EnemyStatsScene');
-            });
-
-        // Add Power Up Stats Button
-        const powerUpButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 270, 'Power Up Stats', {
-            fontSize: '32px',
-            color: '#ffffff',
-            backgroundColor: '#0000ef',
-            padding: { x: 20, y: 10 },
-            fontFamily: '"Noto Sans", sans-serif'
-        })
-        .setOrigin(0.5)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => {
-                this.scene.start('PowerUpAndAttackStatsScene');
+                window.location.href = 'howto.html';
             });
 
         // Add Records (leaderboard) Button — a static HTML page (records.html)
-        const recordsButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 340, '🏆 Records', {
+        const recordsButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 270, '🏆 Records', {
             fontSize: '32px',
             color: '#000000',
             backgroundColor: '#ffd700',

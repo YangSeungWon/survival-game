@@ -41,9 +41,11 @@ scripts/run.bat
 scripts/**/*.js
 scripts/**/*.js.map
 !scripts/build-records.js
+!scripts/build-howto.js
 
-# Generated from records.json at build time (npm prebuild/prestart)
+# Generated from game data at build time (npm prebuild/prestart)
 records.html
+howto.html
 coverage/
 internal/
 **/.DS_Store
