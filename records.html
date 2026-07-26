@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Survival Game 리더보드 · Leaderboard | 클리어 기록 보관소</title>
+<meta name="description" content="Survival Game(뱀파이어 서바이벌류 로그라이크) 클리어 기록 리더보드입니다. 현재 9개 기록, 플레이어 5명(KS, stf, star, boo, dh). 밸런스 버전별로 최단 클리어 시간과 빌드를 비교하세요. Clear-time leaderboard for a browser vampire-survivors-style roguelike — fastest clears, builds, and screenshots per balance version.">
+<link rel="canonical" href="https://survival.game.ysw.kr/records.html">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Survival Game 리더보드 · Leaderboard">
+<meta property="og:description" content="Survival Game 클리어 기록 보관소 — 밸런스 버전별 최단 클리어 시간·빌드·스크린샷.">
+<meta property="og:url" content="https://survival.game.ysw.kr/records.html">
+<meta property="og:image" content="https://survival.game.ysw.kr/assets/start.webp">
+<link rel="icon" type="image/png" href="assets/player.png">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0a0a0a; color: #eee;
+    font-family: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.5; }
+  a { color: #66ccff; }
+  header.top { padding: 24px 20px 8px; text-align: center; }
+  header.top h1 { margin: 0 0 6px; font-size: clamp(24px, 5vw, 40px); color: #ffd700; }
+  header.top p.intro { max-width: 760px; margin: 8px auto 0; color: #bbb; font-size: 14px; }
+  .nav { text-align: center; margin: 14px 0 4px; }
+  .nav a { display: inline-block; padding: 8px 16px; background: #1a1a1a; border-radius: 8px;
+    text-decoration: none; font-weight: 600; }
+  .controls { text-align: center; margin: 18px 0 6px; }
+  .controls button { font: inherit; cursor: pointer; padding: 8px 16px; margin: 0 4px;
+    border: 1px solid #333; border-radius: 999px; background: #222; color: #ddd; }
+  .controls button[aria-pressed="true"] { background: #ffd700; color: #000; border-color: #ffd700; font-weight: 700; }
+  main { max-width: 1100px; margin: 0 auto; padding: 0 16px 60px; }
+  section.balance { margin: 28px 0; }
+  section.balance h2 { color: #66ccff; border-bottom: 2px solid #223; padding-bottom: 6px; font-size: 20px; }
+  section.balance h2 .count { color: #888; font-weight: 400; font-size: 15px; }
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table.board { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 720px; }
+  table.board th, table.board td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #1c1c1c; white-space: nowrap; }
+  table.board th { color: #999; font-weight: 600; position: sticky; top: 0; background: #0a0a0a; }
+  table.board td.cond { white-space: normal; min-width: 260px; color: #cfcfcf; font-size: 13px; }
+  table.board tbody tr:first-child { color: #ffd700; }
+  td.time { font-variant-numeric: tabular-nums; font-weight: 700; }
+  td.commit { color: #8aa; font-family: ui-monospace, monospace; font-size: 12px; }
+  td.date { color: #888; font-size: 12px; }
+  img.thumb { height: 40px; width: 64px; object-fit: cover; border-radius: 4px; border: 1px solid #333; display: block; }
+  .thumb-btn { padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .noshot { color: #555; }
+  #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.94); display: none;
+    align-items: center; justify-content: center; z-index: 50; cursor: zoom-out; padding: 20px; }
+  #lightbox.open { display: flex; }
+  #lightbox img { max-width: 96vw; max-height: 92vh; border-radius: 6px; }
+  footer { text-align: center; color: #666; font-size: 12px; padding: 24px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>🏆 Survival Game · Leaderboard</h1>
+  <p class="intro">Survival Game(뱀파이어 서바이벌류 로그라이크) 클리어 기록 리더보드입니다. 현재 9개 기록, 플레이어 5명(KS, stf, star, boo, dh). 밸런스 버전별로 최단 클리어 시간과 빌드를 비교하세요. Clear-time leaderboard for a browser vampire-survivors-style roguelike — fastest clears, builds, and screenshots per balance version.</p>
+  <div class="nav"><a href="./">← 게임으로 / Play</a></div>
+</header>
+
+<div class="controls" role="group" aria-label="정렬 기준">
+  <button id="cat-fastest" aria-pressed="true">⏱ 최단 클리어 · Fastest</button>
+  <button id="cat-longest" aria-pressed="false">🐢 최장 생존 · Longest</button>
+</div>
+
+<main>
+<section class="balance">
+    <h2>Balance v1 <span class="count">· 9 clears</span></h2>
+    <div class="table-wrap">
+      <table class="board">
+        <thead><tr>
+          <th>#</th><th>Time</th><th>Player</th><th>Lv</th><th>Build</th><th>Cond.</th><th>Date</th><th>📷</th>
+        </tr></thead>
+        <tbody>
+<tr data-time="175433">
+      <td class="rank"></td>
+      <td class="time">2:55.433</td>
+      <td class="player">KS</td>
+      <td class="lvl">L15</td>
+      <td class="commit" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</td>
+      <td class="cond">HP 5000, Speed 200, LifeSteal 10%, Def 400, Crit 20%, Attacks: ProjectileAttack P50 S200 R500 / ProjectileAttack P1000 S500 R150 / AreaOfEffectAttack P0 S100 R130 / AreaOfEffectAttack P0 S100 R130 / AreaOfEffectAttack P0 S100 R130 / AreaOfEffectAttack P0 S100 R130 / AreaOfEffectAttack P0 S100 R130</td>
+      <td class="date">2024-12-05</td>
+      <td class="shot"><button class="thumb-btn" data-full="assets/records/e5c7683-KS-175433.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-175433.png" alt="KS 기록 스크린샷"></button></td>
+    </tr>
+<tr data-time="176547">
+      <td class="rank"></td>
+      <td class="time">2:56.547</td>
+      <td class="player">KS</td>
+      <td class="lvl">L15</td>
+      <td class="commit" title="d1a2a255f204b1092a2c01de4baaaa5d1f7e006a">@d1a2a25</td>
+      <td class="cond">HP 5000, Speed 200, LifeSteal 10%, Def 400, Crit 0%, Attacks: ProjectileAttack P50 S200 R500 / ProjectileAttack P1000 S500 R150 / ProjectileAttack P1000 S500 R150 / AreaOfEffectAttack P0 S100 R130 / AreaOfEffectAttack P0 S100 R130 / MeleeAttack P1000 S1500 R100</td>
+      <td class="date">2025-04-04</td>
+      <td class="shot"><button class="thumb-btn" data-full="assets/records/d1a2a25-KS-176547.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/d1a2a25-KS-176547.png" alt="KS 기록 스크린샷"></button></td>
+    </tr>
+<tr data-time="177646">
+      <td class="rank"></td>
+      <td class="time">2:57.646</td>
+      <td class="player">KS</td>
+      <td class="lvl">L15</td>
+      <td class="commit" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</td>
+      <td class="cond">Melee Attack, One shot Projectile, Burning AoE, Defense Boost, Burning AoE, Poisoning AoE, Health Boost, Defense Boost, Move Speed, Defense Boost, Poisoning AoE, Life Steal, Life Steal, Critical Hit Chance</td>
+      <td class="date">2024-11-26</td>
+      <td class="shot"><button class="thumb-btn" data-full="assets/records/e5c7683-KS-177646.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-177646.png" alt="KS 기록 스크린샷"></button></td>
+    </tr>
+<tr data-time="244979">
+      <td class="rank"></td>
+      <td class="time">4:04.979</td>
+      <td class="player">dh</td>
+      <td class="lvl">L15</td>
+      <td class="commit" title="d1a2a255f204b1092a2c01de4baaaa5d1f7e006a">@d1a2a25</td>
+      <td class="cond">HP 5000, Speed 250, LifeSteal 20%, Def 100, Crit 20%, Attacks: ProjectileAttack P50 S200 R500 / AreaOfEffectAttack P0 S100 R130 / ProjectileAttack P1000 S500 R150 / AreaOfEffectAttack P0 S100 R130 / AreaOfEffectAttack P0 S100 R130 / AreaOfEffectAttack P0 S100 R130 / AreaOfEffectAttack P0 S100 R130</td>
+      <td class="date">2025-07-08</td>
+      <td class="shot"><button class="thumb-btn" data-full="assets/records/d1a2a25-dh-244979.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/d1a2a25-dh-244979.png" alt="dh 기록 스크린샷"></button></td>
+    </tr>
+<tr data-time="300931">
+      <td class="rank"></td>
+      <td class="time">5:00.931</td>
+      <td class="player">KS</td>
+      <td class="lvl">L15</td>
+      <td class="commit" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</td>
+      <td class="cond">Piercing Projectile, Critical Hit Chance, Move Speed, One shot Projectile, Life Steal, One shot Projectile, Critical Hit Chance, Health Boost, Defense Boost, Piercing Projectile, Defense Boost, One shot Projectile, Stunning Projectile, Critical Hit Chance</td>
+      <td class="date">2024-11-28</td>
+      <td class="shot"><button class="thumb-btn" data-full="assets/records/e5c7683-KS-300931.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-300931.png" alt="KS 기록 스크린샷"></button></td>
+    </tr>
+<tr data-time="315402">
+      <td class="rank"></td>
+      <td class="time">5:15.402</td>
+      <td class="player">star</td>
+      <td class="lvl">L15</td>
+      <td class="commit" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</td>
+      <td class="cond">One shot Projectile, Critical Hit Chance, Freezing AoE, Poisoning AoE, Farthest Beam Attack, Defense Boost, Critical Hit Chance, Piercing Projectile, Stunning Projectile, Critical Hit Chance, Critical Hit Chance, Health Boost, Burning AoE, Defense Boost</td>
+      <td class="date">2024-11-27</td>
+      <td class="shot"><button class="thumb-btn" data-full="assets/records/e5c7683-star-315402.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-star-315402.png" alt="star 기록 스크린샷"></button></td>
+    </tr>
+<tr data-time="358253">
+      <td class="rank"></td>
+      <td class="time">5:58.253</td>
+      <td class="player">stf</td>
+      <td class="lvl">L15</td>
+      <td class="commit" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</td>
+      <td class="cond">Piercing Projectile, Freezing AoE, One shot Projectile, Farthest Beam Attack, One shot Projectile, Piercing Projectile, Stunning Projectile, Critical Hit Chance, Move Speed, Life Steal, Piercing Projectile, Defense Boost, Farthest Beam Attack</td>
+      <td class="date">2024-11-27</td>
+      <td class="shot"><button class="thumb-btn" data-full="assets/records/e5c7683-stf-358253.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-stf-358253.png" alt="stf 기록 스크린샷"></button></td>
+    </tr>
+<tr data-time="377701">
+      <td class="rank"></td>
+      <td class="time">6:17.701</td>
+      <td class="player">boo</td>
+      <td class="lvl">L15</td>
+      <td class="commit" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</td>
+      <td class="cond">Piercing Projectile, Stunning Projectile, Life Steal, Piercing Projectile, Piercing Projectile, Piercing Projectile, Defense Boost, Life Steal, One shot Projectile, Defense Boost, Critical Hit Chance, Life Steal, Piercing Projectile, Critical Hit Chance</td>
+      <td class="date">2024-11-28</td>
+      <td class="shot"><button class="thumb-btn" data-full="assets/records/e5c7683-boo-377701.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-boo-377701.png" alt="boo 기록 스크린샷"></button></td>
+    </tr>
+<tr data-time="2296993">
+      <td class="rank"></td>
+      <td class="time">38:16.993</td>
+      <td class="player">KS</td>
+      <td class="lvl">L16</td>
+      <td class="commit" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</td>
+      <td class="cond">Move Speed, Life Steal, Critical Hit Chance, Life Steal, Life Steal, Move Speed, Defense Boost, Life Steal, Critical Hit Chance, Critical Hit Chance, Critical Hit Chance, Critical Hit Chance, Life Steal, Defense Boost, Defense Boost</td>
+      <td class="date">2024-11-28</td>
+      <td class="shot"><button class="thumb-btn" data-full="assets/records/e5c7683-KS-2296993.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-2296993.png" alt="KS 기록 스크린샷"></button></td>
+    </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<div id="lightbox" aria-hidden="true"><img alt="record screenshot"></div>
+
+<footer>records.json 에서 자동 생성됨 · 밸런스 버전별로만 비교 유효</footer>
+
+<script>
+(function () {
+  // Rank numbering + category toggle (re-sort rows within each table by data-time).
+  var order = 'fastest';
+  function renumber() {
+    document.querySelectorAll('table.board tbody').forEach(function (tb) {
+      var rows = Array.prototype.slice.call(tb.querySelectorAll('tr'));
+      rows.sort(function (a, b) {
+        var d = (+a.dataset.time) - (+b.dataset.time);
+        return order === 'longest' ? -d : d;
+      });
+      rows.forEach(function (r, i) {
+        tb.appendChild(r);
+        var medals = ['🥇', '🥈', '🥉'];
+        r.querySelector('.rank').textContent = medals[i] || ('#' + (i + 1));
+        r.style.color = i === 0 ? '#ffd700' : '';
+      });
+    });
+  }
+  function setCat(c) {
+    order = c;
+    document.getElementById('cat-fastest').setAttribute('aria-pressed', c === 'fastest');
+    document.getElementById('cat-longest').setAttribute('aria-pressed', c === 'longest');
+    renumber();
+  }
+  document.getElementById('cat-fastest').addEventListener('click', function () { setCat('fastest'); });
+  document.getElementById('cat-longest').addEventListener('click', function () { setCat('longest'); });
+  renumber();
+
+  // Screenshot lightbox
+  var lb = document.getElementById('lightbox');
+  var lbImg = lb.querySelector('img');
+  document.querySelectorAll('.thumb-btn').forEach(function (b) {
+    b.addEventListener('click', function () { lbImg.src = b.dataset.full; lb.classList.add('open'); });
+  });
+  lb.addEventListener('click', function () { lb.classList.remove('open'); lbImg.src = ''; });
+})();
+</script>
+</body>
+</html>
