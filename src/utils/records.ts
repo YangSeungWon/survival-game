@@ -79,3 +79,43 @@ export function formatCondition(entry: RecordEntry): string {
 export function sortRecords(records: RecordEntry[]): RecordEntry[] {
     return [...records].sort((a, b) => a.time - b.time);
 }
+
+/**
+ * Leaderboard categories. Records are only comparable within the same commit,
+ * so both categories are applied per commit group.
+ * - `fastest`: shortest clear time (speedrun).
+ * - `longest`: longest survival before clearing (endurance) — same wins, reversed.
+ */
+export type RecordCategory = 'fastest' | 'longest';
+
+/** Sorts a record list according to the given category, returning a new array. */
+export function sortByCategory(records: RecordEntry[], category: RecordCategory): RecordEntry[] {
+    const dir = category === 'longest' ? -1 : 1;
+    return [...records].sort((a, b) => (a.time - b.time) * dir);
+}
+
+export interface RecordGroup {
+    commit: string;
+    records: RecordEntry[];
+}
+
+/** Latest (max) play date in a record list, as a sortable YYYY-MM-DD string. */
+function latestDate(records: RecordEntry[]): string {
+    return records.reduce((max, r) => (r.date && r.date > max ? r.date : max), '');
+}
+
+/**
+ * Groups records by commit hash. Groups are ordered by their most recent play
+ * date (newest balance version first) so the current meta sits on top.
+ */
+export function groupByCommit(records: RecordEntry[]): RecordGroup[] {
+    const map = new Map<string, RecordEntry[]>();
+    for (const record of records) {
+        const key = record.commit || 'unknown';
+        if (!map.has(key)) map.set(key, []);
+        map.get(key)!.push(record);
+    }
+    return [...map.entries()]
+        .map(([commit, records]) => ({ commit, records }))
+        .sort((a, b) => latestDate(b.records).localeCompare(latestDate(a.records)));
+}

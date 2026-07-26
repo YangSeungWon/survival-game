@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import GameScene from './GameScene';
 import share from '../utils/share';
 import copyToClipboard from '../utils/copyToClipboard';
-import { RecordEntry, RecordStats, RecordsFile, formatRecordTime, formatCondition, sortRecords, shortCommit } from '../utils/records';
+import { RecordEntry, RecordStats, RecordsFile, RecordCategory, formatRecordTime, formatCondition, sortByCategory, groupByCommit, shortCommit } from '../utils/records';
 
 interface GameResultData {
     level: number;
@@ -23,6 +23,7 @@ export default class GameResultScene extends Phaser.Scene {
     private retryButton!: Phaser.GameObjects.Text;
     private shareButton!: Phaser.GameObjects.Text;
     private recordsPanel: Phaser.GameObjects.GameObject[] = [];
+    private recordsCategory: RecordCategory = 'fastest';
 
     constructor() {
         super({ key: 'GameResultScene' });
@@ -135,62 +136,85 @@ export default class GameResultScene extends Phaser.Scene {
     }
 
     /**
-     * Opens the record archive overlay: wins sorted fastest-first, showing each
-     * run's clear time and its condition (power-up build, or final stats).
+     * Opens the record archive overlay. Records are grouped by commit (balance
+     * version) since times are only comparable within the same commit, and each
+     * group is ranked by the active category (fastest clear / longest survival).
+     * Each row shows the rank, time, player, and condition.
      */
     private openRecords() {
         this.closeRecords();
         const cam = this.cameras.main;
         const depth = 1000;
 
-        const overlay = this.add.rectangle(cam.centerX, cam.centerY, cam.width, cam.height, 0x000000, 0.88)
+        const overlay = this.add.rectangle(cam.centerX, cam.centerY, cam.width, cam.height, 0x000000, 0.9)
             .setDepth(depth)
             .setInteractive();
         this.recordsPanel.push(overlay);
 
-        const title = this.add.text(cam.centerX, 30, '🏆 기록 보관소 · Fastest Clears', {
-            fontSize: '28px',
+        const isFastest = this.recordsCategory === 'fastest';
+        const title = this.add.text(cam.centerX, 24, '🏆 기록 보관소 · Leaderboard', {
+            fontSize: '26px',
             color: '#ffd700',
         }).setOrigin(0.5, 0).setDepth(depth + 1);
         this.recordsPanel.push(title);
 
-        const data = this.cache.json.get('records') as RecordsFile | undefined;
-        const records = sortRecords(data?.records ?? []);
+        // Category toggle: fastest clear vs longest survival
+        this.addCategoryButton('⏱ 최단 클리어', 'fastest', cam.centerX - 130, 64, depth);
+        this.addCategoryButton('🐢 최장 생존', 'longest', cam.centerX + 20, 64, depth);
 
-        if (records.length === 0) {
+        const data = this.cache.json.get('records') as RecordsFile | undefined;
+        const allRecords = data?.records ?? [];
+
+        if (allRecords.length === 0) {
             const empty = this.add.text(
                 cam.centerX,
-                cam.centerY - 40,
+                cam.centerY,
                 '아직 기록이 없습니다.\n승리 후 [📋 Copy Record]로 JSON을 복사해\nrecords.json 의 "records" 배열에 추가하고 커밋하세요.',
                 { fontSize: '18px', color: '#ffffff', align: 'center' }
             ).setOrigin(0.5).setDepth(depth + 1);
             this.recordsPanel.push(empty);
         } else {
-            const maxRows = 14;
-            const startY = 90;
-            const rowHeight = 30;
-            records.slice(0, maxRows).forEach((record, index) => {
-                const condition = this.truncate(formatCondition(record), 72);
-                const commit = shortCommit(record.commit);
-                const commitTag = commit ? ` @${commit}` : '';
-                const line = `#${index + 1}  ⏱ ${formatRecordTime(record.time)}${commitTag}   ${condition}`;
-                const row = this.add.text(30, startY + index * rowHeight, line, {
-                    fontSize: '15px',
-                    color: index === 0 ? '#ffd700' : '#ffffff',
-                }).setDepth(depth + 1);
-                this.recordsPanel.push(row);
-            });
+            const groups = groupByCommit(allRecords);
+            const lineHeight = 24;
+            const maxRowsPerGroup = 10;
+            let y = 108;
 
-            if (records.length > maxRows) {
-                const more = this.add.text(30, startY + maxRows * rowHeight, `… +${records.length - maxRows} more`, {
-                    fontSize: '14px',
-                    color: '#aaaaaa',
+            groups.forEach(group => {
+                const header = this.add.text(24, y, `▓ @${shortCommit(group.commit)} · ${group.records.length} clears`, {
+                    fontSize: '17px',
+                    color: '#66ccff',
+                    fontStyle: 'bold',
                 }).setDepth(depth + 1);
-                this.recordsPanel.push(more);
-            }
+                this.recordsPanel.push(header);
+                y += lineHeight + 4;
+
+                const ranked = sortByCategory(group.records, this.recordsCategory);
+                ranked.slice(0, maxRowsPerGroup).forEach((record, index) => {
+                    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+                    const player = record.player ? `[${record.player}]` : '[?]';
+                    const condition = this.truncate(formatCondition(record), 60);
+                    const line = `${medal}  ⏱ ${formatRecordTime(record.time)}  ${player}  L${record.level}  ${condition}`;
+                    const row = this.add.text(40, y, line, {
+                        fontSize: '15px',
+                        color: index === 0 ? '#ffd700' : '#ffffff',
+                    }).setDepth(depth + 1);
+                    this.recordsPanel.push(row);
+                    y += lineHeight;
+                });
+
+                if (group.records.length > maxRowsPerGroup) {
+                    const more = this.add.text(40, y, `… +${group.records.length - maxRowsPerGroup} more`, {
+                        fontSize: '13px',
+                        color: '#aaaaaa',
+                    }).setDepth(depth + 1);
+                    this.recordsPanel.push(more);
+                    y += lineHeight;
+                }
+                y += 10; // gap between groups
+            });
         }
 
-        const closeButton = this.add.text(cam.centerX, cam.height - 60, 'Close', {
+        const closeButton = this.add.text(cam.centerX, cam.height - 50, 'Close', {
             fontSize: '24px',
             color: '#ffffff',
             backgroundColor: '#0000ef',
@@ -201,6 +225,26 @@ export default class GameResultScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => this.closeRecords());
         this.recordsPanel.push(closeButton);
+    }
+
+    /** Adds a category toggle button; the active category is highlighted. */
+    private addCategoryButton(label: string, category: RecordCategory, x: number, y: number, depth: number) {
+        const active = this.recordsCategory === category;
+        const button = this.add.text(x, y, label, {
+            fontSize: '16px',
+            color: active ? '#000000' : '#ffffff',
+            backgroundColor: active ? '#ffd700' : '#333333',
+            padding: { x: 10, y: 5 },
+        })
+            .setDepth(depth + 1)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                if (this.recordsCategory !== category) {
+                    this.recordsCategory = category;
+                    this.openRecords();
+                }
+            });
+        this.recordsPanel.push(button);
     }
 
     private closeRecords() {
