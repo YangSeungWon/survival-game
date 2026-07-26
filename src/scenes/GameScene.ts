@@ -608,6 +608,15 @@ export default class GameScene extends Phaser.Scene {
         this.physics.pause();
         this.isPaused = true;
 
+        // Freeze the player's status-effect timers so poison/burn ticks don't
+        // accumulate or fire while the game is paused for power-up selection.
+        this.player?.pause();
+
+        // Pause tweens so in-flight enemy AoE warnings (which apply damage/poison
+        // in their onComplete) don't resolve while the game is paused. Otherwise
+        // damage lands during the pause and dumps all at once on resume.
+        this.tweens.pauseAll();
+
         // Show power-ups when the game is paused
         this.showPowerUps();
 
@@ -645,6 +654,15 @@ export default class GameScene extends Phaser.Scene {
         // Resume the game physics
         this.physics.resume();
         this.isPaused = false;
+
+        // Resume tweens paused in pauseGame().
+        this.tweens.resumeAll();
+
+        // Resume the player's status effects. Tick timers (lastTick) and durations
+        // are intentionally left untouched so poison/burn continue exactly where
+        // they left off — the paused period simply doesn't count, no time is added
+        // or skipped.
+        this.player?.resume();
 
         this.hidePowerUps();
 
