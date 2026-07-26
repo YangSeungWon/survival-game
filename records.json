@@ -1,3 +1,43 @@
 {
-  "records": []
+  "records": [
+    {
+      "time": 177646,
+      "level": 15,
+      "powerUps": [
+        "Melee Attack",
+        "One shot Projectile",
+        "Burning AoE",
+        "Defense Boost",
+        "Burning AoE",
+        "Poisoning AoE",
+        "Health Boost",
+        "Defense Boost",
+        "Move Speed",
+        "Defense Boost",
+        "Poisoning AoE",
+        "Life Steal",
+        "Life Steal",
+        "Critical Hit Chance"
+      ],
+      "stats": {
+        "maxHealth": 5000,
+        "moveSpeed": 250,
+        "lifeSteal": 10,
+        "defense": 300,
+        "critChance": 20,
+        "attacks": [
+          "ProjectileAttack P50 S200 R500",
+          "MeleeAttack P1000 S1500 R100",
+          "ProjectileAttack P1000 S500 R150",
+          "AreaOfEffectAttack P0 S100 R130",
+          "AreaOfEffectAttack P0 S100 R130",
+          "AreaOfEffectAttack P0 S100 R130",
+          "AreaOfEffectAttack P0 S100 R130"
+        ]
+      },
+      "player": "ysw",
+      "date": "2026-07-26",
+      "note": "commit e5c7683"
+    }
+  ]
 }
