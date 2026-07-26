@@ -163,6 +163,84 @@
       "player": "KS",
       "date": "2025-04-04",
       "note": "played 2025-04-04 16:52 · different balance commit · 9 attacks total (only 6 captured), power-up list not captured"
+    },
+    {
+      "time": 358253,
+      "level": 15,
+      "powerUps": [
+        "Piercing Projectile",
+        "Freezing AoE",
+        "One shot Projectile",
+        "Farthest Beam Attack",
+        "One shot Projectile",
+        "Piercing Projectile",
+        "Stunning Projectile",
+        "Critical Hit Chance",
+        "Move Speed",
+        "Life Steal",
+        "Piercing Projectile",
+        "Defense Boost",
+        "Farthest Beam Attack"
+      ],
+      "stats": {
+        "maxHealth": 5000,
+        "moveSpeed": 250,
+        "lifeSteal": 5,
+        "defense": 100,
+        "critChance": 20,
+        "attacks": [
+          "ProjectileAttack P50 S200 R500",
+          "ProjectileAttack P20 S300 R2000",
+          "AreaOfEffectAttack P0 S100 R200",
+          "ProjectileAttack P1000 S500 R150",
+          "BeamAttack P20 S1000 R400"
+        ]
+      },
+      "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
+      "player": "stf",
+      "date": "2024-11-27",
+      "note": "played 2024-11-27 02:25 · 14 power-ups (13 captured), 11 attacks total (5 captured)"
+    },
+    {
+      "time": 315402,
+      "level": 15,
+      "powerUps": [
+        "One shot Projectile",
+        "Critical Hit Chance",
+        "Freezing AoE",
+        "Poisoning AoE",
+        "Farthest Beam Attack",
+        "Defense Boost",
+        "Critical Hit Chance",
+        "Piercing Projectile",
+        "Stunning Projectile",
+        "Critical Hit Chance",
+        "Critical Hit Chance",
+        "Health Boost",
+        "Burning AoE",
+        "Defense Boost"
+      ],
+      "stats": {
+        "maxHealth": 5000,
+        "moveSpeed": 200,
+        "lifeSteal": 0,
+        "defense": 200,
+        "critChance": 80,
+        "attacks": [
+          "ProjectileAttack P50 S200 R500",
+          "ProjectileAttack P1000 S500 R150",
+          "AreaOfEffectAttack P0 S100 R200",
+          "AreaOfEffectAttack P0 S100 R130",
+          "BeamAttack P20 S1000 R400",
+          "ProjectileAttack P20 S300 R2000",
+          "ProjectileAttack P10 S200 R200",
+          "AreaOfEffectAttack P0 S100 R130"
+        ]
+      },
+      "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
+      "player": "star",
+      "date": "2024-11-27",
+      "note": "played 2024-11-27 03:48"
     }
   ]
 }
