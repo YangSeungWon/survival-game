@@ -95,8 +95,33 @@ export function sortByCategory(records: RecordEntry[], category: RecordCategory)
     return [...records].sort((a, b) => (a.time - b.time) * dir);
 }
 
+/**
+ * Records are only comparable within the same *balance* — which changes only
+ * when the gameplay numbers change (enemy/attack/status stats), NOT on every
+ * commit. Bug fixes, audio, SEO, refactors keep the same balance version.
+ *
+ * Map each known commit to its balance version here. Verified via git that the
+ * balance data files are byte-identical from e5c7683 through the current build,
+ * so every commit so far is the same balance ("v1"). When a real balance patch
+ * lands, give its commits a new label (e.g. "v2").
+ */
+const BALANCE_VERSIONS: Record<string, string> = {
+    'e5c7683ba8ff54439cd817b58bf14e7d380ad8eb': 'v1',
+    'd1a2a255f204b1092a2c01de4baaaa5d1f7e006a': 'v1',
+};
+
+/**
+ * Balance version for a commit. Unmapped commits fall back to their short hash
+ * (shown as a separate group) so a new build never silently merges into v1 —
+ * add it to the map above once its balance is classified.
+ */
+export function balanceVersion(commit?: string): string {
+    if (!commit) return 'unknown';
+    return BALANCE_VERSIONS[commit] ?? `unversioned (${shortCommit(commit)})`;
+}
+
 export interface RecordGroup {
-    commit: string;
+    version: string;
     records: RecordEntry[];
 }
 
@@ -106,17 +131,17 @@ function latestDate(records: RecordEntry[]): string {
 }
 
 /**
- * Groups records by commit hash. Groups are ordered by their most recent play
- * date (newest balance version first) so the current meta sits on top.
+ * Groups records by balance version. Groups are ordered by their most recent
+ * play date (newest balance on top) so the current meta sits first.
  */
-export function groupByCommit(records: RecordEntry[]): RecordGroup[] {
+export function groupByBalance(records: RecordEntry[]): RecordGroup[] {
     const map = new Map<string, RecordEntry[]>();
     for (const record of records) {
-        const key = record.commit || 'unknown';
+        const key = balanceVersion(record.commit);
         if (!map.has(key)) map.set(key, []);
         map.get(key)!.push(record);
     }
     return [...map.entries()]
-        .map(([commit, records]) => ({ commit, records }))
+        .map(([version, records]) => ({ version, records }))
         .sort((a, b) => latestDate(b.records).localeCompare(latestDate(a.records)));
 }

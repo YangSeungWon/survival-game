@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import GameScene from './GameScene';
 import share from '../utils/share';
 import copyToClipboard from '../utils/copyToClipboard';
-import { RecordEntry, RecordStats, RecordsFile, RecordCategory, formatRecordTime, formatCondition, sortByCategory, groupByCommit, shortCommit } from '../utils/records';
+import { RecordEntry, RecordStats, RecordsFile, RecordCategory, formatRecordTime, formatCondition, sortByCategory, groupByBalance, shortCommit } from '../utils/records';
 
 interface GameResultData {
     level: number;
@@ -174,13 +174,13 @@ export default class GameResultScene extends Phaser.Scene {
             ).setOrigin(0.5).setDepth(depth + 1);
             this.recordsPanel.push(empty);
         } else {
-            const groups = groupByCommit(allRecords);
+            const groups = groupByBalance(allRecords);
             const lineHeight = 24;
             const maxRowsPerGroup = 10;
             let y = 108;
 
             groups.forEach(group => {
-                const header = this.add.text(24, y, `▓ @${shortCommit(group.commit)} · ${group.records.length} clears`, {
+                const header = this.add.text(24, y, `▓ Balance ${group.version} · ${group.records.length} clears`, {
                     fontSize: '17px',
                     color: '#66ccff',
                     fontStyle: 'bold',
@@ -192,9 +192,9 @@ export default class GameResultScene extends Phaser.Scene {
                 ranked.slice(0, maxRowsPerGroup).forEach((record, index) => {
                     const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
                     const player = record.player ? `[${record.player}]` : '[?]';
-                    const condition = this.truncate(formatCondition(record), 58);
+                    const condition = this.truncate(formatCondition(record), 52);
                     const camera = record.screenshot ? ' 📷' : '';
-                    const line = `${medal}  ⏱ ${formatRecordTime(record.time)}  ${player}  L${record.level}  ${condition}${camera}`;
+                    const line = `${medal}  ⏱ ${formatRecordTime(record.time)}  ${player}  L${record.level}  @${shortCommit(record.commit)}  ${condition}${camera}`;
                     const row = this.add.text(40, y, line, {
                         fontSize: '15px',
                         color: index === 0 ? '#ffd700' : '#ffffff',
