@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Survival Game 리더보드 · 클리어 기록 보관소</title>
-<meta name="description" content="Survival Game(뱀파이어 서바이벌류 로그라이크) 보스 처치 클리어 기록 리더보드. 현재 9개 기록, 플레이어 5명. 밸런스 버전별 클리어 시간·빌드·최종 스탯 비교.">
-<link rel="canonical" href="https://survival.game.ysw.kr/records.html">
+<title>Survival Game — Leaderboard | Clear-time records</title>
+<meta name="description" content="Boss-defeat clear leaderboard for Survival Game, a browser vampire-survivors-style roguelike. 9 clears by 5 players. Compare clear times, builds and final stats per balance version.">
+<link rel="canonical" href="https://survival.game.ysw.kr/en/records.html">
 <link rel="alternate" hreflang="ko" href="https://survival.game.ysw.kr/records.html">
 <link rel="alternate" hreflang="en" href="https://survival.game.ysw.kr/en/records.html">
 <link rel="alternate" hreflang="x-default" href="https://survival.game.ysw.kr/records.html">
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
-<meta property="og:title" content="🏆 Survival Game · 리더보드">
-<meta property="og:description" content="Survival Game(뱀파이어 서바이벌류 로그라이크) 보스 처치 클리어 기록 리더보드. 현재 9개 기록, 플레이어 5명. 밸런스 버전별 클리어 시간·빌드·최종 스탯 비교.">
-<meta property="og:url" content="https://survival.game.ysw.kr/records.html">
+<meta property="og:title" content="🏆 Survival Game · Leaderboard">
+<meta property="og:description" content="Boss-defeat clear leaderboard for Survival Game, a browser vampire-survivors-style roguelike. 9 clears by 5 players. Compare clear times, builds and final stats per balance version.">
+<meta property="og:url" content="https://survival.game.ysw.kr/en/records.html">
 <meta property="og:image" content="https://survival.game.ysw.kr/assets/start.webp">
 <link rel="icon" type="image/png" href="/assets/player.png">
 <style>
@@ -68,35 +68,35 @@
 </head>
 <body>
 <header class="top">
-  <h1>🏆 Survival Game · 리더보드</h1>
-  <div class="nav"><a href="/">← 게임으로</a><a href="/howto.html">📖 게임 방법</a><a href="/en/records.html" rel="alternate" hreflang="en">🌐 English</a></div>
-  <p class="allclear">✅ 모든 기록은 보스 처치 클리어입니다</p>
+  <h1>🏆 Survival Game · Leaderboard</h1>
+  <div class="nav"><a href="/en/">← Play</a><a href="/en/howto.html">📖 How to Play</a><a href="/records.html" rel="alternate" hreflang="ko">🌐 한국어</a></div>
+  <p class="allclear">✅ Every record is a boss-defeat clear</p>
 </header>
 <div class="controls" role="group">
-  <button id="cat-fastest" aria-pressed="true">⏱ 빠른 클리어</button>
-  <button id="cat-longest" aria-pressed="false">🐢 오래 버틴</button>
+  <button id="cat-fastest" aria-pressed="true">⏱ Fastest</button>
+  <button id="cat-longest" aria-pressed="false">🐢 Longest run</button>
 </div>
 <main>
 <section class="balance">
-    <h2>⚖️ Balance v1 <span class="count">· 9 클리어</span></h2>
-    <p class="cap">같은 밸런스끼리만 비교 유효</p>
+    <h2>⚖️ Balance v1 <span class="count">· 9 clears</span></h2>
+    <p class="cap">comparable only within the same balance</p>
     <div class="cards">
 <article class="rec" data-time="175433">
     <div class="rec-head">
       <span class="rank"></span>
       <span class="time">2:55.433</span>
       <span class="player">KS</span>
-      <span class="clear" title="보스 처치 클리어">✅ Clear</span>
+      <span class="clear" title="boss defeated">✅ Clear</span>
       
       <span class="ver" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</span>
       <span class="summary">Speed 200 · LifeSteal 10% · Def 400 · Crit 20%</span>
-      <button class="toggle" aria-expanded="false">빌드 ▾</button>
-      <button class="thumb-btn" data-full="assets/records/e5c7683-KS-175433.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-175433.png" alt="KS clear screenshot"></button>
+      <button class="toggle" aria-expanded="false">Build ▾</button>
+      <button class="thumb-btn" data-full="assets/records/e5c7683-KS-175433.png" aria-label="view screenshot"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-175433.png" alt="KS clear screenshot"></button>
     </div>
     <div class="rec-body" hidden>
-      <h4>파워업 순서</h4>
-      <p class="muted">빌드 미기록 (아래 최종 스탯 참고)</p>
-      <h4>최종 스탯</h4>
+      <h4>Build order</h4>
+      <p class="muted">build not captured (see final stats below)</p>
+      <h4>Final stats</h4>
       <div class="badges"><span class="stat">❤️ 5000</span><span class="stat">🏃 200</span><span class="stat">🩸 10%</span><span class="stat">🛡️ 400</span><span class="stat">🎯 20%</span></div><div class="chips atks"><span class="atkchip">ProjectileAttack P50 S200 R500</span><span class="atkchip">ProjectileAttack P1000 S500 R150</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span></div>
       <p class="note">📝 played 2024-12-05 13:52 · power-up list not captured (condition shown from final stats)</p>
     </div>
@@ -106,17 +106,17 @@
       <span class="rank"></span>
       <span class="time">2:56.547</span>
       <span class="player">KS</span>
-      <span class="clear" title="보스 처치 클리어">✅ Clear</span>
+      <span class="clear" title="boss defeated">✅ Clear</span>
       
       <span class="ver" title="d1a2a255f204b1092a2c01de4baaaa5d1f7e006a">@d1a2a25</span>
       <span class="summary">Speed 200 · LifeSteal 10% · Def 400 · Crit 0%</span>
-      <button class="toggle" aria-expanded="false">빌드 ▾</button>
-      <button class="thumb-btn" data-full="assets/records/d1a2a25-KS-176547.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/d1a2a25-KS-176547.png" alt="KS clear screenshot"></button>
+      <button class="toggle" aria-expanded="false">Build ▾</button>
+      <button class="thumb-btn" data-full="assets/records/d1a2a25-KS-176547.png" aria-label="view screenshot"><img class="thumb" loading="lazy" src="assets/records/d1a2a25-KS-176547.png" alt="KS clear screenshot"></button>
     </div>
     <div class="rec-body" hidden>
-      <h4>파워업 순서</h4>
-      <p class="muted">빌드 미기록 (아래 최종 스탯 참고)</p>
-      <h4>최종 스탯</h4>
+      <h4>Build order</h4>
+      <p class="muted">build not captured (see final stats below)</p>
+      <h4>Final stats</h4>
       <div class="badges"><span class="stat">❤️ 5000</span><span class="stat">🏃 200</span><span class="stat">🩸 10%</span><span class="stat">🛡️ 400</span><span class="stat">🎯 0%</span></div><div class="chips atks"><span class="atkchip">ProjectileAttack P50 S200 R500</span><span class="atkchip">ProjectileAttack P1000 S500 R150</span><span class="atkchip">ProjectileAttack P1000 S500 R150</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">MeleeAttack P1000 S1500 R100</span></div>
       <p class="note">📝 played 2025-04-04 16:52 · different balance commit · 9 attacks total (only 6 captured), power-up list not captured</p>
     </div>
@@ -126,17 +126,17 @@
       <span class="rank"></span>
       <span class="time">2:57.646</span>
       <span class="player">KS</span>
-      <span class="clear" title="보스 처치 클리어">✅ Clear</span>
+      <span class="clear" title="boss defeated">✅ Clear</span>
       
       <span class="ver" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</span>
       <span class="summary">Defense Boost×3 · Burning AoE×2 · Poisoning AoE×2 · Life Steal×2 +5</span>
-      <button class="toggle" aria-expanded="false">빌드 ▾</button>
-      <button class="thumb-btn" data-full="assets/records/e5c7683-KS-177646.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-177646.png" alt="KS clear screenshot"></button>
+      <button class="toggle" aria-expanded="false">Build ▾</button>
+      <button class="thumb-btn" data-full="assets/records/e5c7683-KS-177646.png" aria-label="view screenshot"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-177646.png" alt="KS clear screenshot"></button>
     </div>
     <div class="rec-body" hidden>
-      <h4>파워업 순서</h4>
+      <h4>Build order</h4>
       <div class="chips"><span class="pu atk"><b>1</b>Melee Attack</span><span class="arrow">›</span><span class="pu atk"><b>2</b>One shot Projectile</span><span class="arrow">›</span><span class="pu aoe"><b>3</b>Burning AoE</span><span class="arrow">›</span><span class="pu stat"><b>4</b>Defense Boost</span><span class="arrow">›</span><span class="pu aoe"><b>5</b>Burning AoE</span><span class="arrow">›</span><span class="pu aoe"><b>6</b>Poisoning AoE</span><span class="arrow">›</span><span class="pu stat"><b>7</b>Health Boost</span><span class="arrow">›</span><span class="pu stat"><b>8</b>Defense Boost</span><span class="arrow">›</span><span class="pu stat"><b>9</b>Move Speed</span><span class="arrow">›</span><span class="pu stat"><b>10</b>Defense Boost</span><span class="arrow">›</span><span class="pu aoe"><b>11</b>Poisoning AoE</span><span class="arrow">›</span><span class="pu stat"><b>12</b>Life Steal</span><span class="arrow">›</span><span class="pu stat"><b>13</b>Life Steal</span><span class="arrow">›</span><span class="pu stat"><b>14</b>Critical Hit Chance</span></div>
-      <h4>최종 스탯</h4>
+      <h4>Final stats</h4>
       <div class="badges"><span class="stat">❤️ 5000</span><span class="stat">🏃 250</span><span class="stat">🩸 10%</span><span class="stat">🛡️ 300</span><span class="stat">🎯 20%</span></div><div class="chips atks"><span class="atkchip">ProjectileAttack P50 S200 R500</span><span class="atkchip">MeleeAttack P1000 S1500 R100</span><span class="atkchip">ProjectileAttack P1000 S500 R150</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span></div>
       <p class="note">📝 played 2024-11-26 20:46</p>
     </div>
@@ -146,17 +146,17 @@
       <span class="rank"></span>
       <span class="time">4:04.979</span>
       <span class="player">dh</span>
-      <span class="clear" title="보스 처치 클리어">✅ Clear</span>
+      <span class="clear" title="boss defeated">✅ Clear</span>
       
       <span class="ver" title="d1a2a255f204b1092a2c01de4baaaa5d1f7e006a">@d1a2a25</span>
       <span class="summary">Speed 250 · LifeSteal 20% · Def 100 · Crit 20%</span>
-      <button class="toggle" aria-expanded="false">빌드 ▾</button>
-      <button class="thumb-btn" data-full="assets/records/d1a2a25-dh-244979.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/d1a2a25-dh-244979.png" alt="dh clear screenshot"></button>
+      <button class="toggle" aria-expanded="false">Build ▾</button>
+      <button class="thumb-btn" data-full="assets/records/d1a2a25-dh-244979.png" aria-label="view screenshot"><img class="thumb" loading="lazy" src="assets/records/d1a2a25-dh-244979.png" alt="dh clear screenshot"></button>
     </div>
     <div class="rec-body" hidden>
-      <h4>파워업 순서</h4>
-      <p class="muted">빌드 미기록 (아래 최종 스탯 참고)</p>
-      <h4>최종 스탯</h4>
+      <h4>Build order</h4>
+      <p class="muted">build not captured (see final stats below)</p>
+      <h4>Final stats</h4>
       <div class="badges"><span class="stat">❤️ 5000</span><span class="stat">🏃 250</span><span class="stat">🩸 20%</span><span class="stat">🛡️ 100</span><span class="stat">🎯 20%</span></div><div class="chips atks"><span class="atkchip">ProjectileAttack P50 S200 R500</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">ProjectileAttack P1000 S500 R150</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span></div>
       <p class="note">📝 played 2025-07-08 20:56 · power-up list not captured (condition shown from final stats)</p>
     </div>
@@ -166,17 +166,17 @@
       <span class="rank"></span>
       <span class="time">5:00.931</span>
       <span class="player">KS</span>
-      <span class="clear" title="보스 처치 클리어">✅ Clear</span>
+      <span class="clear" title="boss defeated">✅ Clear</span>
       
       <span class="ver" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</span>
       <span class="summary">Critical Hit Chance×3 · One shot Projectile×3 · Piercing Projectile×2 · Defense Boost×2 +4</span>
-      <button class="toggle" aria-expanded="false">빌드 ▾</button>
-      <button class="thumb-btn" data-full="assets/records/e5c7683-KS-300931.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-300931.png" alt="KS clear screenshot"></button>
+      <button class="toggle" aria-expanded="false">Build ▾</button>
+      <button class="thumb-btn" data-full="assets/records/e5c7683-KS-300931.png" aria-label="view screenshot"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-300931.png" alt="KS clear screenshot"></button>
     </div>
     <div class="rec-body" hidden>
-      <h4>파워업 순서</h4>
+      <h4>Build order</h4>
       <div class="chips"><span class="pu atk"><b>1</b>Piercing Projectile</span><span class="arrow">›</span><span class="pu stat"><b>2</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu stat"><b>3</b>Move Speed</span><span class="arrow">›</span><span class="pu atk"><b>4</b>One shot Projectile</span><span class="arrow">›</span><span class="pu stat"><b>5</b>Life Steal</span><span class="arrow">›</span><span class="pu atk"><b>6</b>One shot Projectile</span><span class="arrow">›</span><span class="pu stat"><b>7</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu stat"><b>8</b>Health Boost</span><span class="arrow">›</span><span class="pu stat"><b>9</b>Defense Boost</span><span class="arrow">›</span><span class="pu atk"><b>10</b>Piercing Projectile</span><span class="arrow">›</span><span class="pu stat"><b>11</b>Defense Boost</span><span class="arrow">›</span><span class="pu atk"><b>12</b>One shot Projectile</span><span class="arrow">›</span><span class="pu atk"><b>13</b>Stunning Projectile</span><span class="arrow">›</span><span class="pu stat"><b>14</b>Critical Hit Chance</span></div>
-      <h4>최종 스탯</h4>
+      <h4>Final stats</h4>
       <div class="badges"><span class="stat">❤️ 5000</span><span class="stat">🏃 250</span><span class="stat">🩸 5%</span><span class="stat">🛡️ 200</span><span class="stat">🎯 60%</span></div><div class="chips atks"><span class="atkchip">ProjectileAttack P50 S200 R500</span><span class="atkchip">ProjectileAttack P20 S300 R2000</span><span class="atkchip">ProjectileAttack P1000 S500 R150</span><span class="atkchip">ProjectileAttack P1000 S500 R150</span><span class="atkchip">ProjectileAttack P20 S300 R2000</span><span class="atkchip">ProjectileAttack P1000 S500 R150</span><span class="atkchip">ProjectileAttack P10 S200 R200</span></div>
       <p class="note">📝 played 2024-11-28 12:41</p>
     </div>
@@ -186,17 +186,17 @@
       <span class="rank"></span>
       <span class="time">5:15.402</span>
       <span class="player">star</span>
-      <span class="clear" title="보스 처치 클리어">✅ Clear</span>
+      <span class="clear" title="boss defeated">✅ Clear</span>
       
       <span class="ver" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</span>
       <span class="summary">Critical Hit Chance×4 · Defense Boost×2 · One shot Projectile · Freezing AoE +6</span>
-      <button class="toggle" aria-expanded="false">빌드 ▾</button>
-      <button class="thumb-btn" data-full="assets/records/e5c7683-star-315402.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-star-315402.png" alt="star clear screenshot"></button>
+      <button class="toggle" aria-expanded="false">Build ▾</button>
+      <button class="thumb-btn" data-full="assets/records/e5c7683-star-315402.png" aria-label="view screenshot"><img class="thumb" loading="lazy" src="assets/records/e5c7683-star-315402.png" alt="star clear screenshot"></button>
     </div>
     <div class="rec-body" hidden>
-      <h4>파워업 순서</h4>
+      <h4>Build order</h4>
       <div class="chips"><span class="pu atk"><b>1</b>One shot Projectile</span><span class="arrow">›</span><span class="pu stat"><b>2</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu aoe"><b>3</b>Freezing AoE</span><span class="arrow">›</span><span class="pu aoe"><b>4</b>Poisoning AoE</span><span class="arrow">›</span><span class="pu atk"><b>5</b>Farthest Beam Attack</span><span class="arrow">›</span><span class="pu stat"><b>6</b>Defense Boost</span><span class="arrow">›</span><span class="pu stat"><b>7</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu atk"><b>8</b>Piercing Projectile</span><span class="arrow">›</span><span class="pu atk"><b>9</b>Stunning Projectile</span><span class="arrow">›</span><span class="pu stat"><b>10</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu stat"><b>11</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu stat"><b>12</b>Health Boost</span><span class="arrow">›</span><span class="pu aoe"><b>13</b>Burning AoE</span><span class="arrow">›</span><span class="pu stat"><b>14</b>Defense Boost</span></div>
-      <h4>최종 스탯</h4>
+      <h4>Final stats</h4>
       <div class="badges"><span class="stat">❤️ 5000</span><span class="stat">🏃 200</span><span class="stat">🩸 0%</span><span class="stat">🛡️ 200</span><span class="stat">🎯 80%</span></div><div class="chips atks"><span class="atkchip">ProjectileAttack P50 S200 R500</span><span class="atkchip">ProjectileAttack P1000 S500 R150</span><span class="atkchip">AreaOfEffectAttack P0 S100 R200</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span><span class="atkchip">BeamAttack P20 S1000 R400</span><span class="atkchip">ProjectileAttack P20 S300 R2000</span><span class="atkchip">ProjectileAttack P10 S200 R200</span><span class="atkchip">AreaOfEffectAttack P0 S100 R130</span></div>
       <p class="note">📝 played 2024-11-27 03:48</p>
     </div>
@@ -206,17 +206,17 @@
       <span class="rank"></span>
       <span class="time">5:58.253</span>
       <span class="player">stf</span>
-      <span class="clear" title="보스 처치 클리어">✅ Clear</span>
+      <span class="clear" title="boss defeated">✅ Clear</span>
       
       <span class="ver" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</span>
       <span class="summary">Piercing Projectile×3 · One shot Projectile×2 · Farthest Beam Attack×2 · Freezing AoE +5</span>
-      <button class="toggle" aria-expanded="false">빌드 ▾</button>
-      <button class="thumb-btn" data-full="assets/records/e5c7683-stf-358253.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-stf-358253.png" alt="stf clear screenshot"></button>
+      <button class="toggle" aria-expanded="false">Build ▾</button>
+      <button class="thumb-btn" data-full="assets/records/e5c7683-stf-358253.png" aria-label="view screenshot"><img class="thumb" loading="lazy" src="assets/records/e5c7683-stf-358253.png" alt="stf clear screenshot"></button>
     </div>
     <div class="rec-body" hidden>
-      <h4>파워업 순서</h4>
+      <h4>Build order</h4>
       <div class="chips"><span class="pu atk"><b>1</b>Piercing Projectile</span><span class="arrow">›</span><span class="pu aoe"><b>2</b>Freezing AoE</span><span class="arrow">›</span><span class="pu atk"><b>3</b>One shot Projectile</span><span class="arrow">›</span><span class="pu atk"><b>4</b>Farthest Beam Attack</span><span class="arrow">›</span><span class="pu atk"><b>5</b>One shot Projectile</span><span class="arrow">›</span><span class="pu atk"><b>6</b>Piercing Projectile</span><span class="arrow">›</span><span class="pu atk"><b>7</b>Stunning Projectile</span><span class="arrow">›</span><span class="pu stat"><b>8</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu stat"><b>9</b>Move Speed</span><span class="arrow">›</span><span class="pu stat"><b>10</b>Life Steal</span><span class="arrow">›</span><span class="pu atk"><b>11</b>Piercing Projectile</span><span class="arrow">›</span><span class="pu stat"><b>12</b>Defense Boost</span><span class="arrow">›</span><span class="pu atk"><b>13</b>Farthest Beam Attack</span></div>
-      <h4>최종 스탯</h4>
+      <h4>Final stats</h4>
       <div class="badges"><span class="stat">❤️ 5000</span><span class="stat">🏃 250</span><span class="stat">🩸 5%</span><span class="stat">🛡️ 100</span><span class="stat">🎯 20%</span></div><div class="chips atks"><span class="atkchip">ProjectileAttack P50 S200 R500</span><span class="atkchip">ProjectileAttack P20 S300 R2000</span><span class="atkchip">AreaOfEffectAttack P0 S100 R200</span><span class="atkchip">ProjectileAttack P1000 S500 R150</span><span class="atkchip">BeamAttack P20 S1000 R400</span></div>
       <p class="note">📝 played 2024-11-27 02:25 · 14 power-ups (13 captured), 11 attacks total (5 captured)</p>
     </div>
@@ -226,17 +226,17 @@
       <span class="rank"></span>
       <span class="time">6:17.701</span>
       <span class="player">boo</span>
-      <span class="clear" title="보스 처치 클리어">✅ Clear</span>
+      <span class="clear" title="boss defeated">✅ Clear</span>
       
       <span class="ver" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</span>
       <span class="summary">Piercing Projectile×5 · Life Steal×3 · Defense Boost×2 · Critical Hit Chance×2 +2</span>
-      <button class="toggle" aria-expanded="false">빌드 ▾</button>
-      <button class="thumb-btn" data-full="assets/records/e5c7683-boo-377701.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-boo-377701.png" alt="boo clear screenshot"></button>
+      <button class="toggle" aria-expanded="false">Build ▾</button>
+      <button class="thumb-btn" data-full="assets/records/e5c7683-boo-377701.png" aria-label="view screenshot"><img class="thumb" loading="lazy" src="assets/records/e5c7683-boo-377701.png" alt="boo clear screenshot"></button>
     </div>
     <div class="rec-body" hidden>
-      <h4>파워업 순서</h4>
+      <h4>Build order</h4>
       <div class="chips"><span class="pu atk"><b>1</b>Piercing Projectile</span><span class="arrow">›</span><span class="pu atk"><b>2</b>Stunning Projectile</span><span class="arrow">›</span><span class="pu stat"><b>3</b>Life Steal</span><span class="arrow">›</span><span class="pu atk"><b>4</b>Piercing Projectile</span><span class="arrow">›</span><span class="pu atk"><b>5</b>Piercing Projectile</span><span class="arrow">›</span><span class="pu atk"><b>6</b>Piercing Projectile</span><span class="arrow">›</span><span class="pu stat"><b>7</b>Defense Boost</span><span class="arrow">›</span><span class="pu stat"><b>8</b>Life Steal</span><span class="arrow">›</span><span class="pu atk"><b>9</b>One shot Projectile</span><span class="arrow">›</span><span class="pu stat"><b>10</b>Defense Boost</span><span class="arrow">›</span><span class="pu stat"><b>11</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu stat"><b>12</b>Life Steal</span><span class="arrow">›</span><span class="pu atk"><b>13</b>Piercing Projectile</span><span class="arrow">›</span><span class="pu stat"><b>14</b>Critical Hit Chance</span></div>
-      <h4>최종 스탯</h4>
+      <h4>Final stats</h4>
       <div class="badges"><span class="stat">❤️ 5000</span><span class="stat">🏃 200</span><span class="stat">🩸 15%</span><span class="stat">🛡️ 200</span><span class="stat">🎯 40%</span></div><div class="chips atks"><span class="atkchip">ProjectileAttack P50 S200 R500</span><span class="atkchip">ProjectileAttack P20 S300 R2000</span><span class="atkchip">ProjectileAttack P10 S200 R200</span><span class="atkchip">ProjectileAttack P20 S300 R2000</span><span class="atkchip">ProjectileAttack P20 S300 R2000</span><span class="atkchip">ProjectileAttack P20 S300 R2000</span><span class="atkchip">ProjectileAttack P1000 S500 R150</span><span class="atkchip">ProjectileAttack P20 S300 R2000</span></div>
       <p class="note">📝 played 2024-11-28 13:39 · result screen only — final stats reconstructed from power-ups</p>
     </div>
@@ -246,17 +246,17 @@
       <span class="rank"></span>
       <span class="time">38:16.993</span>
       <span class="player">KS</span>
-      <span class="clear" title="보스 처치 클리어">✅ Clear</span>
+      <span class="clear" title="boss defeated">✅ Clear</span>
       <span class="lvl">L16</span>
       <span class="ver" title="e5c7683ba8ff54439cd817b58bf14e7d380ad8eb">@e5c7683</span>
       <span class="summary">Life Steal×5 · Critical Hit Chance×5 · Defense Boost×3 · Move Speed×2</span>
-      <button class="toggle" aria-expanded="false">빌드 ▾</button>
-      <button class="thumb-btn" data-full="assets/records/e5c7683-KS-2296993.png" aria-label="스크린샷 보기"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-2296993.png" alt="KS clear screenshot"></button>
+      <button class="toggle" aria-expanded="false">Build ▾</button>
+      <button class="thumb-btn" data-full="assets/records/e5c7683-KS-2296993.png" aria-label="view screenshot"><img class="thumb" loading="lazy" src="assets/records/e5c7683-KS-2296993.png" alt="KS clear screenshot"></button>
     </div>
     <div class="rec-body" hidden>
-      <h4>파워업 순서</h4>
+      <h4>Build order</h4>
       <div class="chips"><span class="pu stat"><b>1</b>Move Speed</span><span class="arrow">›</span><span class="pu stat"><b>2</b>Life Steal</span><span class="arrow">›</span><span class="pu stat"><b>3</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu stat"><b>4</b>Life Steal</span><span class="arrow">›</span><span class="pu stat"><b>5</b>Life Steal</span><span class="arrow">›</span><span class="pu stat"><b>6</b>Move Speed</span><span class="arrow">›</span><span class="pu stat"><b>7</b>Defense Boost</span><span class="arrow">›</span><span class="pu stat"><b>8</b>Life Steal</span><span class="arrow">›</span><span class="pu stat"><b>9</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu stat"><b>10</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu stat"><b>11</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu stat"><b>12</b>Critical Hit Chance</span><span class="arrow">›</span><span class="pu stat"><b>13</b>Life Steal</span><span class="arrow">›</span><span class="pu stat"><b>14</b>Defense Boost</span><span class="arrow">›</span><span class="pu stat"><b>15</b>Defense Boost</span></div>
-      <h4>최종 스탯</h4>
+      <h4>Final stats</h4>
       <div class="badges"><span class="stat">❤️ 5000</span><span class="stat">🏃 300</span><span class="stat">🩸 25%</span><span class="stat">🛡️ 300</span><span class="stat">🎯 100%</span></div><div class="chips atks"><span class="atkchip">ProjectileAttack P50 S200 R500</span></div>
       <p class="note">📝 played 2024-11-28 23:31 · no attack power-ups (crit-only build)</p>
     </div>
@@ -265,7 +265,7 @@
   </section>
 </main>
 <div id="lightbox" aria-hidden="true"><img alt="record screenshot"></div>
-<footer>records.json 에서 자동 생성됨</footer>
+<footer>auto-generated from records.json</footer>
 <script>
 (function(){
   var order='fastest';

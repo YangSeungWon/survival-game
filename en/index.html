@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Served from /en/ — resolve all relative URLs (assets, bundle) from the site root. -->
+    <base href="/">
+
+    <!-- Primary SEO -->
+    <title>Survival Game · Vampire Survivors-style Roguelike (Free, Browser)</title>
+    <meta name="description" content="Free browser-based vampire-survivors-style roguelike: dodge endless enemy waves, auto-attack, collect power-ups, and survive as long as you can. Play instantly on desktop and mobile — no install.">
+    <meta name="keywords" content="survival game, vampire survivors, roguelike, browser game, free game, web game, phaser game, auto attack, power-ups">
+    <meta name="author" content="ysw">
+    <link rel="canonical" href="https://survival.game.ysw.kr/en/">
+
+    <!-- Localization -->
+    <link rel="alternate" hreflang="ko" href="https://survival.game.ysw.kr/">
+    <link rel="alternate" hreflang="en" href="https://survival.game.ysw.kr/en/">
+    <link rel="alternate" hreflang="x-default" href="https://survival.game.ysw.kr/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Survival Game">
+    <meta property="og:title" content="Survival Game · Vampire Survivors-style Roguelike">
+    <meta property="og:description" content="Free vampire-survivors-style roguelike — survive endless enemy waves right in your browser. Auto-attack, level up, pick power-ups.">
+    <meta property="og:url" content="https://survival.game.ysw.kr/en/">
+    <meta property="og:image" content="https://survival.game.ysw.kr/assets/start.webp">
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="1024">
+    <meta property="og:image:alt" content="Survival Game start screen">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ko_KR">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Survival Game · Vampire Survivors-style Roguelike">
+    <meta name="twitter:description" content="Free vampire-survivors-style roguelike in your browser.">
+    <meta name="twitter:image" content="https://survival.game.ysw.kr/assets/start.webp">
+
+    <!-- Icons & theme -->
+    <link rel="icon" type="image/png" href="assets/player.png">
+    <link rel="apple-touch-icon" href="assets/player.png">
+    <meta name="theme-color" content="#000000">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Survival Game",
+      "url": "https://survival.game.ysw.kr/en/",
+      "image": "https://survival.game.ysw.kr/assets/start.webp",
+      "description": "A free vampire-survivors-style roguelike you can play directly in the browser.",
+      "genre": ["Roguelike", "Survival", "Action"],
+      "gamePlatform": ["Web Browser", "PC", "Mobile"],
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "inLanguage": ["en", "ko"],
+      "author": { "@type": "Person", "name": "ysw" },
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser3-rex-plugins/dist/rexuiplugin.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <style>
+        /* SEO content sits behind the game canvas: crawlable in the DOM,
+           covered by the full-screen Phaser canvas during play. */
+        #seo-content {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            overflow: auto;
+            margin: 0 auto;
+            padding: 2rem 1.25rem;
+            max-width: 720px;
+            color: #ddd;
+            background: #000;
+            font-family: 'Noto Sans', system-ui, sans-serif;
+            line-height: 1.6;
+        }
+        #seo-content h1 { font-size: 1.8rem; margin: 0 0 .5rem; }
+        #seo-content h2 { font-size: 1.15rem; margin: 1.5rem 0 .4rem; }
+        #seo-content a { color: #8ab4ff; }
+        canvas { position: relative; z-index: 1; }
+    </style>
+<script defer src="../bundle.js"></script></head>
+<body>
+    <!-- Crawlable content layer. The game renders on a <canvas> (not indexable),
+         so this describes the page for search engines and social previews. -->
+    <main id="seo-content">
+        <h1>Survival Game — Vampire Survivors-style Roguelike</h1>
+
+        <p>
+            <strong>Survival Game</strong> is a free vampire-survivors-style roguelike you can
+            play directly in your browser. Dodge endless waves of enemies, auto-attack to clear
+            the screen, collect experience to level up, and pick power-ups to build an
+            unstoppable character. No install required — playable on both desktop and mobile.
+        </p>
+
+        <h2>How to play</h2>
+        <ul>
+            <li>Move: arrow keys or the on-screen joystick</li>
+            <li>Attack: automatic (auto-aims the nearest enemy)</li>
+            <li>Upgrade: choose a power-up each time you level up</li>
+        </ul>
+
+        <h2>Features</h2>
+        <ul>
+            <li>Varied enemies &amp; bosses — ranged wizards, fast rushers, elites, a final boss</li>
+            <li>Multiple attack types — projectile, beam, area-of-effect, melee</li>
+            <li>Roguelike power-up builds — a different run every time</li>
+            <li>Mobile support — touch joystick for phones / iPad</li>
+        </ul>
+
+        <p>
+            <a href="https://survival.game.ysw.kr/en/">▶ Play now</a> ·
+            <a href="https://survival.game.ysw.kr/en/howto.html">How to Play</a> ·
+            <a href="https://survival.game.ysw.kr/en/records.html">Leaderboard</a> ·
+            <a href="https://survival.game.ysw.kr/">한국어</a>
+        </p>
+    </main>
+</body>
+</html>
