@@ -27,6 +27,7 @@ export interface RecordEntry {
     stats: RecordStats;
     commit?: string;     // git commit hash the run was played on — records are only
                          // comparable within the same commit (balance patches change times)
+    screenshot?: string; // path to the run's screenshot (relative to the site root)
     player?: string;
     date?: string;       // YYYY-MM-DD
     note?: string;

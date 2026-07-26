@@ -38,7 +38,8 @@
       "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
       "player": "KS",
       "date": "2024-11-26",
-      "note": "played 2024-11-26 20:46"
+      "note": "played 2024-11-26 20:46",
+      "screenshot": "assets/records/e5c7683-KS-177646.png"
     },
     {
       "time": 300931,
@@ -78,7 +79,8 @@
       "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
       "player": "KS",
       "date": "2024-11-28",
-      "note": "played 2024-11-28 12:41"
+      "note": "played 2024-11-28 12:41",
+      "screenshot": "assets/records/e5c7683-KS-300931.png"
     },
     {
       "time": 2296993,
@@ -113,7 +115,8 @@
       "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
       "player": "KS",
       "date": "2024-11-28",
-      "note": "played 2024-11-28 23:31 · no attack power-ups (crit-only build)"
+      "note": "played 2024-11-28 23:31 · no attack power-ups (crit-only build)",
+      "screenshot": "assets/records/e5c7683-KS-2296993.png"
     },
     {
       "time": 175433,
@@ -138,7 +141,8 @@
       "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
       "player": "KS",
       "date": "2024-12-05",
-      "note": "played 2024-12-05 13:52 · power-up list not captured (condition shown from final stats)"
+      "note": "played 2024-12-05 13:52 · power-up list not captured (condition shown from final stats)",
+      "screenshot": "assets/records/e5c7683-KS-175433.png"
     },
     {
       "time": 176547,
@@ -162,7 +166,8 @@
       "commit": "d1a2a255f204b1092a2c01de4baaaa5d1f7e006a",
       "player": "KS",
       "date": "2025-04-04",
-      "note": "played 2025-04-04 16:52 · different balance commit · 9 attacks total (only 6 captured), power-up list not captured"
+      "note": "played 2025-04-04 16:52 · different balance commit · 9 attacks total (only 6 captured), power-up list not captured",
+      "screenshot": "assets/records/d1a2a25-KS-176547.png"
     },
     {
       "time": 358253,
@@ -199,7 +204,8 @@
       "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
       "player": "stf",
       "date": "2024-11-27",
-      "note": "played 2024-11-27 02:25 · 14 power-ups (13 captured), 11 attacks total (5 captured)"
+      "note": "played 2024-11-27 02:25 · 14 power-ups (13 captured), 11 attacks total (5 captured)",
+      "screenshot": "assets/records/e5c7683-stf-358253.png"
     },
     {
       "time": 315402,
@@ -240,7 +246,8 @@
       "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
       "player": "star",
       "date": "2024-11-27",
-      "note": "played 2024-11-27 03:48"
+      "note": "played 2024-11-27 03:48",
+      "screenshot": "assets/records/e5c7683-star-315402.png"
     },
     {
       "time": 377701,
@@ -281,7 +288,34 @@
       "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
       "player": "boo",
       "date": "2024-11-28",
-      "note": "played 2024-11-28 13:39 · result screen only — final stats reconstructed from power-ups"
+      "note": "played 2024-11-28 13:39 · result screen only — final stats reconstructed from power-ups",
+      "screenshot": "assets/records/e5c7683-boo-377701.png"
+    },
+    {
+      "time": 244979,
+      "level": 15,
+      "powerUps": [],
+      "stats": {
+        "maxHealth": 5000,
+        "moveSpeed": 250,
+        "lifeSteal": 20,
+        "defense": 100,
+        "critChance": 20,
+        "attacks": [
+          "ProjectileAttack P50 S200 R500",
+          "AreaOfEffectAttack P0 S100 R130",
+          "ProjectileAttack P1000 S500 R150",
+          "AreaOfEffectAttack P0 S100 R130",
+          "AreaOfEffectAttack P0 S100 R130",
+          "AreaOfEffectAttack P0 S100 R130",
+          "AreaOfEffectAttack P0 S100 R130"
+        ]
+      },
+      "commit": "d1a2a255f204b1092a2c01de4baaaa5d1f7e006a",
+      "player": "dh",
+      "date": "2025-07-08",
+      "note": "played 2025-07-08 20:56 · power-up list not captured (condition shown from final stats)",
+      "screenshot": "assets/records/d1a2a25-dh-244979.png"
     }
   ]
 }

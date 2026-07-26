@@ -192,12 +192,18 @@ export default class GameResultScene extends Phaser.Scene {
                 ranked.slice(0, maxRowsPerGroup).forEach((record, index) => {
                     const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
                     const player = record.player ? `[${record.player}]` : '[?]';
-                    const condition = this.truncate(formatCondition(record), 60);
-                    const line = `${medal}  ⏱ ${formatRecordTime(record.time)}  ${player}  L${record.level}  ${condition}`;
+                    const condition = this.truncate(formatCondition(record), 58);
+                    const camera = record.screenshot ? ' 📷' : '';
+                    const line = `${medal}  ⏱ ${formatRecordTime(record.time)}  ${player}  L${record.level}  ${condition}${camera}`;
                     const row = this.add.text(40, y, line, {
                         fontSize: '15px',
                         color: index === 0 ? '#ffd700' : '#ffffff',
                     }).setDepth(depth + 1);
+                    if (record.screenshot) {
+                        const shot = record.screenshot;
+                        row.setInteractive({ useHandCursor: true })
+                            .on('pointerdown', () => this.showRecordScreenshot(shot));
+                    }
                     this.recordsPanel.push(row);
                     y += lineHeight;
                 });
@@ -250,6 +256,52 @@ export default class GameResultScene extends Phaser.Scene {
     private closeRecords() {
         this.recordsPanel.forEach(obj => obj.destroy());
         this.recordsPanel = [];
+    }
+
+    /** Loads (on demand) and shows a record's screenshot full-screen. */
+    private showRecordScreenshot(path: string) {
+        const key = 'recordShot:' + path;
+        if (this.textures.exists(key)) {
+            this.displayScreenshotOverlay(key);
+            return;
+        }
+        this.load.image(key, path);
+        this.load.once('complete', () => this.displayScreenshotOverlay(key));
+        this.load.once('loaderror', () => this.showCopySuccessMessage('스크린샷을 불러오지 못했습니다.', true));
+        this.load.start();
+    }
+
+    private displayScreenshotOverlay(textureKey: string) {
+        const cam = this.cameras.main;
+        const depth = 2000;
+
+        const backdrop = this.add.rectangle(cam.centerX, cam.centerY, cam.width, cam.height, 0x000000, 0.95)
+            .setDepth(depth)
+            .setInteractive();
+        this.recordsPanel.push(backdrop);
+
+        const image = this.add.image(cam.centerX, cam.centerY, textureKey).setDepth(depth + 1);
+        // Fit within the screen while preserving aspect ratio (leave a margin).
+        const scale = Math.min((cam.width * 0.92) / image.width, (cam.height * 0.86) / image.height, 1);
+        image.setScale(scale);
+        this.recordsPanel.push(image);
+
+        const hint = this.add.text(cam.centerX, cam.height - 28, '아무 곳이나 클릭하면 닫힙니다', {
+            fontSize: '15px',
+            color: '#cccccc',
+        }).setOrigin(0.5).setDepth(depth + 1);
+        this.recordsPanel.push(hint);
+
+        // Click the backdrop (or image) to dismiss just this overlay and return
+        // to the leaderboard underneath.
+        const dismiss = () => {
+            backdrop.destroy();
+            image.destroy();
+            hint.destroy();
+            this.recordsPanel = this.recordsPanel.filter(o => o !== backdrop && o !== image && o !== hint);
+        };
+        backdrop.on('pointerdown', dismiss);
+        image.setInteractive({ useHandCursor: true }).on('pointerdown', dismiss);
     }
 
     /**
