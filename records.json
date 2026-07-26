@@ -241,6 +241,47 @@
       "player": "star",
       "date": "2024-11-27",
       "note": "played 2024-11-27 03:48"
+    },
+    {
+      "time": 377701,
+      "level": 15,
+      "powerUps": [
+        "Piercing Projectile",
+        "Stunning Projectile",
+        "Life Steal",
+        "Piercing Projectile",
+        "Piercing Projectile",
+        "Piercing Projectile",
+        "Defense Boost",
+        "Life Steal",
+        "One shot Projectile",
+        "Defense Boost",
+        "Critical Hit Chance",
+        "Life Steal",
+        "Piercing Projectile",
+        "Critical Hit Chance"
+      ],
+      "stats": {
+        "maxHealth": 5000,
+        "moveSpeed": 200,
+        "lifeSteal": 15,
+        "defense": 200,
+        "critChance": 40,
+        "attacks": [
+          "ProjectileAttack P50 S200 R500",
+          "ProjectileAttack P20 S300 R2000",
+          "ProjectileAttack P10 S200 R200",
+          "ProjectileAttack P20 S300 R2000",
+          "ProjectileAttack P20 S300 R2000",
+          "ProjectileAttack P20 S300 R2000",
+          "ProjectileAttack P1000 S500 R150",
+          "ProjectileAttack P20 S300 R2000"
+        ]
+      },
+      "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
+      "player": "boo",
+      "date": "2024-11-28",
+      "note": "played 2024-11-28 13:39 · result screen only — final stats reconstructed from power-ups"
     }
   ]
 }
