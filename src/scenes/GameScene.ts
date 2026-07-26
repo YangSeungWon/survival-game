@@ -549,6 +549,16 @@ export default class GameScene extends Phaser.Scene {
                     experience: this.player!.experience, 
                     isSuccess: isSuccess,
                     powerUps: this.powerUpManager!.selectedPowerUps,
+                    stats: {
+                        maxHealth: this.player!.maxHealth,
+                        moveSpeed: Math.round(this.player!.moveSpeed),
+                        lifeSteal: this.player!.percentLifeSteal,
+                        defense: this.player!.defense,
+                        critChance: this.player!.percentCritChance,
+                        attacks: this.player!.attacks.map(attack =>
+                            `${attack.constructor.name} P${attack.attackPower} S${attack.attackSpeed} R${attack.attackRange}`
+                        )
+                    },
                     screenshot: screenshot // Pass the screenshot
                 }
             });

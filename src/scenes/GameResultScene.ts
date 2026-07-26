@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import GameScene from './GameScene';
 import share from '../utils/share';
+import copyToClipboard from '../utils/copyToClipboard';
+import { RecordEntry, RecordStats, RecordsFile, formatRecordTime, formatCondition, sortRecords } from '../utils/records';
 
 interface GameResultData {
     level: number;
@@ -10,6 +12,7 @@ interface GameResultData {
     experience: number;
     isSuccess: boolean;
     powerUps: string[];
+    stats: RecordStats;
     screenshot: string;
 }
 
@@ -19,6 +22,7 @@ export default class GameResultScene extends Phaser.Scene {
     private resultText!: Phaser.GameObjects.Text;
     private retryButton!: Phaser.GameObjects.Text;
     private shareButton!: Phaser.GameObjects.Text;
+    private recordsPanel: Phaser.GameObjects.GameObject[] = [];
 
     constructor() {
         super({ key: 'GameResultScene' });
@@ -32,6 +36,9 @@ export default class GameResultScene extends Phaser.Scene {
         // Load necessary assets
         this.load.image('background', this.resultData.screenshot);
         this.load.json('version', 'version.json');
+        // Static record archive (curated in records.json). Missing/failed load is
+        // fine — the archive just shows as empty.
+        this.load.json('records', 'records.json');
     }
 
     create() {
@@ -101,6 +108,128 @@ export default class GameResultScene extends Phaser.Scene {
         this.retryButton.setY(this.cameras.main.height - 100);
         this.shareButton.setY(this.cameras.main.height - 160);
         downloadScreenshotButton.setY(this.cameras.main.height - 220);
+
+        // 기록 보관소 버튼 (항상 표시)
+        this.add.text(this.cameras.main.width - 20, 20, '🏆 Records', {
+            fontSize: '24px',
+            color: '#ffd700',
+            backgroundColor: '#000000',
+            padding: { x: 12, y: 6 },
+        })
+            .setOrigin(1, 0)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => this.openRecords());
+
+        // 승리한 경우에만: records.json 에 붙여넣을 기록 항목을 클립보드로 복사
+        if (this.resultData.isSuccess) {
+            this.add.text(this.cameras.main.width - 20, 70, '📋 Copy Record', {
+                fontSize: '24px',
+                color: '#00ff00',
+                backgroundColor: '#000000',
+                padding: { x: 12, y: 6 },
+            })
+                .setOrigin(1, 0)
+                .setInteractive({ useHandCursor: true })
+                .on('pointerdown', () => this.copyRecordEntry());
+        }
+    }
+
+    /**
+     * Opens the record archive overlay: wins sorted fastest-first, showing each
+     * run's clear time and its condition (power-up build, or final stats).
+     */
+    private openRecords() {
+        this.closeRecords();
+        const cam = this.cameras.main;
+        const depth = 1000;
+
+        const overlay = this.add.rectangle(cam.centerX, cam.centerY, cam.width, cam.height, 0x000000, 0.88)
+            .setDepth(depth)
+            .setInteractive();
+        this.recordsPanel.push(overlay);
+
+        const title = this.add.text(cam.centerX, 30, '🏆 기록 보관소 · Fastest Clears', {
+            fontSize: '28px',
+            color: '#ffd700',
+        }).setOrigin(0.5, 0).setDepth(depth + 1);
+        this.recordsPanel.push(title);
+
+        const data = this.cache.json.get('records') as RecordsFile | undefined;
+        const records = sortRecords(data?.records ?? []);
+
+        if (records.length === 0) {
+            const empty = this.add.text(
+                cam.centerX,
+                cam.centerY - 40,
+                '아직 기록이 없습니다.\n승리 후 [📋 Copy Record]로 JSON을 복사해\nrecords.json 의 "records" 배열에 추가하고 커밋하세요.',
+                { fontSize: '18px', color: '#ffffff', align: 'center' }
+            ).setOrigin(0.5).setDepth(depth + 1);
+            this.recordsPanel.push(empty);
+        } else {
+            const maxRows = 14;
+            const startY = 90;
+            const rowHeight = 30;
+            records.slice(0, maxRows).forEach((record, index) => {
+                const condition = this.truncate(formatCondition(record), 78);
+                const line = `#${index + 1}  ⏱ ${formatRecordTime(record.time)}   ${condition}`;
+                const row = this.add.text(30, startY + index * rowHeight, line, {
+                    fontSize: '15px',
+                    color: index === 0 ? '#ffd700' : '#ffffff',
+                }).setDepth(depth + 1);
+                this.recordsPanel.push(row);
+            });
+
+            if (records.length > maxRows) {
+                const more = this.add.text(30, startY + maxRows * rowHeight, `… +${records.length - maxRows} more`, {
+                    fontSize: '14px',
+                    color: '#aaaaaa',
+                }).setDepth(depth + 1);
+                this.recordsPanel.push(more);
+            }
+        }
+
+        const closeButton = this.add.text(cam.centerX, cam.height - 60, 'Close', {
+            fontSize: '24px',
+            color: '#ffffff',
+            backgroundColor: '#0000ef',
+            padding: { x: 20, y: 10 },
+        })
+            .setOrigin(0.5)
+            .setDepth(depth + 1)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => this.closeRecords());
+        this.recordsPanel.push(closeButton);
+    }
+
+    private closeRecords() {
+        this.recordsPanel.forEach(obj => obj.destroy());
+        this.recordsPanel = [];
+    }
+
+    /**
+     * Copies the current (winning) run as a JSON entry ready to paste into the
+     * "records" array of records.json.
+     */
+    private async copyRecordEntry() {
+        const entry: RecordEntry = {
+            time: Math.floor(this.resultData.time),
+            level: this.resultData.level,
+            powerUps: this.resultData.powerUps,
+            stats: this.resultData.stats,
+            player: '',
+            date: new Date().toISOString().slice(0, 10),
+            note: '',
+        };
+        const json = JSON.stringify(entry, null, 2);
+        const copied = await copyToClipboard(json);
+        this.showCopySuccessMessage(
+            copied ? 'Record JSON copied — paste into records.json' : 'Failed to copy record.',
+            !copied
+        );
+    }
+
+    private truncate(text: string, max: number): string {
+        return text.length > max ? text.slice(0, max - 1) + '…' : text;
     }
 
     update(time: number, delta: number) {
