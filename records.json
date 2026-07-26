@@ -139,6 +139,30 @@
       "player": "ysw",
       "date": "2024-12-05",
       "note": "played 2024-12-05 13:52 · power-up list not captured (condition shown from final stats)"
+    },
+    {
+      "time": 176547,
+      "level": 15,
+      "powerUps": [],
+      "stats": {
+        "maxHealth": 5000,
+        "moveSpeed": 200,
+        "lifeSteal": 10,
+        "defense": 400,
+        "critChance": 0,
+        "attacks": [
+          "ProjectileAttack P50 S200 R500",
+          "ProjectileAttack P1000 S500 R150",
+          "ProjectileAttack P1000 S500 R150",
+          "AreaOfEffectAttack P0 S100 R130",
+          "AreaOfEffectAttack P0 S100 R130",
+          "MeleeAttack P1000 S1500 R100"
+        ]
+      },
+      "commit": "d1a2a255f204b1092a2c01de4baaaa5d1f7e006a",
+      "player": "ysw",
+      "date": "2025-04-04",
+      "note": "played 2025-04-04 16:52 · different balance commit · 9 attacks total (only 6 captured), power-up list not captured"
     }
   ]
 }
