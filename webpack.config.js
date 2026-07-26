@@ -45,6 +45,7 @@ module.exports = {
       patterns: [
         { from: 'version.json', to: 'version.json' },
         { from: 'records.json', to: 'records.json' },
+        { from: 'records.html', to: 'records.html', noErrorOnMissing: true },
         { from: 'robots.txt', to: 'robots.txt' },
         { from: 'sitemap.xml', to: 'sitemap.xml' },
       ],

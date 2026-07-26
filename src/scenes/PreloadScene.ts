@@ -101,5 +101,19 @@ export default class PreloadScene extends Phaser.Scene {
             .on('pointerdown', () => {
                 this.scene.start('PowerUpAndAttackStatsScene');
             });
+
+        // Add Records (leaderboard) Button — a static HTML page (records.html)
+        const recordsButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 340, '🏆 Records', {
+            fontSize: '32px',
+            color: '#000000',
+            backgroundColor: '#ffd700',
+            padding: { x: 20, y: 10 },
+            fontFamily: '"Noto Sans", sans-serif'
+        })
+        .setOrigin(0.5)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                window.location.href = 'records.html';
+            });
     }
 }

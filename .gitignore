@@ -40,6 +40,10 @@ scripts/debug.bat
 scripts/run.bat
 scripts/**/*.js
 scripts/**/*.js.map
+!scripts/build-records.js
+
+# Generated from records.json at build time (npm prebuild/prestart)
+records.html
 coverage/
 internal/
 **/.DS_Store
