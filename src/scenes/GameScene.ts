@@ -17,6 +17,7 @@ import { createEnemyTexture, createMissileTexture, createTrackingMissileTexture 
 import BeamShooterEnemy from '../sprites/enemies/BeamShooterEnemy';
 import EnemyPool from '../utils/EnemyPool';
 import GameResultScene from './GameResultScene';
+import { t, localizePowerUpName, localizeAttackName } from '../utils/i18n';
 
 export default class GameScene extends Phaser.Scene {
     elapsedTimeMillis: number;
@@ -221,16 +222,19 @@ export default class GameScene extends Phaser.Scene {
 
         this.cursors = this.input.keyboard!.createCursorKeys() ? this.input.keyboard!.createCursorKeys() : null;
 
-        this.healthText = this.add.text(16, 10, `Health: ${this.player.health}/${this.player.maxHealth}`, { ...this.defaultTextStyle, color: '#f00' })
+        this.healthText = this.add.text(16, 10, `${t('health')}: ${this.player.health}/${this.player.maxHealth}`, { ...this.defaultTextStyle, color: '#f00' })
             .setScrollFactor(0)
             .setDepth(this.depthManager.getDepth(DepthLayer.UI));
-        this.playerStatsText = this.add.text(16, this.cameras.main.height - 200, '', { ...this.defaultTextStyle, fontSize: '12px' })
+        // Bottom-left anchored (origin y = 1) so the block grows upward as more
+        // stats/attacks are added and never runs off the bottom of the screen.
+        this.playerStatsText = this.add.text(16, this.cameras.main.height - 16, '', { ...this.defaultTextStyle, fontSize: '12px' })
+            .setOrigin(0, 1)
             .setScrollFactor(0)
             .setDepth(this.depthManager.getDepth(DepthLayer.UI));
-        this.timeText = this.add.text(16, 44, 'Time: 0:00', this.defaultTextStyle)
+        this.timeText = this.add.text(16, 44, `${t('time')}: 0:00`, this.defaultTextStyle)
             .setScrollFactor(0)
             .setDepth(this.depthManager.getDepth(DepthLayer.UI));
-        this.experienceText = this.add.text(16, 78, 'XP: 0', { ...this.defaultTextStyle, color: '#00ff00' })
+        this.experienceText = this.add.text(16, 78, `${t('xp')}: 0`, { ...this.defaultTextStyle, color: '#00ff00' })
             .setScrollFactor(0)
             .setDepth(this.depthManager.getDepth(DepthLayer.UI));
         this.fpsText = this.add.text(this.cameras.main.width / 2, 8, 'FPS: 0', { ...this.defaultTextStyle, fontSize: '12px' })
@@ -255,7 +259,7 @@ export default class GameScene extends Phaser.Scene {
         this.experienceBar.setDepth(this.depthManager.getDepth(DepthLayer.UI)); // Set depth for experience bar
         this.updateExperienceRelatedUI();
 
-        this.powerUpText = this.add.text(100, 220, 'Power-Ups:', { fontSize: '16px', color: '#ffffff' });
+        this.powerUpText = this.add.text(100, 220, `${t('powerUps')}:`, { fontSize: '16px', color: '#ffffff' });
         this.powerUpText.setDepth(this.depthManager.getDepth(DepthLayer.UI));
         this.powerUpText.setVisible(false);
 
@@ -340,6 +344,8 @@ export default class GameScene extends Phaser.Scene {
 
     private updateCommitHashPosition(gameSize: Phaser.Structs.Size) {
         this.commitHashText.setPosition(gameSize.width - 10, gameSize.height - 10);
+        // Keep the bottom-anchored stats block pinned to the bottom-left on resize.
+        this.playerStatsText?.setPosition(16, gameSize.height - 16);
     }
 
     createEnemies() {
@@ -442,19 +448,26 @@ export default class GameScene extends Phaser.Scene {
 
         // Update player stats text
         var statsText = '';
-        statsText += `Level: ${this.player!.level}\n`;
+        statsText += `${t('level')}: ${this.player!.level}\n`;
         if (this.boss) {
-            statsText += `Boss Health: ${this.boss!.health}/${this.boss!.maxHealth}\n`;
+            statsText += `${t('bossHealth')}: ${this.boss!.health}/${this.boss!.maxHealth}\n`;
         }
-        statsText += `XP Threshold: ${this.player!.experienceThreshold}\n`;
-        statsText += `Enemy Spawn Interval: ${this.enemySpawnInterval}\n`;
-        statsText += `Move Speed: ${this.player!.moveSpeed}\n`;
-        statsText += `Life Steal (%): ${this.player!.percentLifeSteal}\n`;
-        statsText += `Defense: ${this.player!.defense}\n`;
-        statsText += `Critical Hit Chance (%): ${this.player!.percentCritChance}\n`;
-        statsText += `Attacks: ${this.player!.attacks.length}`;
+        statsText += `${t('xpThreshold')}: ${this.player!.experienceThreshold}\n`;
+        statsText += `${t('spawnInterval')}: ${this.enemySpawnInterval}\n`;
+        statsText += `${t('moveSpeed')}: ${this.player!.moveSpeed}\n`;
+        statsText += `${t('lifeSteal')}: ${this.player!.percentLifeSteal}\n`;
+        statsText += `${t('defense')}: ${this.player!.defense}\n`;
+        statsText += `${t('critChance')}: ${this.player!.percentCritChance}\n`;
+        statsText += `${t('attacks')}: ${this.player!.attacks.length}`;
+        // Group identical attacks as "…  ×N" so the list stays short when the
+        // player stacks many copies of the same attack.
+        const attackCounts = new Map<string, number>();
         for (const attack of this.player!.attacks) {
-            statsText += `\n\t- ${attack.constructor.name} P${attack.attackPower} S${attack.attackSpeed} R${attack.attackRange}`;
+            const key = `${localizeAttackName(attack.constructor.name)} P${attack.attackPower} S${attack.attackSpeed} R${attack.attackRange}`;
+            attackCounts.set(key, (attackCounts.get(key) ?? 0) + 1);
+        }
+        for (const [key, count] of attackCounts) {
+            statsText += `\n\t- ${key}${count > 1 ? ` ×${count}` : ''}`;
         }
         this.playerStatsText!.setText(statsText);
 
@@ -468,7 +481,7 @@ export default class GameScene extends Phaser.Scene {
         const ms = Math.floor(this.elapsedTimeMillis % 1000);
 
         // Update time text
-        this.timeText!.setText(`Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}:${ms < 100 ? ms < 10 ? '00' : '0' : ''}${ms}`);
+        this.timeText!.setText(`${t('time')}: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}:${ms < 100 ? ms < 10 ? '00' : '0' : ''}${ms}`);
 
         if (this.boss) {
             this.updateBossHealthRelatedUI();
@@ -490,11 +503,11 @@ export default class GameScene extends Phaser.Scene {
     }
 
     updateHealthText() {
-        this.healthText!.setText(`Health: ${this.player!.health}/${this.player!.maxHealth}`);
+        this.healthText!.setText(`${t('health')}: ${this.player!.health}/${this.player!.maxHealth}`);
     }
 
     updateExperienceText() {
-        this.experienceText!.setText(`XP: ${this.player!.experience}`);
+        this.experienceText!.setText(`${t('xp')}: ${this.player!.experience}`);
     }
 
     updateHealthBar() {
@@ -637,9 +650,9 @@ export default class GameScene extends Phaser.Scene {
     }
 
     showPowerUps() {
-        let text = 'Power-Ups:\n';
+        let text = `${t('powerUps')}:\n`;
         this.powerUpManager!.selectedPowerUps.forEach((powerUp, index) => {
-            text += `• ${powerUp}\n`;
+            text += `• ${localizePowerUpName(powerUp)}\n`;
         });
         this.powerUpText!.setText(text);
 

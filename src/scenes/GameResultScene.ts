@@ -3,6 +3,8 @@ import GameScene from './GameScene';
 import share from '../utils/share';
 import copyToClipboard from '../utils/copyToClipboard';
 import { RecordEntry, RecordStats } from '../utils/records';
+import { pageHref } from '../utils/locale';
+import { t, localizePowerUpName } from '../utils/i18n';
 
 interface GameResultData {
     level: number;
@@ -44,7 +46,7 @@ export default class GameResultScene extends Phaser.Scene {
         this.background.displayHeight = this.cameras.main.height;
 
         // 결과 텍스트 표시
-        const resultMessage = this.resultData.isSuccess ? 'You Win!' : 'Game Over';
+        const resultMessage = this.resultData.isSuccess ? t('youWin') : t('gameOver');
         this.resultText = this.add.text(this.cameras.main.centerX, 100, resultMessage, {
             fontSize: '48px',
             color: '#ffffff'
@@ -54,21 +56,21 @@ export default class GameResultScene extends Phaser.Scene {
         const versionData = this.cache.json.get('version') as { commitHash: string };
         const commitHash = versionData?.commitHash || 'Unknown';
         this.add.text(50, 170, `Commit: ${commitHash}`, { fontSize: '16px', color: '#ffffff' });
-        this.add.text(50, 200, `Level: ${this.resultData.level}`, { fontSize: '24px', color: '#ffffff' });
-        this.add.text(50, 230, `Time: ${this.formatTime(this.resultData.time)}`, { fontSize: '24px', color: '#ffffff' });
-        this.add.text(50, 260, `Experience: ${this.resultData.experience}`, { fontSize: '24px', color: '#ffffff' });
+        this.add.text(50, 200, `${t('level')}: ${this.resultData.level}`, { fontSize: '24px', color: '#ffffff' });
+        this.add.text(50, 230, `${t('time')}: ${this.formatTime(this.resultData.time)}`, { fontSize: '24px', color: '#ffffff' });
+        this.add.text(50, 260, `${t('experience')}: ${this.resultData.experience}`, { fontSize: '24px', color: '#ffffff' });
         if (this.resultData.bossHealth) {
-            this.add.text(50, 290, `Boss Health: ${this.resultData.bossHealth}/${this.resultData.bossMaxHealth}`, { fontSize: '24px', color: '#ffffff' });
+            this.add.text(50, 290, `${t('bossHealth')}: ${this.resultData.bossHealth}/${this.resultData.bossMaxHealth}`, { fontSize: '24px', color: '#ffffff' });
         }
 
         // 파워업 표시
-        this.add.text(50, 320, 'Power-Ups:', { fontSize: '20px', color: '#ffffff' });
+        this.add.text(50, 320, `${t('powerUps')}:`, { fontSize: '20px', color: '#ffffff' });
         this.resultData.powerUps.forEach((powerUp, index) => {
-            this.add.text(100, 350 + index * 25, `• ${powerUp}`, { fontSize: '16px', color: '#ffffff' });
+            this.add.text(100, 350 + index * 25, `• ${localizePowerUpName(powerUp)}`, { fontSize: '16px', color: '#ffffff' });
         });
 
         // 리트라이 버튼 추가
-        this.retryButton = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 100, 'Retry', {
+        this.retryButton = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 100, t('retry'), {
             fontSize: '32px',
             color: '#ffffff',
             backgroundColor: '#0000ef',
@@ -79,7 +81,7 @@ export default class GameResultScene extends Phaser.Scene {
             .on('pointerdown', () => this.retryGame());
 
         // 일반 공유 버튼 추가
-        this.shareButton = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 160, 'Share', {
+        this.shareButton = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 160, t('share'), {
             fontSize: '32px',
             color: '#0000ef',
             backgroundColor: '#ffffff',
@@ -90,7 +92,7 @@ export default class GameResultScene extends Phaser.Scene {
             .on('pointerdown', () => this.shareResult());
 
         // 스크린샷 다운로드 버튼 추가
-        const downloadScreenshotButton = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 220, 'Download Screenshot', {
+        const downloadScreenshotButton = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 220, t('downloadScreenshot'), {
             fontSize: '32px',
             color: '#000000',
             backgroundColor: '#ffffff',
@@ -106,7 +108,7 @@ export default class GameResultScene extends Phaser.Scene {
         downloadScreenshotButton.setY(this.cameras.main.height - 220);
 
         // 기록 보관소 버튼 (항상 표시) → 정적 HTML 리더보드 페이지로 이동
-        this.add.text(this.cameras.main.width - 20, 20, '🏆 Records', {
+        this.add.text(this.cameras.main.width - 20, 20, t('records'), {
             fontSize: '24px',
             color: '#ffd700',
             backgroundColor: '#000000',
@@ -114,11 +116,11 @@ export default class GameResultScene extends Phaser.Scene {
         })
             .setOrigin(1, 0)
             .setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => { window.location.href = 'records.html'; });
+            .on('pointerdown', () => { window.location.href = pageHref('records.html'); });
 
         // 승리한 경우에만: records.json 에 붙여넣을 기록 항목을 클립보드로 복사
         if (this.resultData.isSuccess) {
-            this.add.text(this.cameras.main.width - 20, 70, '📋 Copy Record', {
+            this.add.text(this.cameras.main.width - 20, 70, t('copyRecord'), {
                 fontSize: '24px',
                 color: '#00ff00',
                 backgroundColor: '#000000',
@@ -149,7 +151,7 @@ export default class GameResultScene extends Phaser.Scene {
         const json = JSON.stringify(entry, null, 2);
         const copied = await copyToClipboard(json);
         this.showCopySuccessMessage(
-            copied ? 'Record JSON copied — paste into records.json' : 'Failed to copy record.',
+            copied ? t('recordCopied') : t('recordCopyFailed'),
             !copied
         );
     }
@@ -183,19 +185,21 @@ export default class GameResultScene extends Phaser.Scene {
 
         const isShared = await share(shareData);
         if (isShared === 'shared' || isShared === 'copiedToClipboard') {
-            this.showCopySuccessMessage('Share text copied to clipboard!');
+            this.showCopySuccessMessage(t('shareCopied'));
         } else {
-            this.showCopySuccessMessage('Failed to copy share text.', true);
+            this.showCopySuccessMessage(t('shareFailed'), true);
         }
     }
 
     private getShareText(): string {
         const { level, time, experience, isSuccess, powerUps } = this.resultData;
-        const resultMessage = '[Survival Game Result]\n' + (isSuccess ? 'I won!' : 'I was defeated.');
+        const resultMessage = isSuccess ? t('shareResultWin') : t('shareResultLose');
         const formattedTime = this.formatTime(time);
-        const powerUpsText = powerUps.length > 0 ? powerUps.join(', ') : 'No power-ups';
+        const powerUpsText = powerUps.length > 0
+            ? powerUps.map(p => localizePowerUpName(p)).join(', ')
+            : t('noPowerUps');
 
-        return `${resultMessage}\nLevel: ${level}\nTime: ${formattedTime}\nExperience: ${experience}\nPower-Ups: ${powerUpsText}\n`;
+        return `${resultMessage}\n${t('level')}: ${level}\n${t('time')}: ${formattedTime}\n${t('experience')}: ${experience}\n${t('powerUps')}: ${powerUpsText}\n`;
     }
 
     private showCopySuccessMessage(message: string, isError: boolean = false) {

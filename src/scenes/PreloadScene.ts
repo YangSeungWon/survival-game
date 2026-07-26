@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import GameScene from './GameScene';
+import { pageHref } from '../utils/locale';
+import { t } from '../utils/i18n';
 
 export default class PreloadScene extends Phaser.Scene {
     constructor() {
@@ -52,7 +54,7 @@ export default class PreloadScene extends Phaser.Scene {
             fontFamily: '"Noto Sans", sans-serif'
         }).setOrigin(0.5).setStroke('#000000', 10);
 
-        this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 100, 'Click Anywhere to Play', {
+        this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 100, t('clickToPlay'), {
             fontSize: '36px',
             color: '#ffffff',
             fontFamily: '"Noto Sans", sans-serif'
@@ -76,7 +78,7 @@ export default class PreloadScene extends Phaser.Scene {
 
         // Add How to Play Button — static HTML guide (howto.html), which now
         // covers the enemy and power-up/attack reference too.
-        const howToButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 200, '📖 How to Play', {
+        const howToButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 200, t('howToPlay'), {
             fontSize: '32px',
             color: '#ffffff',
             backgroundColor: '#0000ef',
@@ -86,11 +88,11 @@ export default class PreloadScene extends Phaser.Scene {
         .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                window.location.href = 'howto.html';
+                window.location.href = pageHref('howto.html');
             });
 
         // Add Records (leaderboard) Button — a static HTML page (records.html)
-        const recordsButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 270, '🏆 Records', {
+        const recordsButton = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 270, t('records'), {
             fontSize: '32px',
             color: '#000000',
             backgroundColor: '#ffd700',
@@ -100,7 +102,7 @@ export default class PreloadScene extends Phaser.Scene {
         .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                window.location.href = 'records.html';
+                window.location.href = pageHref('records.html');
             });
     }
 }

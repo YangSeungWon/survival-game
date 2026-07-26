@@ -33,8 +33,12 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html', // Ensure this path is correct
+      template: './src/index.html', // Korean game page (served at /)
       filename: 'index.html', // Output filename in the dist directory
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/index.en.html', // English game page (served at /en/)
+      filename: 'en/index.html',
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -47,6 +51,7 @@ module.exports = {
         { from: 'records.json', to: 'records.json' },
         { from: 'records.html', to: 'records.html', noErrorOnMissing: true },
         { from: 'howto.html', to: 'howto.html', noErrorOnMissing: true },
+        { from: 'en', to: 'en', noErrorOnMissing: true },
         { from: 'robots.txt', to: 'robots.txt' },
         { from: 'sitemap.xml', to: 'sitemap.xml' },
       ],

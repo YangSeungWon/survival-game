@@ -11,6 +11,7 @@ import { AreaOfEffectAttackConfig } from '../attacks/AreaOfEffectAttack';
 import DepthManager, { DepthLayer } from './DepthManager';
 import BeamAttack, { BeamAttackConfig } from '../attacks/BeamAttack';
 import { PlayerAttackStats } from './PlayerAttackStats';
+import { t, localizePowerUp } from './i18n';
 
 export interface PowerUp {
     name: string;
@@ -133,7 +134,7 @@ export default class PowerUpManager {
         const title = this.scene.add.text(
             centerX, 
             centerY - 160, 
-            `Level ${level}! Choose a Power-Up:`, 
+            t('chooseUpgrade', { level }),
             { fontSize: '24px', color: '#000000' }
         ).setOrigin(0.5)
           .setDepth(this.depthManager.getDepth(DepthLayer.UI));
@@ -158,10 +159,11 @@ export default class PowerUpManager {
             button.setStrokeStyle(2, 0x000000);
             button.setData('powerUp', true);
 
+            const display = localizePowerUp(powerUp.name, powerUp.description);
             const buttonText = this.scene.add.text(
-                centerX, 
-                buttonY - 20, 
-                `${index + 1}: ${powerUp.name}`, 
+                centerX,
+                buttonY - 20,
+                `${index + 1}: ${display.name}`,
                 { fontSize: '20px', color: '#000000' }
             ).setOrigin(0.5)
               .setDepth(this.depthManager.getDepth(DepthLayer.UI) + 1);
@@ -170,7 +172,7 @@ export default class PowerUpManager {
             const descriptionText = this.scene.add.text(
                 centerX,
                 buttonY + 15,
-                powerUp.description,
+                display.desc,
                 { 
                     fontSize: '16px', 
                     color: '#000000', 
@@ -209,9 +211,9 @@ export default class PowerUpManager {
         cancelButton.setData('powerUp', true);
 
         const cancelText = this.scene.add.text(
-            centerX, 
-            cancelY, 
-            'Cancel', 
+            centerX,
+            cancelY,
+            t('cancel'),
             { fontSize: '18px', color: '#ffffff' }
         ).setOrigin(0.5)
           .setDepth(this.depthManager.getDepth(DepthLayer.UI) + 1);
