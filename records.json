@@ -35,9 +35,10 @@
           "AreaOfEffectAttack P0 S100 R130"
         ]
       },
+      "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
       "player": "ysw",
       "date": "2024-11-26",
-      "note": "commit e5c7683 · played 2024-11-26 20:46"
+      "note": "played 2024-11-26 20:46"
     },
     {
       "time": 300931,
@@ -74,9 +75,10 @@
           "ProjectileAttack P10 S200 R200"
         ]
       },
+      "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
       "player": "ysw",
       "date": "2024-11-28",
-      "note": "commit e5c7683 · played 2024-11-28 12:41"
+      "note": "played 2024-11-28 12:41"
     },
     {
       "time": 2296993,
@@ -108,9 +110,35 @@
           "ProjectileAttack P50 S200 R500"
         ]
       },
+      "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
       "player": "ysw",
       "date": "2024-11-28",
-      "note": "commit e5c7683 · played 2024-11-28 23:31 · no attack power-ups (crit-only build)"
+      "note": "played 2024-11-28 23:31 · no attack power-ups (crit-only build)"
+    },
+    {
+      "time": 175433,
+      "level": 15,
+      "powerUps": [],
+      "stats": {
+        "maxHealth": 5000,
+        "moveSpeed": 200,
+        "lifeSteal": 10,
+        "defense": 400,
+        "critChance": 20,
+        "attacks": [
+          "ProjectileAttack P50 S200 R500",
+          "ProjectileAttack P1000 S500 R150",
+          "AreaOfEffectAttack P0 S100 R130",
+          "AreaOfEffectAttack P0 S100 R130",
+          "AreaOfEffectAttack P0 S100 R130",
+          "AreaOfEffectAttack P0 S100 R130",
+          "AreaOfEffectAttack P0 S100 R130"
+        ]
+      },
+      "commit": "e5c7683ba8ff54439cd817b58bf14e7d380ad8eb",
+      "player": "ysw",
+      "date": "2024-12-05",
+      "note": "played 2024-12-05 13:52 · power-up list not captured (condition shown from final stats)"
     }
   ]
 }

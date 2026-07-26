@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import GameScene from './GameScene';
 import share from '../utils/share';
 import copyToClipboard from '../utils/copyToClipboard';
-import { RecordEntry, RecordStats, RecordsFile, formatRecordTime, formatCondition, sortRecords } from '../utils/records';
+import { RecordEntry, RecordStats, RecordsFile, formatRecordTime, formatCondition, sortRecords, shortCommit } from '../utils/records';
 
 interface GameResultData {
     level: number;
@@ -170,8 +170,10 @@ export default class GameResultScene extends Phaser.Scene {
             const startY = 90;
             const rowHeight = 30;
             records.slice(0, maxRows).forEach((record, index) => {
-                const condition = this.truncate(formatCondition(record), 78);
-                const line = `#${index + 1}  ⏱ ${formatRecordTime(record.time)}   ${condition}`;
+                const condition = this.truncate(formatCondition(record), 72);
+                const commit = shortCommit(record.commit);
+                const commitTag = commit ? ` @${commit}` : '';
+                const line = `#${index + 1}  ⏱ ${formatRecordTime(record.time)}${commitTag}   ${condition}`;
                 const row = this.add.text(30, startY + index * rowHeight, line, {
                     fontSize: '15px',
                     color: index === 0 ? '#ffd700' : '#ffffff',
@@ -211,11 +213,13 @@ export default class GameResultScene extends Phaser.Scene {
      * "records" array of records.json.
      */
     private async copyRecordEntry() {
+        const versionData = this.cache.json.get('version') as { commitHash: string } | undefined;
         const entry: RecordEntry = {
             time: Math.floor(this.resultData.time),
             level: this.resultData.level,
             powerUps: this.resultData.powerUps,
             stats: this.resultData.stats,
+            commit: versionData?.commitHash || '',
             player: '',
             date: new Date().toISOString().slice(0, 10),
             note: '',

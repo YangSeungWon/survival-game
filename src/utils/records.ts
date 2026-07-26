@@ -25,6 +25,8 @@ export interface RecordEntry {
     level: number;
     powerUps: string[];
     stats: RecordStats;
+    commit?: string;     // git commit hash the run was played on — records are only
+                         // comparable within the same commit (balance patches change times)
     player?: string;
     date?: string;       // YYYY-MM-DD
     note?: string;
@@ -32,6 +34,11 @@ export interface RecordEntry {
 
 export interface RecordsFile {
     records: RecordEntry[];
+}
+
+/** Short 7-char commit hash for display (empty string if unknown). */
+export function shortCommit(commit?: string): string {
+    return commit ? commit.slice(0, 7) : '';
 }
 
 /** Formats a clear time as `m:ss.mmm`. */
